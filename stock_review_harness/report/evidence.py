@@ -10,6 +10,9 @@ from __future__ import annotations
 import json
 from datetime import datetime
 
+from ..data.validate import validate_bundle
+from ..logic.conditions import leader_ma_distances, quantify
+from ..logic.diagnostics import diagnose
 from ..models import DataBundle
 
 
@@ -68,6 +71,11 @@ def _market_section(bundle: DataBundle) -> dict:
                 "ratio_pct": _f(b.turnover_ratio),
                 "change_pct": _f(b.change_pct),
                 "main_flow_yi": _f(b.main_flow),
+                "main_flow_turnover_pct": (
+                    _f(abs(b.main_flow) / b.turnover * 100)
+                    if b.main_flow is not None and b.turnover
+                    else None
+                ),
                 "limit_ups": b.limit_ups,
             }
             for b in top_boards
@@ -146,10 +154,12 @@ def _leaders_candidates(bundle: DataBundle) -> list[dict]:
     m = bundle.market
     enriched = {l.code: l for l in m.leaders}
     zt_codes = {s.get("code") for s in m.zt_pool}
+    ma_dists = leader_ma_distances(bundle)
     top = sorted(m.zt_pool, key=lambda s: s.get("amount") or 0, reverse=True)[:10]
     out = []
     for s in top:
         e = enriched.get(s.get("code"))
+        md = ma_dists.get(s.get("code")) or {}
         # 涨停池个股以涨停价收盘是强封信号，不适用"尾盘企稳"这类非涨停描述
         tail = "涨停封板" if s.get("code") in zt_codes else (e.tail_behavior if e else None)
         out.append(
@@ -166,6 +176,8 @@ def _leaders_candidates(bundle: DataBundle) -> list[dict]:
                 "close": e.close if e else None,
                 "ma5": e.ma5 if e else None,
                 "ma10": e.ma10 if e else None,
+                "ma5_dist_pct": md.get("ma5_dist_pct"),
+                "ma10_dist_pct": md.get("ma10_dist_pct"),
                 "main_flow_yi": e.main_flow if e else None,
                 "tail_behavior": tail,
             }
@@ -207,11 +219,14 @@ def to_evidence_dict(bundle: DataBundle) -> dict:
                 *bundle.market.notes,
             ],
             "data_gaps": _data_gaps(bundle),
+            "anomalies": validate_bundle(bundle),
         },
         "market": _market_section(bundle),
         "emotion": _emotion_section(bundle),
         "leaders_candidates": _leaders_candidates(bundle),
         "high_ladder_stocks": _high_ladder_stocks(bundle),
+        "diagnostics": diagnose(bundle),
+        "quantified": quantify(bundle),
     }
 
 

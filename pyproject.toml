@@ -9,4 +9,9 @@ description = "A 股四步深度复盘引擎（资金-锚点-周期-策略），
 requires-python = ">=3.10"
 
 [tool.setuptools]
-packages = ["stock_review_harness", "stock_review_harness.data", "stock_review_harness.report"]
+packages = [
+    "stock_review_harness",
+    "stock_review_harness.data",
+    "stock_review_harness.logic",
+    "stock_review_harness.report",
+]

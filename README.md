@@ -76,6 +76,12 @@ python3 tools/build_llm_prompt.py evidence.json > prompt.md
 - `leaders_candidates.industry` 为东财涨停池行业标签，可能只反映次要属性，板块归属
   需结合主营判断；涨停池个股尾盘统一标注"涨停封板"；
 - `meta.data_gaps`：显式列出数据缺口（如北向未披露），LLM 不得编造；
+- `meta.anomalies`：**数据核验**拦截的异常（如主力净流入占板块成交 >30%、成交环比
+  >±50%），LLM 不得直接采信，报告中标注"数据异常（未采信）"；
+- `diagnostics`：**矛盾诊断**——确定性识别数据张力（封板率高 vs 晋级率低、板块涨 vs
+  主力流出、指数涨 vs 高度独苗），LLM 须逐条调和；
+- `quantified`：**量化条件变量**——中军候选距 MA5/MA10 的百分比、板块主力流入强度，
+  操作条件必须引用硬阈值（如"回踩至 MA5±2%""主力净流入为正"），禁止模糊表述；
 - LLM 输出中的每个数字都可回查 `evidence.json` 做防幻觉校验。
 
 ### A/B 对抗式辩论（质量把关）

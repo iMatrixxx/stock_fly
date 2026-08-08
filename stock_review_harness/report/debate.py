@@ -29,8 +29,9 @@ def _norm_num(s: str) -> str:
 
 
 def _collect_evidence_numbers(evidence: dict) -> set[str]:
-    """证据链中所有数值的归一化字符串集合。"""
+    """证据链中所有数值的归一化字符串集合（含字符串字段里出现的数字）。"""
     out: set[str] = set()
+    _NUM_RE = re.compile(r"-?\d+(?:\.\d+)?")
 
     def walk(v):
         if isinstance(v, dict):
@@ -41,6 +42,9 @@ def _collect_evidence_numbers(evidence: dict) -> set[str]:
                 walk(x)
         elif isinstance(v, (int, float)) and not isinstance(v, bool):
             out.add(_norm_num(str(v)))
+        elif isinstance(v, str):
+            for tok in _NUM_RE.findall(v):
+                out.add(_norm_num(tok))
 
     walk(evidence)
     return out
@@ -71,6 +75,8 @@ def _is_benign(tok: str, report: str) -> bool:
             return True
         if "进" in before:                        # 晋级层级名（10进11、1进2）
             return True
+        if any(op in before for op in (">", "<", "≥", "≤", "以上", "以下")):  # 触发条件阈值
+            return True
         start = idx + len(tok)
     return False
 
@@ -78,10 +84,16 @@ def _is_benign(tok: str, report: str) -> bool:
 def verify_report_numbers(report_md: str, evidence: dict) -> dict:
     """把报告中的数字与证据链比对，返回 {total, suspects}（数据辩论裁决）。"""
     ev_nums = _collect_evidence_numbers(evidence)
+    ev_nums_abs = {n.lstrip("-") for n in ev_nums}  # 符号不敏感（净流出 22.11 ≡ -22.11）
     tokens = re.findall(r"-?\d+(?:\.\d+)?", report_md)
     suspects: list[str] = []
     for tok in tokens:
-        if tok in ev_nums or _norm_num(tok) in ev_nums or _norm_num(tok).lstrip("-") in ev_nums:
+        norm = _norm_num(tok)
+        if (
+            tok in ev_nums
+            or norm in ev_nums
+            or norm.lstrip("-") in ev_nums_abs
+        ):
             continue
         if _is_benign(tok, report_md):
             continue
