@@ -1,0 +1,495 @@
+{
+  "meta": {
+    "date": "2026-08-05",
+    "generated_at": "2026-08-08T09:38:43",
+    "note": "本 JSON 仅包含数据与确定性聚合，不含交易判断；请由 LLM 基于数据独立完成四步分析并撰写报告。注意：leaders_candidates 的 industry 为东财涨停池行业标签，可能只反映次要属性，板块归属需结合个股主营判断；涨停池个股尾盘行为统一标注为『涨停封板』。",
+    "data_sources": [
+      "大班客：https://dabanke.com/index-20260805.html",
+      "数据源：同花顺日线（指数/板块成交额）+ 东方财富涨停/跌停池 + 腾讯个股K线 + 新浪个股资金流；板块主力净流入：东财行业板块主力净流入命中 86/90 个板块；中军尾盘行为取自东财分钟线（近 3 个交易日内可得）",
+      "北向资金日频净买入未披露；涨停池口径为东财（103 家），跌停 1 家"
+    ],
+    "data_gaps": [
+      "北向资金日频净买入自 2024-08-19 起未披露，不得编造北向数据"
+    ]
+  },
+  "market": {
+    "total_turnover_yi": 26596.35,
+    "prev_total_turnover_yi": 22135.92,
+    "turnover_change_pct": 20.15,
+    "indices": [
+      {
+        "name": "沪深300",
+        "close": 4658.15,
+        "change_pct": 1.24,
+        "turnover_yi": 8791.61
+      },
+      {
+        "name": "深证成指",
+        "close": 14144.2,
+        "change_pct": 1.86,
+        "turnover_yi": 14509.11
+      },
+      {
+        "name": "上证指数",
+        "close": 3878.43,
+        "change_pct": 1.47,
+        "turnover_yi": 12087.23
+      },
+      {
+        "name": "科创50",
+        "close": 1693.67,
+        "change_pct": 4.78,
+        "turnover_yi": 1543.09
+      },
+      {
+        "name": "创业板指",
+        "close": 3535.14,
+        "change_pct": 1.32,
+        "turnover_yi": 7252.64
+      }
+    ],
+    "top_boards": [
+      {
+        "name": "半导体",
+        "turnover_yi": 4133.9,
+        "ratio_pct": 15.54,
+        "change_pct": 5.63,
+        "main_flow_yi": 108.2,
+        "limit_ups": null
+      },
+      {
+        "name": "通信设备",
+        "turnover_yi": 2515.25,
+        "ratio_pct": 9.46,
+        "change_pct": 3.06,
+        "main_flow_yi": -22.11,
+        "limit_ups": null
+      },
+      {
+        "name": "元件",
+        "turnover_yi": 1489.37,
+        "ratio_pct": 5.6,
+        "change_pct": 5.12,
+        "main_flow_yi": 124.31,
+        "limit_ups": null
+      },
+      {
+        "name": "IT服务",
+        "turnover_yi": 795.36,
+        "ratio_pct": 2.99,
+        "change_pct": 2.66,
+        "main_flow_yi": -21.97,
+        "limit_ups": null
+      },
+      {
+        "name": "消费电子",
+        "turnover_yi": 792.28,
+        "ratio_pct": 2.98,
+        "change_pct": 3.81,
+        "main_flow_yi": -0.82,
+        "limit_ups": null
+      },
+      {
+        "name": "通用设备",
+        "turnover_yi": 751.77,
+        "ratio_pct": 2.83,
+        "change_pct": 2.77,
+        "main_flow_yi": 10.14,
+        "limit_ups": null
+      },
+      {
+        "name": "软件开发",
+        "turnover_yi": 707.43,
+        "ratio_pct": 2.66,
+        "change_pct": 2.05,
+        "main_flow_yi": -38.67,
+        "limit_ups": null
+      },
+      {
+        "name": "电池",
+        "turnover_yi": 646.25,
+        "ratio_pct": 2.43,
+        "change_pct": 3.04,
+        "main_flow_yi": 11.18,
+        "limit_ups": null
+      }
+    ],
+    "zt_pool_count": 103,
+    "dt_pool_count": 1,
+    "yesterday_zt_premium": {
+      "count": 137,
+      "avg_pct": 1.26
+    },
+    "top_fallers": [
+      {
+        "code": "600363",
+        "name": "联创光电",
+        "change_pct": -10.01,
+        "note": "跌停（消费电子，连续跌停 1 天）"
+      }
+    ]
+  },
+  "emotion": {
+    "sealed_total": 103,
+    "blast_total": 45,
+    "seal_rate_pct": 69.6,
+    "blast_avg_change_pct": 7.83,
+    "first_board": {
+      "sealed": 71,
+      "attempted": 103,
+      "rate_pct": 69.0
+    },
+    "promote_rates": {
+      "7进8": {
+        "rate_pct": 100.0,
+        "sealed": 1,
+        "attempted": 1
+      },
+      "5进6": {
+        "rate_pct": 0.0,
+        "sealed": 0,
+        "attempted": 1
+      },
+      "4进5": {
+        "rate_pct": 0.0,
+        "sealed": 0,
+        "attempted": 1
+      },
+      "3进4": {
+        "rate_pct": 33.0,
+        "sealed": 2,
+        "attempted": 6
+      },
+      "2进3": {
+        "rate_pct": 20.0,
+        "sealed": 2,
+        "attempted": 10
+      },
+      "1进2": {
+        "rate_pct": 23.0,
+        "sealed": 27,
+        "attempted": 118
+      }
+    },
+    "max_ladder": 8,
+    "ladder": {
+      "2": 27,
+      "3": 2,
+      "4": 2,
+      "8": 1
+    },
+    "industry_concentration": [
+      {
+        "industry": "无人驾驶",
+        "count": 10
+      },
+      {
+        "industry": "中报预增",
+        "count": 9
+      },
+      {
+        "industry": "AI应用",
+        "count": 6
+      },
+      {
+        "industry": "国企改革",
+        "count": 6
+      },
+      {
+        "industry": "机器人概念",
+        "count": 5
+      },
+      {
+        "industry": "算力租赁",
+        "count": 4
+      },
+      {
+        "industry": "半导体",
+        "count": 4
+      },
+      {
+        "industry": "存储芯片",
+        "count": 4
+      },
+      {
+        "industry": "CPO",
+        "count": 4
+      },
+      {
+        "industry": "半年报预增",
+        "count": 4
+      }
+    ],
+    "concept_focus": [
+      {
+        "concept": "无人驾驶",
+        "sealed": 10,
+        "total": 11
+      },
+      {
+        "concept": "中报预增",
+        "sealed": 7,
+        "total": 14
+      },
+      {
+        "concept": "AI应用",
+        "sealed": 6,
+        "total": 20
+      },
+      {
+        "concept": "存储芯片",
+        "sealed": 6,
+        "total": 16
+      },
+      {
+        "concept": "国企改革",
+        "sealed": 6,
+        "total": 12
+      }
+    ],
+    "industry_zt_groups": {
+      "无人驾驶": [
+        "浙江世宝",
+        "大立科技",
+        "索菱股份",
+        "大众交通",
+        "兴民智通",
+        "万集科技",
+        "联创电子",
+        "博彦科技"
+      ],
+      "中报预增": [
+        "风范股份",
+        "盛视科技",
+        "博杰股份",
+        "利通电子",
+        "金海通",
+        "海星股份",
+        "东材科技",
+        "金富科技"
+      ],
+      "AI应用": [
+        "凯撒文化",
+        "博彦科技",
+        "嘉环科技",
+        "新开普",
+        "德生科技",
+        "金一文化"
+      ],
+      "国企改革": [
+        "星网锐捷",
+        "有研新材",
+        "宝武镁业",
+        "东方钽业",
+        "黄河旋风",
+        "江钨装备"
+      ],
+      "机器人概念": [
+        "智动力",
+        "新开普",
+        "宝武镁业",
+        "春光科技",
+        "科森科技"
+      ]
+    }
+  },
+  "leaders_candidates": [
+    {
+      "code": "601869",
+      "name": "长飞光纤",
+      "ladder": 1,
+      "industry": "通信设备",
+      "market_cap_yi": 2586.38,
+      "turnover_yi": 46.09,
+      "change_pct": 10.0,
+      "first_seal_time": "13:00:27",
+      "blast_count": 0,
+      "close": 312.4,
+      "ma5": 278.57,
+      "ma10": 300.05,
+      "main_flow_yi": 7.88,
+      "tail_behavior": "涨停封板"
+    },
+    {
+      "code": "000657",
+      "name": "中钨高新",
+      "ladder": 1,
+      "industry": "小金属",
+      "market_cap_yi": 1308.6,
+      "turnover_yi": 45.91,
+      "change_pct": 10.0,
+      "first_seal_time": "11:16:21",
+      "blast_count": 0,
+      "close": 57.43,
+      "ma5": 51.11,
+      "ma10": 53.43,
+      "main_flow_yi": 7.75,
+      "tail_behavior": "涨停封板"
+    },
+    {
+      "code": "600206",
+      "name": "有研新材",
+      "ladder": 1,
+      "industry": "半导体",
+      "market_cap_yi": 337.01,
+      "turnover_yi": 34.39,
+      "change_pct": 10.0,
+      "first_seal_time": "09:46:32",
+      "blast_count": 1,
+      "close": 39.81,
+      "ma5": 36.08,
+      "ma10": 39.64,
+      "main_flow_yi": 13.04,
+      "tail_behavior": "涨停封板"
+    },
+    {
+      "code": "603629",
+      "name": "利通电子",
+      "ladder": 2,
+      "industry": "消费电子",
+      "market_cap_yi": 413.12,
+      "turnover_yi": 30.51,
+      "change_pct": 10.0,
+      "first_seal_time": "09:33:10",
+      "blast_count": 4,
+      "close": 112.65,
+      "ma5": 98.29,
+      "ma10": 103.63,
+      "main_flow_yi": 14.23,
+      "tail_behavior": "涨停封板"
+    },
+    {
+      "code": "002636",
+      "name": "金安国纪",
+      "ladder": 1,
+      "industry": "元件",
+      "market_cap_yi": 408.99,
+      "turnover_yi": 28.48,
+      "change_pct": 10.01,
+      "first_seal_time": "13:04:12",
+      "blast_count": 3,
+      "close": 56.18,
+      "ma5": 50.9,
+      "ma10": 55.11,
+      "main_flow_yi": 6.72,
+      "tail_behavior": "涨停封板"
+    },
+    {
+      "code": "603256",
+      "name": "宏和科技",
+      "ladder": 1,
+      "industry": "玻璃玻纤",
+      "market_cap_yi": 1249.32,
+      "turnover_yi": 28.46,
+      "change_pct": 10.0,
+      "first_seal_time": "13:11:34",
+      "blast_count": 6,
+      "close": 138.11,
+      "ma5": 126.45,
+      "ma10": 137.99,
+      "main_flow_yi": 3.57,
+      "tail_behavior": "涨停封板"
+    },
+    {
+      "code": "002396",
+      "name": "星网锐捷",
+      "ladder": 1,
+      "industry": "通信设备",
+      "market_cap_yi": 218.28,
+      "turnover_yi": 27.23,
+      "change_pct": 10.0,
+      "first_seal_time": "09:42:15",
+      "blast_count": 4,
+      "close": null,
+      "ma5": null,
+      "ma10": null,
+      "main_flow_yi": null,
+      "tail_behavior": "涨停封板"
+    },
+    {
+      "code": "002080",
+      "name": "中材科技",
+      "ladder": 2,
+      "industry": "玻璃玻纤",
+      "market_cap_yi": 819.09,
+      "turnover_yi": 26.49,
+      "change_pct": 10.01,
+      "first_seal_time": "13:02:09",
+      "blast_count": 6,
+      "close": null,
+      "ma5": null,
+      "ma10": null,
+      "main_flow_yi": null,
+      "tail_behavior": "涨停封板"
+    },
+    {
+      "code": "603618",
+      "name": "杭电股份",
+      "ladder": 1,
+      "industry": "电网设备",
+      "market_cap_yi": 181.28,
+      "turnover_yi": 26.37,
+      "change_pct": 9.98,
+      "first_seal_time": "13:01:42",
+      "blast_count": 12,
+      "close": null,
+      "ma5": null,
+      "ma10": null,
+      "main_flow_yi": null,
+      "tail_behavior": "涨停封板"
+    },
+    {
+      "code": "002428",
+      "name": "云南锗业",
+      "ladder": 2,
+      "industry": "小金属",
+      "market_cap_yi": 540.2,
+      "turnover_yi": 25.73,
+      "change_pct": 10.0,
+      "first_seal_time": "09:30:00",
+      "blast_count": 1,
+      "close": null,
+      "ma5": null,
+      "ma10": null,
+      "main_flow_yi": null,
+      "tail_behavior": "涨停封板"
+    }
+  ],
+  "high_ladder_stocks": [
+    {
+      "code": "003032",
+      "name": "传智教育",
+      "ladder": 8,
+      "first_seal_time": "09:30:48",
+      "industry": "教育"
+    },
+    {
+      "code": "000593",
+      "name": "德龙汇能",
+      "ladder": 4,
+      "first_seal_time": "09:25:00",
+      "industry": "燃气Ⅱ"
+    },
+    {
+      "code": "002963",
+      "name": "豪尔赛",
+      "ladder": 4,
+      "first_seal_time": "09:31:21",
+      "industry": "装修装饰"
+    },
+    {
+      "code": "300615",
+      "name": "欣天科技",
+      "ladder": 3,
+      "first_seal_time": "09:25:00",
+      "industry": "通信设备"
+    },
+    {
+      "code": "601700",
+      "name": "风范股份",
+      "ladder": 3,
+      "first_seal_time": "09:25:01",
+      "industry": "电网设备"
+    }
+  ]
+}

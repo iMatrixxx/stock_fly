@@ -1,0 +1,64 @@
+{
+  "_schema_note": "行情补充 JSON 模板（可选输入）。所有字段均可省略；省略字段在报告中标注'数据缺失'。单位：金额=亿元，涨跌幅/占比=%，价格=元。",
+  "date": "2026-07-30",
+  "total_turnover": 18000,
+  "prev_total_turnover": 17500,
+  "indices": [
+    {
+      "name": "上证指数",
+      "code": "000001",
+      "close": 3421.5,
+      "change_pct": 0.85,
+      "turnover": 7800
+    },
+    {
+      "name": "创业板指",
+      "code": "399006",
+      "close": 2310.2,
+      "change_pct": -0.42,
+      "turnover": 5200
+    }
+  ],
+  "boards": [
+    {
+      "name": "数据中心",
+      "turnover": 680,
+      "market_turnover": 18000,
+      "change_pct": 3.2,
+      "main_flow": 32.5,
+      "limit_ups": 6,
+      "north_flow": null
+    }
+  ],
+  "leaders": [
+    {
+      "code": "600000",
+      "name": "示例中军",
+      "market_cap": 450,
+      "turnover": 38.6,
+      "close": 12.8,
+      "ma5": 12.4,
+      "ma10": 12.1,
+      "tail_behavior": "尾盘企稳"
+    }
+  ],
+  "yesterday_premiums": [
+    {
+      "code": "603221",
+      "name": "爱丽家居",
+      "open_premium_pct": 4.2
+    }
+  ],
+  "top_fallers": [
+    {
+      "code": "000000",
+      "name": "示例A杀股",
+      "change_pct": -9.5,
+      "note": "高位A杀，连续两日跌停"
+    }
+  ],
+  "_example": {
+    "说明": "上方字段为示例值，直接替换为真实行情即可；示例板块/个股数据不是 2026-07-30 的真实数据，正式使用时务必用实际行情覆盖。"
+  },
+  "notes": []
+}

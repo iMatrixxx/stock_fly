@@ -1,0 +1,1370 @@
+{
+ "date": "2026-07-29",
+ "total_turnover": 22966.0,
+ "prev_total_turnover": 20258.0,
+ "indices": [
+  {
+   "name": "上证指数",
+   "code": "000001",
+   "close": 3828.47,
+   "change_pct": 0.4,
+   "turnover": 10874.1
+  },
+  {
+   "name": "深证成指",
+   "code": "399001",
+   "close": 13658.44,
+   "change_pct": 1.1,
+   "turnover": 12091.7
+  },
+  {
+   "name": "创业板指",
+   "code": "399006",
+   "close": 3378.7,
+   "change_pct": 1.55,
+   "turnover": 5691.7
+  },
+  {
+   "name": "科创50",
+   "code": "000688",
+   "close": 1678.74,
+   "change_pct": -0.87,
+   "turnover": null
+  }
+ ],
+ "boards": [
+  {
+   "name": "半导体",
+   "turnover": 4233.0,
+   "market_turnover": 22966.0,
+   "change_pct": -0.82,
+   "main_flow": null,
+   "limit_ups": null,
+   "north_flow": null
+  },
+  {
+   "name": "通信设备",
+   "turnover": 1633.5,
+   "market_turnover": 22966.0,
+   "change_pct": -0.45,
+   "main_flow": null,
+   "limit_ups": null,
+   "north_flow": null
+  },
+  {
+   "name": "元件",
+   "turnover": 1193.5,
+   "market_turnover": 22966.0,
+   "change_pct": 0.12,
+   "main_flow": null,
+   "limit_ups": null,
+   "north_flow": null
+  },
+  {
+   "name": "电池",
+   "turnover": 705.2,
+   "market_turnover": 22966.0,
+   "change_pct": 2.5,
+   "main_flow": null,
+   "limit_ups": null,
+   "north_flow": null
+  },
+  {
+   "name": "消费电子",
+   "turnover": 602.6,
+   "market_turnover": 22966.0,
+   "change_pct": 0.89,
+   "main_flow": null,
+   "limit_ups": null,
+   "north_flow": null
+  },
+  {
+   "name": "电力",
+   "turnover": 537.1,
+   "market_turnover": 22966.0,
+   "change_pct": 1.49,
+   "main_flow": null,
+   "limit_ups": null,
+   "north_flow": null
+  },
+  {
+   "name": "电子化学品",
+   "turnover": 536.7,
+   "market_turnover": 22966.0,
+   "change_pct": -1.81,
+   "main_flow": null,
+   "limit_ups": null,
+   "north_flow": null
+  },
+  {
+   "name": "通用设备",
+   "turnover": 530.1,
+   "market_turnover": 22966.0,
+   "change_pct": 0.66,
+   "main_flow": null,
+   "limit_ups": null,
+   "north_flow": null
+  },
+  {
+   "name": "IT服务",
+   "turnover": 504.6,
+   "market_turnover": 22966.0,
+   "change_pct": 0.08,
+   "main_flow": null,
+   "limit_ups": null,
+   "north_flow": null
+  },
+  {
+   "name": "光学光电子",
+   "turnover": 464.0,
+   "market_turnover": 22966.0,
+   "change_pct": -0.1,
+   "main_flow": null,
+   "limit_ups": null,
+   "north_flow": null
+  },
+  {
+   "name": "电网设备",
+   "turnover": 454.9,
+   "market_turnover": 22966.0,
+   "change_pct": 2.39,
+   "main_flow": null,
+   "limit_ups": null,
+   "north_flow": null
+  },
+  {
+   "name": "自动化设备",
+   "turnover": 431.8,
+   "market_turnover": 22966.0,
+   "change_pct": 0.58,
+   "main_flow": null,
+   "limit_ups": null,
+   "north_flow": null
+  },
+  {
+   "name": "汽车零部件",
+   "turnover": 431.4,
+   "market_turnover": 22966.0,
+   "change_pct": 1.49,
+   "main_flow": null,
+   "limit_ups": null,
+   "north_flow": null
+  },
+  {
+   "name": "化学制品",
+   "turnover": 430.8,
+   "market_turnover": 22966.0,
+   "change_pct": 1.5,
+   "main_flow": null,
+   "limit_ups": null,
+   "north_flow": null
+  },
+  {
+   "name": "软件开发",
+   "turnover": 423.6,
+   "market_turnover": 22966.0,
+   "change_pct": 1.39,
+   "main_flow": null,
+   "limit_ups": null,
+   "north_flow": null
+  },
+  {
+   "name": "化学制药",
+   "turnover": 401.6,
+   "market_turnover": 22966.0,
+   "change_pct": 0.51,
+   "main_flow": null,
+   "limit_ups": null,
+   "north_flow": null
+  },
+  {
+   "name": "专用设备",
+   "turnover": 401.5,
+   "market_turnover": 22966.0,
+   "change_pct": 1.05,
+   "main_flow": null,
+   "limit_ups": null,
+   "north_flow": null
+  },
+  {
+   "name": "计算机设备",
+   "turnover": 388.7,
+   "market_turnover": 22966.0,
+   "change_pct": 0.99,
+   "main_flow": null,
+   "limit_ups": null,
+   "north_flow": null
+  },
+  {
+   "name": "银行",
+   "turnover": 356.2,
+   "market_turnover": 22966.0,
+   "change_pct": 0.7,
+   "main_flow": null,
+   "limit_ups": null,
+   "north_flow": null
+  },
+  {
+   "name": "工业金属",
+   "turnover": 338.3,
+   "market_turnover": 22966.0,
+   "change_pct": 2.23,
+   "main_flow": null,
+   "limit_ups": null,
+   "north_flow": null
+  },
+  {
+   "name": "证券",
+   "turnover": 332.7,
+   "market_turnover": 22966.0,
+   "change_pct": 2.3,
+   "main_flow": null,
+   "limit_ups": null,
+   "north_flow": null
+  },
+  {
+   "name": "建筑材料",
+   "turnover": 328.8,
+   "market_turnover": 22966.0,
+   "change_pct": 1.93,
+   "main_flow": null,
+   "limit_ups": null,
+   "north_flow": null
+  },
+  {
+   "name": "军工装备",
+   "turnover": 321.6,
+   "market_turnover": 22966.0,
+   "change_pct": 1.76,
+   "main_flow": null,
+   "limit_ups": null,
+   "north_flow": null
+  },
+  {
+   "name": "光伏设备",
+   "turnover": 315.6,
+   "market_turnover": 22966.0,
+   "change_pct": 1.36,
+   "main_flow": null,
+   "limit_ups": null,
+   "north_flow": null
+  },
+  {
+   "name": "医疗服务",
+   "turnover": 289.9,
+   "market_turnover": 22966.0,
+   "change_pct": -0.11,
+   "main_flow": null,
+   "limit_ups": null,
+   "north_flow": null
+  },
+  {
+   "name": "建筑装饰",
+   "turnover": 282.5,
+   "market_turnover": 22966.0,
+   "change_pct": 1.4,
+   "main_flow": null,
+   "limit_ups": null,
+   "north_flow": null
+  },
+  {
+   "name": "小金属",
+   "turnover": 277.0,
+   "market_turnover": 22966.0,
+   "change_pct": 2.02,
+   "main_flow": null,
+   "limit_ups": null,
+   "north_flow": null
+  },
+  {
+   "name": "军工电子",
+   "turnover": 216.3,
+   "market_turnover": 22966.0,
+   "change_pct": 1.0,
+   "main_flow": null,
+   "limit_ups": null,
+   "north_flow": null
+  },
+  {
+   "name": "医疗器械",
+   "turnover": 208.6,
+   "market_turnover": 22966.0,
+   "change_pct": 1.0,
+   "main_flow": null,
+   "limit_ups": null,
+   "north_flow": null
+  },
+  {
+   "name": "贵金属",
+   "turnover": 208.1,
+   "market_turnover": 22966.0,
+   "change_pct": 2.39,
+   "main_flow": null,
+   "limit_ups": null,
+   "north_flow": null
+  },
+  {
+   "name": "塑料制品",
+   "turnover": 194.6,
+   "market_turnover": 22966.0,
+   "change_pct": 0.13,
+   "main_flow": null,
+   "limit_ups": null,
+   "north_flow": null
+  },
+  {
+   "name": "白酒",
+   "turnover": 194.0,
+   "market_turnover": 22966.0,
+   "change_pct": 1.04,
+   "main_flow": null,
+   "limit_ups": null,
+   "north_flow": null
+  },
+  {
+   "name": "文化传媒",
+   "turnover": 187.6,
+   "market_turnover": 22966.0,
+   "change_pct": 1.76,
+   "main_flow": null,
+   "limit_ups": null,
+   "north_flow": null
+  },
+  {
+   "name": "其他电子",
+   "turnover": 186.6,
+   "market_turnover": 22966.0,
+   "change_pct": 0.27,
+   "main_flow": null,
+   "limit_ups": null,
+   "north_flow": null
+  },
+  {
+   "name": "游戏",
+   "turnover": 184.1,
+   "market_turnover": 22966.0,
+   "change_pct": 4.19,
+   "main_flow": null,
+   "limit_ups": null,
+   "north_flow": null
+  },
+  {
+   "name": "通信服务",
+   "turnover": 177.6,
+   "market_turnover": 22966.0,
+   "change_pct": 0.98,
+   "main_flow": null,
+   "limit_ups": null,
+   "north_flow": null
+  },
+  {
+   "name": "房地产",
+   "turnover": 172.6,
+   "market_turnover": 22966.0,
+   "change_pct": 1.95,
+   "main_flow": null,
+   "limit_ups": null,
+   "north_flow": null
+  },
+  {
+   "name": "汽车整车",
+   "turnover": 171.7,
+   "market_turnover": 22966.0,
+   "change_pct": 3.29,
+   "main_flow": null,
+   "limit_ups": null,
+   "north_flow": null
+  },
+  {
+   "name": "零售",
+   "turnover": 170.9,
+   "market_turnover": 22966.0,
+   "change_pct": 2.9,
+   "main_flow": null,
+   "limit_ups": null,
+   "north_flow": null
+  },
+  {
+   "name": "能源金属",
+   "turnover": 169.6,
+   "market_turnover": 22966.0,
+   "change_pct": 4.11,
+   "main_flow": null,
+   "limit_ups": null,
+   "north_flow": null
+  },
+  {
+   "name": "白色家电",
+   "turnover": 168.7,
+   "market_turnover": 22966.0,
+   "change_pct": 1.12,
+   "main_flow": null,
+   "limit_ups": null,
+   "north_flow": null
+  },
+  {
+   "name": "其他电源设备",
+   "turnover": 168.1,
+   "market_turnover": 22966.0,
+   "change_pct": 0.9,
+   "main_flow": null,
+   "limit_ups": null,
+   "north_flow": null
+  },
+  {
+   "name": "农化制品",
+   "turnover": 152.5,
+   "market_turnover": 22966.0,
+   "change_pct": 2.18,
+   "main_flow": null,
+   "limit_ups": null,
+   "north_flow": null
+  },
+  {
+   "name": "化学原料",
+   "turnover": 137.5,
+   "market_turnover": 22966.0,
+   "change_pct": 2.06,
+   "main_flow": null,
+   "limit_ups": null,
+   "north_flow": null
+  },
+  {
+   "name": "环境治理",
+   "turnover": 136.9,
+   "market_turnover": 22966.0,
+   "change_pct": 1.35,
+   "main_flow": null,
+   "limit_ups": null,
+   "north_flow": null
+  },
+  {
+   "name": "中药",
+   "turnover": 127.9,
+   "market_turnover": 22966.0,
+   "change_pct": 0.54,
+   "main_flow": null,
+   "limit_ups": null,
+   "north_flow": null
+  },
+  {
+   "name": "饮料制造",
+   "turnover": 127.2,
+   "market_turnover": 22966.0,
+   "change_pct": 4.99,
+   "main_flow": null,
+   "limit_ups": null,
+   "north_flow": null
+  },
+  {
+   "name": "煤炭开采加工",
+   "turnover": 121.8,
+   "market_turnover": 22966.0,
+   "change_pct": 2.18,
+   "main_flow": null,
+   "limit_ups": null,
+   "north_flow": null
+  },
+  {
+   "name": "食品加工制造",
+   "turnover": 119.4,
+   "market_turnover": 22966.0,
+   "change_pct": 3.68,
+   "main_flow": null,
+   "limit_ups": null,
+   "north_flow": null
+  },
+  {
+   "name": "生物制品",
+   "turnover": 106.2,
+   "market_turnover": 22966.0,
+   "change_pct": 0.94,
+   "main_flow": null,
+   "limit_ups": null,
+   "north_flow": null
+  },
+  {
+   "name": "工程机械",
+   "turnover": 97.6,
+   "market_turnover": 22966.0,
+   "change_pct": 2.21,
+   "main_flow": null,
+   "limit_ups": null,
+   "north_flow": null
+  },
+  {
+   "name": "保险",
+   "turnover": 93.9,
+   "market_turnover": 22966.0,
+   "change_pct": -0.32,
+   "main_flow": null,
+   "limit_ups": null,
+   "north_flow": null
+  },
+  {
+   "name": "钢铁",
+   "turnover": 92.7,
+   "market_turnover": 22966.0,
+   "change_pct": 2.51,
+   "main_flow": null,
+   "limit_ups": null,
+   "north_flow": null
+  },
+  {
+   "name": "港口航运",
+   "turnover": 92.7,
+   "market_turnover": 22966.0,
+   "change_pct": 1.54,
+   "main_flow": null,
+   "limit_ups": null,
+   "north_flow": null
+  },
+  {
+   "name": "风电设备",
+   "turnover": 90.1,
+   "market_turnover": 22966.0,
+   "change_pct": 0.99,
+   "main_flow": null,
+   "limit_ups": null,
+   "north_flow": null
+  },
+  {
+   "name": "包装印刷",
+   "turnover": 89.1,
+   "market_turnover": 22966.0,
+   "change_pct": 0.79,
+   "main_flow": null,
+   "limit_ups": null,
+   "north_flow": null
+  },
+  {
+   "name": "油气开采及服务",
+   "turnover": 87.1,
+   "market_turnover": 22966.0,
+   "change_pct": 2.26,
+   "main_flow": null,
+   "limit_ups": null,
+   "north_flow": null
+  },
+  {
+   "name": "家居用品",
+   "turnover": 84.4,
+   "market_turnover": 22966.0,
+   "change_pct": 2.14,
+   "main_flow": null,
+   "limit_ups": null,
+   "north_flow": null
+  },
+  {
+   "name": "金属新材料",
+   "turnover": 78.2,
+   "market_turnover": 22966.0,
+   "change_pct": 1.44,
+   "main_flow": null,
+   "limit_ups": null,
+   "north_flow": null
+  },
+  {
+   "name": "服装家纺",
+   "turnover": 74.7,
+   "market_turnover": 22966.0,
+   "change_pct": 1.18,
+   "main_flow": null,
+   "limit_ups": null,
+   "north_flow": null
+  },
+  {
+   "name": "互联网电商",
+   "turnover": 70.8,
+   "market_turnover": 22966.0,
+   "change_pct": 0.31,
+   "main_flow": null,
+   "limit_ups": null,
+   "north_flow": null
+  },
+  {
+   "name": "石油加工贸易",
+   "turnover": 63.7,
+   "market_turnover": 22966.0,
+   "change_pct": 1.85,
+   "main_flow": null,
+   "limit_ups": null,
+   "north_flow": null
+  },
+  {
+   "name": "物流",
+   "turnover": 60.3,
+   "market_turnover": 22966.0,
+   "change_pct": 1.51,
+   "main_flow": null,
+   "limit_ups": null,
+   "north_flow": null
+  },
+  {
+   "name": "多元金融",
+   "turnover": 60.1,
+   "market_turnover": 22966.0,
+   "change_pct": 2.52,
+   "main_flow": null,
+   "limit_ups": null,
+   "north_flow": null
+  },
+  {
+   "name": "养殖业",
+   "turnover": 60.0,
+   "market_turnover": 22966.0,
+   "change_pct": 1.21,
+   "main_flow": null,
+   "limit_ups": null,
+   "north_flow": null
+  },
+  {
+   "name": "其他社会服务",
+   "turnover": 57.6,
+   "market_turnover": 22966.0,
+   "change_pct": 1.22,
+   "main_flow": null,
+   "limit_ups": null,
+   "north_flow": null
+  },
+  {
+   "name": "美容护理",
+   "turnover": 56.0,
+   "market_turnover": 22966.0,
+   "change_pct": 1.22,
+   "main_flow": null,
+   "limit_ups": null,
+   "north_flow": null
+  },
+  {
+   "name": "影视院线",
+   "turnover": 53.7,
+   "market_turnover": 22966.0,
+   "change_pct": 3.05,
+   "main_flow": null,
+   "limit_ups": null,
+   "north_flow": null
+  },
+  {
+   "name": "化学纤维",
+   "turnover": 53.0,
+   "market_turnover": 22966.0,
+   "change_pct": 2.24,
+   "main_flow": null,
+   "limit_ups": null,
+   "north_flow": null
+  },
+  {
+   "name": "非金属材料",
+   "turnover": 51.3,
+   "market_turnover": 22966.0,
+   "change_pct": -0.13,
+   "main_flow": null,
+   "limit_ups": null,
+   "north_flow": null
+  },
+  {
+   "name": "综合",
+   "turnover": 50.8,
+   "market_turnover": 22966.0,
+   "change_pct": 2.18,
+   "main_flow": null,
+   "limit_ups": null,
+   "north_flow": null
+  },
+  {
+   "name": "农产品加工",
+   "turnover": 45.7,
+   "market_turnover": 22966.0,
+   "change_pct": 1.63,
+   "main_flow": null,
+   "limit_ups": null,
+   "north_flow": null
+  },
+  {
+   "name": "电机",
+   "turnover": 43.3,
+   "market_turnover": 22966.0,
+   "change_pct": 1.84,
+   "main_flow": null,
+   "limit_ups": null,
+   "north_flow": null
+  },
+  {
+   "name": "纺织制造",
+   "turnover": 42.0,
+   "market_turnover": 22966.0,
+   "change_pct": 1.73,
+   "main_flow": null,
+   "limit_ups": null,
+   "north_flow": null
+  },
+  {
+   "name": "公路铁路运输",
+   "turnover": 41.1,
+   "market_turnover": 22966.0,
+   "change_pct": 1.26,
+   "main_flow": null,
+   "limit_ups": null,
+   "north_flow": null
+  },
+  {
+   "name": "医药商业",
+   "turnover": 40.8,
+   "market_turnover": 22966.0,
+   "change_pct": 0.74,
+   "main_flow": null,
+   "limit_ups": null,
+   "north_flow": null
+  },
+  {
+   "name": "燃气",
+   "turnover": 40.6,
+   "market_turnover": 22966.0,
+   "change_pct": 0.73,
+   "main_flow": null,
+   "limit_ups": null,
+   "north_flow": null
+  },
+  {
+   "name": "旅游及酒店",
+   "turnover": 40.3,
+   "market_turnover": 22966.0,
+   "change_pct": 1.54,
+   "main_flow": null,
+   "limit_ups": null,
+   "north_flow": null
+  },
+  {
+   "name": "环保设备",
+   "turnover": 39.7,
+   "market_turnover": 22966.0,
+   "change_pct": 1.0,
+   "main_flow": null,
+   "limit_ups": null,
+   "north_flow": null
+  },
+  {
+   "name": "机场航运",
+   "turnover": 39.5,
+   "market_turnover": 22966.0,
+   "change_pct": 1.12,
+   "main_flow": null,
+   "limit_ups": null,
+   "north_flow": null
+  },
+  {
+   "name": "汽车服务及其他",
+   "turnover": 36.8,
+   "market_turnover": 22966.0,
+   "change_pct": 1.71,
+   "main_flow": null,
+   "limit_ups": null,
+   "north_flow": null
+  },
+  {
+   "name": "种植业与林业",
+   "turnover": 36.0,
+   "market_turnover": 22966.0,
+   "change_pct": 1.77,
+   "main_flow": null,
+   "limit_ups": null,
+   "north_flow": null
+  },
+  {
+   "name": "轨交设备",
+   "turnover": 35.5,
+   "market_turnover": 22966.0,
+   "change_pct": 1.39,
+   "main_flow": null,
+   "limit_ups": null,
+   "north_flow": null
+  },
+  {
+   "name": "小家电",
+   "turnover": 33.9,
+   "market_turnover": 22966.0,
+   "change_pct": 1.18,
+   "main_flow": null,
+   "limit_ups": null,
+   "north_flow": null
+  },
+  {
+   "name": "橡胶制品",
+   "turnover": 32.9,
+   "market_turnover": 22966.0,
+   "change_pct": 1.31,
+   "main_flow": null,
+   "limit_ups": null,
+   "north_flow": null
+  },
+  {
+   "name": "教育",
+   "turnover": 27.1,
+   "market_turnover": 22966.0,
+   "change_pct": 5.55,
+   "main_flow": null,
+   "limit_ups": null,
+   "north_flow": null
+  },
+  {
+   "name": "造纸",
+   "turnover": 24.2,
+   "market_turnover": 22966.0,
+   "change_pct": 1.13,
+   "main_flow": null,
+   "limit_ups": null,
+   "north_flow": null
+  },
+  {
+   "name": "黑色家电",
+   "turnover": 22.9,
+   "market_turnover": 22966.0,
+   "change_pct": 1.48,
+   "main_flow": null,
+   "limit_ups": null,
+   "north_flow": null
+  },
+  {
+   "name": "贸易",
+   "turnover": 14.9,
+   "market_turnover": 22966.0,
+   "change_pct": 2.02,
+   "main_flow": null,
+   "limit_ups": null,
+   "north_flow": null
+  },
+  {
+   "name": "厨卫电器",
+   "turnover": 6.5,
+   "market_turnover": 22966.0,
+   "change_pct": 1.98,
+   "main_flow": null,
+   "limit_ups": null,
+   "north_flow": null
+  }
+ ],
+ "leaders": [
+  {
+   "code": "000636",
+   "name": "风华高科",
+   "market_cap": 549.7,
+   "turnover": 80.87,
+   "close": 47.51,
+   "ma5": 43.67,
+   "ma10": 44.41,
+   "tail_behavior": "尾盘企稳",
+   "note": "涨停池容量股（连板1）"
+  },
+  {
+   "code": "002558",
+   "name": "巨人网络",
+   "market_cap": 512.8,
+   "turnover": 27.53,
+   "close": 26.98,
+   "ma5": 25.13,
+   "ma10": 27.29,
+   "tail_behavior": "尾盘企稳",
+   "note": "涨停池容量股（连板1）"
+  },
+  {
+   "code": "688981",
+   "name": "中芯国际",
+   "market_cap": 11206.1,
+   "turnover": 89.72,
+   "close": 130.9,
+   "ma5": 140.04,
+   "ma10": 145.15,
+   "tail_behavior": null,
+   "note": "科技老主线中军，反弹但未收复10日线"
+  },
+  {
+   "code": "688041",
+   "name": "海光信息",
+   "market_cap": 6601.1,
+   "turnover": 86.67,
+   "close": 284.0,
+   "ma5": 304.43,
+   "ma10": 314.37,
+   "tail_behavior": "尾盘回落/跳水",
+   "note": "科技老主线中军，反弹但未收复10日线"
+  },
+  {
+   "code": "002371",
+   "name": "北方华创",
+   "market_cap": 5126.2,
+   "turnover": 109.3,
+   "close": 706.39,
+   "ma5": 737.68,
+   "ma10": 725.37,
+   "tail_behavior": null,
+   "note": "科技老主线中军，反弹但未收复10日线"
+  },
+  {
+   "code": "688256",
+   "name": "寒武纪",
+   "market_cap": 7205.9,
+   "turnover": 159.92,
+   "close": 1146.9,
+   "ma5": 1197.98,
+   "ma10": 1232.87,
+   "tail_behavior": null,
+   "note": "科技老主线中军，反弹但未收复10日线"
+  },
+  {
+   "code": "603986",
+   "name": "兆易创新",
+   "market_cap": 2554.6,
+   "turnover": 324.39,
+   "close": 364.03,
+   "ma5": 419.53,
+   "ma10": 445.32,
+   "tail_behavior": null,
+   "note": "科技老主线中军，反弹但未收复10日线"
+  },
+  {
+   "code": "600584",
+   "name": "长电科技",
+   "market_cap": 1282.6,
+   "turnover": 120.71,
+   "close": 71.68,
+   "ma5": 78.91,
+   "ma10": 81.07,
+   "tail_behavior": "尾盘回落/跳水",
+   "note": "科技老主线中军，反弹但未收复10日线"
+  },
+  {
+   "code": "300308",
+   "name": "中际旭创",
+   "market_cap": 11124.2,
+   "turnover": 435.1,
+   "close": 951.0,
+   "ma5": 1010.99,
+   "ma10": 1034.88,
+   "tail_behavior": null,
+   "note": "科技老主线中军，反弹但未收复10日线"
+  },
+  {
+   "code": "002230",
+   "name": "科大讯飞",
+   "market_cap": 962.5,
+   "turnover": 12.19,
+   "close": 40.07,
+   "ma5": 39.8,
+   "ma10": 40.56,
+   "tail_behavior": null,
+   "note": "科技老主线中军，反弹但未收复10日线"
+  },
+  {
+   "code": "300059",
+   "name": "东方财富",
+   "market_cap": 3148.6,
+   "turnover": 60.89,
+   "close": 19.9,
+   "ma5": 19.73,
+   "ma10": 19.87,
+   "tail_behavior": null,
+   "note": "科技老主线中军，反弹但未收复10日线"
+  }
+ ],
+ "yesterday_premiums": [
+  {
+   "code": "002338",
+   "name": "奥普光电",
+   "open_premium_pct": -0.99
+  },
+  {
+   "code": "301421",
+   "name": "波长光电",
+   "open_premium_pct": -1.0
+  },
+  {
+   "code": "603221",
+   "name": "爱丽家居",
+   "open_premium_pct": 9.98
+  },
+  {
+   "code": "600619",
+   "name": "海立股份",
+   "open_premium_pct": -0.95
+  },
+  {
+   "code": "603297",
+   "name": "永新光学",
+   "open_premium_pct": -0.99
+  },
+  {
+   "code": "600895",
+   "name": "张江高科",
+   "open_premium_pct": 3.09
+  },
+  {
+   "code": "002173",
+   "name": "创新医疗",
+   "open_premium_pct": 5.45
+  },
+  {
+   "code": "002889",
+   "name": "东方嘉盛",
+   "open_premium_pct": 4.54
+  },
+  {
+   "code": "600076",
+   "name": "康欣新材",
+   "open_premium_pct": -2.0
+  },
+  {
+   "code": "000533",
+   "name": "顺钠股份",
+   "open_premium_pct": -6.75
+  },
+  {
+   "code": "920690",
+   "name": "捷众科技",
+   "open_premium_pct": -4.98
+  },
+  {
+   "code": "603358",
+   "name": "华达科技",
+   "open_premium_pct": 3.15
+  },
+  {
+   "code": "002309",
+   "name": "中利集团",
+   "open_premium_pct": -3.26
+  },
+  {
+   "code": "000566",
+   "name": "海南海药",
+   "open_premium_pct": -2.06
+  },
+  {
+   "code": "002969",
+   "name": "嘉美包装",
+   "open_premium_pct": 9.44
+  },
+  {
+   "code": "002199",
+   "name": "东晶电子",
+   "open_premium_pct": -2.55
+  },
+  {
+   "code": "000428",
+   "name": "华天酒店",
+   "open_premium_pct": 10.08
+  },
+  {
+   "code": "002388",
+   "name": "新亚制程",
+   "open_premium_pct": -4.55
+  },
+  {
+   "code": "000045",
+   "name": "深纺织Ａ",
+   "open_premium_pct": -0.9
+  },
+  {
+   "code": "603716",
+   "name": "塞力医疗",
+   "open_premium_pct": 1.4
+  },
+  {
+   "code": "001358",
+   "name": "兴欣新材",
+   "open_premium_pct": 3.02
+  },
+  {
+   "code": "000859",
+   "name": "国风新材",
+   "open_premium_pct": -1.66
+  },
+  {
+   "code": "603928",
+   "name": "兴业股份",
+   "open_premium_pct": -2.52
+  },
+  {
+   "code": "605068",
+   "name": "明新旭腾",
+   "open_premium_pct": 9.99
+  },
+  {
+   "code": "002642",
+   "name": "荣联科技",
+   "open_premium_pct": 6.61
+  },
+  {
+   "code": "002195",
+   "name": "岩山科技",
+   "open_premium_pct": 2.93
+  },
+  {
+   "code": "000948",
+   "name": "南天信息",
+   "open_premium_pct": 4.62
+  },
+  {
+   "code": "002387",
+   "name": "维信诺",
+   "open_premium_pct": -2.04
+  },
+  {
+   "code": "603389",
+   "name": "亚振家居",
+   "open_premium_pct": 2.75
+  },
+  {
+   "code": "600303",
+   "name": "曙光股份",
+   "open_premium_pct": -0.74
+  },
+  {
+   "code": "300663",
+   "name": "科蓝软件",
+   "open_premium_pct": 7.14
+  },
+  {
+   "code": "600629",
+   "name": "华建集团",
+   "open_premium_pct": -3.2
+  },
+  {
+   "code": "002279",
+   "name": "久其软件",
+   "open_premium_pct": 2.94
+  },
+  {
+   "code": "003032",
+   "name": "传智教育",
+   "open_premium_pct": 9.97
+  },
+  {
+   "code": "600850",
+   "name": "电科数字",
+   "open_premium_pct": 0.0
+  },
+  {
+   "code": "002995",
+   "name": "天地在线",
+   "open_premium_pct": -1.0
+  },
+  {
+   "code": "001376",
+   "name": "百通能源",
+   "open_premium_pct": -0.09
+  },
+  {
+   "code": "600775",
+   "name": "南京熊猫",
+   "open_premium_pct": -4.35
+  },
+  {
+   "code": "600693",
+   "name": "东百集团",
+   "open_premium_pct": 3.95
+  },
+  {
+   "code": "002310",
+   "name": "东方新能",
+   "open_premium_pct": 0.0
+  },
+  {
+   "code": "603917",
+   "name": "合力科技",
+   "open_premium_pct": 0.0
+  },
+  {
+   "code": "603918",
+   "name": "金桥信息",
+   "open_premium_pct": 0.29
+  },
+  {
+   "code": "603232",
+   "name": "格尔软件",
+   "open_premium_pct": -1.52
+  },
+  {
+   "code": "600191",
+   "name": "华资实业",
+   "open_premium_pct": -0.53
+  },
+  {
+   "code": "000659",
+   "name": "珠海中富",
+   "open_premium_pct": 1.81
+  },
+  {
+   "code": "605179",
+   "name": "一鸣食品",
+   "open_premium_pct": 6.12
+  },
+  {
+   "code": "002687",
+   "name": "乔治白",
+   "open_premium_pct": -0.75
+  },
+  {
+   "code": "600756",
+   "name": "浪潮软件",
+   "open_premium_pct": -0.32
+  },
+  {
+   "code": "603580",
+   "name": "艾艾精工",
+   "open_premium_pct": 3.81
+  },
+  {
+   "code": "605162",
+   "name": "新中港",
+   "open_premium_pct": -0.87
+  },
+  {
+   "code": "600199",
+   "name": "金种子酒",
+   "open_premium_pct": -0.27
+  },
+  {
+   "code": "002869",
+   "name": "金溢科技",
+   "open_premium_pct": -0.06
+  },
+  {
+   "code": "002847",
+   "name": "盐津铺子",
+   "open_premium_pct": 1.39
+  },
+  {
+   "code": "000503",
+   "name": "国新健康",
+   "open_premium_pct": 0.14
+  },
+  {
+   "code": "603980",
+   "name": "吉华集团",
+   "open_premium_pct": 7.69
+  },
+  {
+   "code": "300067",
+   "name": "安诺其",
+   "open_premium_pct": -2.14
+  },
+  {
+   "code": "002795",
+   "name": "永和智控",
+   "open_premium_pct": 1.98
+  },
+  {
+   "code": "002212",
+   "name": "天融信",
+   "open_premium_pct": 5.5
+  },
+  {
+   "code": "000517",
+   "name": "荣安地产",
+   "open_premium_pct": 1.62
+  },
+  {
+   "code": "603400",
+   "name": "华之杰",
+   "open_premium_pct": 0.54
+  },
+  {
+   "code": "000779",
+   "name": "甘咨询",
+   "open_premium_pct": -1.03
+  }
+ ],
+ "top_fallers": [
+  {
+   "code": "002173",
+   "name": "创新医疗",
+   "change_pct": -10.02,
+   "note": "昨日涨停(昨2板)"
+  },
+  {
+   "code": "603297",
+   "name": "永新光学",
+   "change_pct": -8.46,
+   "note": "昨日涨停(昨1板)"
+  },
+  {
+   "code": "301421",
+   "name": "波长光电",
+   "change_pct": -8.3,
+   "note": "昨日涨停(昨1板)"
+  },
+  {
+   "code": "002338",
+   "name": "奥普光电",
+   "change_pct": -7.59,
+   "note": "昨日涨停(昨1板)"
+  },
+  {
+   "code": "000566",
+   "name": "海南海药",
+   "change_pct": -7.2,
+   "note": "昨日涨停(昨2板)"
+  },
+  {
+   "code": "600775",
+   "name": "南京熊猫",
+   "change_pct": -6.96,
+   "note": "昨日涨停(昨2板)"
+  },
+  {
+   "code": "000859",
+   "name": "国风新材",
+   "change_pct": -6.75,
+   "note": "昨日涨停(昨1板)"
+  },
+  {
+   "code": "002687",
+   "name": "乔治白",
+   "change_pct": -6.6,
+   "note": "昨日涨停(昨1板)"
+  },
+  {
+   "code": "002388",
+   "name": "新亚制程",
+   "change_pct": -6.44,
+   "note": "昨日涨停(昨3板)"
+  },
+  {
+   "code": "603928",
+   "name": "兴业股份",
+   "change_pct": -6.27,
+   "note": "昨日涨停(昨1板)"
+  },
+  {
+   "code": "600629",
+   "name": "华建集团",
+   "change_pct": -5.66,
+   "note": "昨日涨停(昨1板)"
+  },
+  {
+   "code": "605162",
+   "name": "新中港",
+   "change_pct": -5.31,
+   "note": "昨日涨停(昨1板)"
+  },
+  {
+   "code": "001309",
+   "name": "德明利",
+   "change_pct": -1.06,
+   "note": "涨停开盘天量炸板收-1.06%，存储链高位派发"
+  },
+  {
+   "code": "603137",
+   "name": "恒尚节能",
+   "change_pct": -4.62,
+   "note": "1进2炸板（跨界存储）"
+  },
+  {
+   "code": "000636",
+   "name": "风华高科",
+   "change_pct": -2.28,
+   "note": "首板炸板（MLCC）"
+  }
+ ],
+ "notes": []
+}

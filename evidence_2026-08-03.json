@@ -1,0 +1,453 @@
+{
+  "meta": {
+    "date": "2026-08-03",
+    "generated_at": "2026-08-03T23:29:23",
+    "data_sources": [
+      "大班客：https://dabanke.com/index-20260803.html",
+      "08-03 深证综指同花顺日线未更新（截止 07-31），两市成交与指数改用腾讯行情口径：沪 9522.57 亿 + 深 10451.29 亿 = 19973.86 亿",
+      "数据源：同花顺日线（指数/板块成交额）+ 东方财富涨停/跌停池 + 腾讯个股K线 + 新浪个股资金流；板块主力净流入：东财行业板块主力净流入命中 86/90 个板块；中军尾盘行为取自东财分钟线（近 3 个交易日内可得）",
+      "北向资金日频净买入未披露；涨停池口径为东财（75 家），跌停 8 家"
+    ],
+    "data_gaps": [
+      "北向资金日频净买入自 2024-08-19 起未披露，不得编造北向数据"
+    ]
+  },
+  "market": {
+    "total_turnover_yi": 19973.86,
+    "prev_total_turnover_yi": 25419.48,
+    "turnover_change_pct": -21.42,
+    "indices": [
+      {
+        "name": "上证指数",
+        "close": 3809.66,
+        "change_pct": -0.59,
+        "turnover_yi": 9522.57
+      },
+      {
+        "name": "深证成指",
+        "close": 13448.29,
+        "change_pct": -0.96,
+        "turnover_yi": 10451.29
+      },
+      {
+        "name": "创业板指",
+        "close": 3302.55,
+        "change_pct": -1.24,
+        "turnover_yi": 4865.04
+      },
+      {
+        "name": "科创50",
+        "close": 1552.89,
+        "change_pct": -5.08,
+        "turnover_yi": 1245.11
+      },
+      {
+        "name": "沪深300",
+        "close": 4543.18,
+        "change_pct": -0.98,
+        "turnover_yi": null
+      },
+      {
+        "name": "上证50",
+        "close": 2887.05,
+        "change_pct": -1.23,
+        "turnover_yi": null
+      }
+    ],
+    "top_boards": [
+      {
+        "name": "半导体",
+        "turnover_yi": 3223.93,
+        "ratio_pct": 16.14,
+        "change_pct": -3.46,
+        "main_flow_yi": -200.6,
+        "limit_ups": 1
+      },
+      {
+        "name": "通信设备",
+        "turnover_yi": 1268.7,
+        "ratio_pct": 6.35,
+        "change_pct": 1.55,
+        "main_flow_yi": 12.74,
+        "limit_ups": null
+      },
+      {
+        "name": "元件",
+        "turnover_yi": 850.5,
+        "ratio_pct": 4.26,
+        "change_pct": -1.13,
+        "main_flow_yi": -19.07,
+        "limit_ups": null
+      },
+      {
+        "name": "软件开发",
+        "turnover_yi": 601.88,
+        "ratio_pct": 3.01,
+        "change_pct": 0.74,
+        "main_flow_yi": -14.45,
+        "limit_ups": null
+      },
+      {
+        "name": "通用设备",
+        "turnover_yi": 562.49,
+        "ratio_pct": 2.82,
+        "change_pct": 1.75,
+        "main_flow_yi": 6.58,
+        "limit_ups": null
+      },
+      {
+        "name": "IT服务",
+        "turnover_yi": 556.6,
+        "ratio_pct": 2.79,
+        "change_pct": 0.98,
+        "main_flow_yi": -3.28,
+        "limit_ups": null
+      },
+      {
+        "name": "消费电子",
+        "turnover_yi": 496.66,
+        "ratio_pct": 2.49,
+        "change_pct": 0.37,
+        "main_flow_yi": -28.57,
+        "limit_ups": null
+      },
+      {
+        "name": "电网设备",
+        "turnover_yi": 456.09,
+        "ratio_pct": 2.28,
+        "change_pct": 3.52,
+        "main_flow_yi": 16.31,
+        "limit_ups": null
+      }
+    ],
+    "zt_pool_count": 75,
+    "dt_pool_count": 8,
+    "yesterday_zt_premium": {
+      "count": 98,
+      "avg_pct": 2.33
+    },
+    "top_fallers": [
+      {
+        "code": "002199",
+        "name": "东晶电子",
+        "change_pct": -10.02,
+        "note": "跌停（元件，连续跌停 1 天）"
+      },
+      {
+        "code": "002379",
+        "name": "宏桥控股",
+        "change_pct": -10.01,
+        "note": "跌停（工业金属，连续跌停 1 天）"
+      },
+      {
+        "code": "600641",
+        "name": "先导基电",
+        "change_pct": -10.0,
+        "note": "跌停（半导体，连续跌停 1 天）"
+      },
+      {
+        "code": "603256",
+        "name": "宏和科技",
+        "change_pct": -10.0,
+        "note": "跌停（玻璃玻纤，连续跌停 1 天）"
+      },
+      {
+        "code": "605068",
+        "name": "明新旭腾",
+        "change_pct": -10.0,
+        "note": "跌停（汽车零部，连续跌停 1 天）"
+      },
+      {
+        "code": "603986",
+        "name": "兆易创新",
+        "change_pct": -10.0,
+        "note": "跌停（半导体，连续跌停 1 天）"
+      },
+      {
+        "code": "600176",
+        "name": "中国巨石",
+        "change_pct": -9.99,
+        "note": "跌停（玻璃玻纤，连续跌停 1 天）"
+      },
+      {
+        "code": "603990",
+        "name": "麦迪科技",
+        "change_pct": -9.98,
+        "note": "跌停（软件开发，连续跌停 1 天）"
+      },
+      {
+        "code": "300996",
+        "name": "普联软件",
+        "change_pct": -8.22,
+        "note": "昨日2连板今日大跌（A杀嫌疑）"
+      }
+    ]
+  },
+  "limit_up_emotion": {
+    "sealed_total": 75,
+    "blast_total": 18,
+    "seal_rate_pct": 80.6,
+    "first_board": {
+      "sealed": 58,
+      "attempted": 73,
+      "rate_pct": 79.0
+    },
+    "promote_rates": {
+      "9进10": 0.0,
+      "5进6": 100.0,
+      "4进5": 100.0,
+      "3进4": 100.0,
+      "2进3": 17.0,
+      "1进2": 14.0
+    },
+    "max_ladder": 6,
+    "ladder": {
+      "2": 13,
+      "3": 1,
+      "4": 1,
+      "5": 1,
+      "6": 1
+    },
+    "industry_concentration": [
+      {
+        "industry": "核电核能",
+        "count": 14
+      },
+      {
+        "industry": "国企改革",
+        "count": 8
+      },
+      {
+        "industry": "AI应用",
+        "count": 7
+      },
+      {
+        "industry": "人形机器人",
+        "count": 5
+      },
+      {
+        "industry": "机器人",
+        "count": 5
+      },
+      {
+        "industry": "可控核聚变",
+        "count": 4
+      },
+      {
+        "industry": "具身智能",
+        "count": 3
+      },
+      {
+        "industry": "商业航天",
+        "count": 3
+      },
+      {
+        "industry": "机器人概念",
+        "count": 3
+      },
+      {
+        "industry": "光伏设备",
+        "count": 3
+      }
+    ],
+    "concept_focus": [
+      {
+        "concept": "电气设备",
+        "sealed": 11,
+        "total": 13
+      },
+      {
+        "concept": "机械设备",
+        "sealed": 8,
+        "total": 13
+      },
+      {
+        "concept": "基础化工",
+        "sealed": 6,
+        "total": 9
+      },
+      {
+        "concept": "电子设备",
+        "sealed": 5,
+        "total": 6
+      },
+      {
+        "concept": "信息技术",
+        "sealed": 4,
+        "total": 4
+      }
+    ]
+  },
+  "battlefield": {
+    "verdicts": [
+      {
+        "board": "半导体",
+        "ratio_pct": 16.14,
+        "change_pct": -3.46,
+        "main_flow_yi": -200.6,
+        "signal": "分歧信号（派发）",
+        "capital_type": "资金撤退型（派发嫌疑）",
+        "evidence": [
+          "板块成交 3224 亿放量但滞涨/收跌 -3.46%，多空分歧巨大，机构可能借机分批离场",
+          "板块「半导体」涨停家数 1 家（涨停池行业标签匹配）",
+          "板块放量下跌（成交 3224 亿、涨幅 -3.46%），资金属性偏向机构/游资批量离场，属于战场撤退而非攻击"
+        ]
+      }
+    ],
+    "fallback_focus": [],
+    "north_statement": "北向资金日频净买入自 2024-08-19 起未再官方披露；本报告不编造北向数据，资金属性改用主力净流入 + 成交结构推导。",
+    "notes": []
+  },
+  "anchors": {
+    "capacity_leader": {
+      "status": "ok",
+      "code": "002131",
+      "name": "利欧股份",
+      "market_cap": 347.39,
+      "turnover": 70.01,
+      "industry": "通用设备",
+      "board_match": false,
+      "health": [
+        "收盘 5.13 位于 5 日线 4.43 上方",
+        "10 日线 4.19 上方"
+      ],
+      "tail_behavior": "尾盘企稳",
+      "tail_verdict": "机构抱团稳定",
+      "main_flow": 17.98,
+      "reasoning": [
+        "市值 347 亿、成交 70 亿，满足中军标准（>100 亿且 >20 亿），行业「通用设备」与核心板块「半导体」无标签匹配，按成交额取最大中军（可能为独立主线）；尾盘企稳 → 机构抱团稳定"
+      ]
+    },
+    "sentiment_leader": {
+      "code": "003032",
+      "name": "传智教育",
+      "连板数": 6,
+      "first_seal_time": "09:25:00",
+      "industry": "教育",
+      "amount": 79372011,
+      "seal_fund": 198742617,
+      "blast_count": 0,
+      "change_pct": 9.99,
+      "source": "东财涨停池"
+    },
+    "earliest_sealer": {
+      "code": "000593",
+      "name": "德龙汇能",
+      "first_seal_time": "09:25:00",
+      "industry": "燃气Ⅱ",
+      "ladder": 2
+    },
+    "followers": [],
+    "blast_tolerance": {
+      "total": 18,
+      "avg_change_pct": 7.91,
+      "verdict": "容错率尚可：炸板 18 家、平均收盘 7.91%（仍为正），炸板后回封/承接尚存，未触发风控降频条件"
+    }
+  },
+  "cycle": {
+    "metrics": {
+      "sealed_total": 75,
+      "seal_rate": 80.6,
+      "ladder": {
+        "2": 13,
+        "3": 1,
+        "4": 1,
+        "5": 1,
+        "6": 1
+      },
+      "max_ladder": 6,
+      "first_sealed": 58,
+      "first_rate": 79.0,
+      "promote_1to2": 14.0,
+      "premium_avg": 2.33,
+      "blast_avg": 7.91,
+      "dt_count": 8
+    },
+    "phase_rule": "退潮期",
+    "evidence": [
+      "跌幅榜出现 9 只收盘跌超 7% 的个股（如 东晶电子）",
+      "跌停 8 家",
+      "跌幅榜大面积蔓延（8 只以上跌超 7%），判定退潮期"
+    ]
+  },
+  "strategy": {
+    "environment": "缩量（两市成交 19974 亿，环比 -21.4%），指数普跌（退潮特征）",
+    "position_cheng": 2.0,
+    "position_band": [
+      0,
+      2
+    ],
+    "position_reasoning": "阶段基准仓位 0-2 成（退潮期）；出现高位 A 杀/大阴线（普联软件）→ 上限压至 2 成",
+    "attack": [
+      "退潮期不主动进攻：容量中军 利欧股份（通用设备，与核心板块「半导体」无行业标签匹配）仅作独立观察，除非放量反包且站回 5 日线，否则不轻仓试错",
+      "情绪龙头 传智教育（6 连板）作为板块高度标尺：退潮期观察其是否补跌，不参与任何接力"
+    ],
+    "avoid": [
+      "坚决回避无基本面支撑的高位缩量加速股（加速末端一字板最容易成为 A 杀起点）"
+    ],
+    "risk_warnings": [
+      {
+        "code": "002199",
+        "name": "东晶电子",
+        "change_pct": -10.02,
+        "note": "跌停（元件，连续跌停 1 天）"
+      },
+      {
+        "code": "002379",
+        "name": "宏桥控股",
+        "change_pct": -10.01,
+        "note": "跌停（工业金属，连续跌停 1 天）"
+      },
+      {
+        "code": "600641",
+        "name": "先导基电",
+        "change_pct": -10.0,
+        "note": "跌停（半导体，连续跌停 1 天）"
+      },
+      {
+        "code": "603256",
+        "name": "宏和科技",
+        "change_pct": -10.0,
+        "note": "跌停（玻璃玻纤，连续跌停 1 天）"
+      },
+      {
+        "code": "605068",
+        "name": "明新旭腾",
+        "change_pct": -10.0,
+        "note": "跌停（汽车零部，连续跌停 1 天）"
+      },
+      {
+        "code": "603986",
+        "name": "兆易创新",
+        "change_pct": -10.0,
+        "note": "跌停（半导体，连续跌停 1 天）"
+      },
+      {
+        "code": "600176",
+        "name": "中国巨石",
+        "change_pct": -9.99,
+        "note": "跌停（玻璃玻纤，连续跌停 1 天）"
+      },
+      {
+        "code": "603990",
+        "name": "麦迪科技",
+        "change_pct": -9.98,
+        "note": "跌停（软件开发，连续跌停 1 天）"
+      },
+      {
+        "code": "300996",
+        "name": "普联软件",
+        "change_pct": -8.22,
+        "note": "昨日2连板今日大跌（A杀嫌疑）"
+      }
+    ],
+    "notes": [
+      "负反馈扫描基于跌幅榜数据"
+    ]
+  },
+  "rule_engine": {
+    "phase": "退潮期",
+    "position_cheng": 2.0,
+    "note": "以上 phase/position/signal 为规则引擎确定性初判，仅供参照；请基于证据链独立判断，可修正并说明理由。"
+  }
+}

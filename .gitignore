@@ -1,0 +1,13 @@
+# Python
+__pycache__/
+*.py[cod]
+
+# macOS
+.DS_Store
+
+# 运行时缓存（可随时联网重抓/重建）
+data_cache/
+
+# 本地临时文件
+*.log
+*.tmp
