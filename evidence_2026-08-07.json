@@ -1,7 +1,7 @@
 {
   "meta": {
     "date": "2026-08-07",
-    "generated_at": "2026-08-08T09:27:26",
+    "generated_at": "2026-08-08T09:52:16",
     "note": "本 JSON 仅包含数据与确定性聚合，不含交易判断；请由 LLM 基于数据独立完成四步分析并撰写报告。注意：leaders_candidates 的 industry 为东财涨停池行业标签，可能只反映次要属性，板块归属需结合个股主营判断；涨停池个股尾盘行为统一标注为『涨停封板』。",
     "data_sources": [
       "大班客：https://dabanke.com/index-20260807.html",
@@ -164,12 +164,36 @@
       "rate_pct": 71.0
     },
     "promote_rates": {
-      "10进11": 0.0,
-      "5进6": 0.0,
-      "4进5": 0.0,
-      "3进4": 56.0,
-      "2进3": 22.0,
-      "1进2": 12.0
+      "10进11": {
+        "rate_pct": 0.0,
+        "sealed": 0,
+        "attempted": 1
+      },
+      "5进6": {
+        "rate_pct": 0.0,
+        "sealed": 0,
+        "attempted": 1
+      },
+      "4进5": {
+        "rate_pct": 0.0,
+        "sealed": 0,
+        "attempted": 2
+      },
+      "3进4": {
+        "rate_pct": 56.0,
+        "sealed": 5,
+        "attempted": 9
+      },
+      "2进3": {
+        "rate_pct": 22.0,
+        "sealed": 2,
+        "attempted": 9
+      },
+      "1进2": {
+        "rate_pct": 12.0,
+        "sealed": 7,
+        "attempted": 57
+      }
     },
     "max_ladder": 4,
     "ladder": {

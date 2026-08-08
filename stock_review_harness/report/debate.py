@@ -69,6 +69,8 @@ def _is_benign(tok: str, report: str) -> bool:
             return True
         if any(x in before for x in ("沪深", "科创", "上证", "深证", "创业板")):  # 指数名
             return True
+        if "进" in before:                        # 晋级层级名（10进11、1进2）
+            return True
         start = idx + len(tok)
     return False
 
