@@ -1,7 +1,7 @@
 {
   "meta": {
     "date": "2026-08-07",
-    "generated_at": "2026-08-08T11:15:58",
+    "generated_at": "2026-08-08T12:02:55",
     "note": "本 JSON 仅包含数据与确定性聚合，不含交易判断；请由 LLM 基于数据独立完成四步分析并撰写报告。注意：leaders_candidates 的 industry 为东财涨停池行业标签，可能只反映次要属性，板块归属需结合个股主营判断；涨停池个股尾盘行为统一标注为『涨停封板』。",
     "data_sources": [
       "大班客：https://dabanke.com/index-20260807.html",
@@ -35,34 +35,44 @@
     "turnover_change_pct": 5.36,
     "indices": [
       {
-        "name": "创业板指",
-        "close": 3563.12,
-        "change_pct": 1.35,
-        "turnover_yi": 7348.24
-      },
-      {
-        "name": "上证指数",
-        "close": 3940.04,
-        "change_pct": 1.02,
-        "turnover_yi": 12095.44
-      },
-      {
         "name": "科创50",
         "close": 1744.02,
         "change_pct": 2.51,
-        "turnover_yi": 1362.69
+        "turnover_yi": 1362.69,
+        "ma5": 1661.65,
+        "ma5_dist_pct": 4.96
+      },
+      {
+        "name": "创业板指",
+        "close": 3563.12,
+        "change_pct": 1.35,
+        "turnover_yi": 7348.24,
+        "ma5": 3481.07,
+        "ma5_dist_pct": 2.36
       },
       {
         "name": "沪深300",
         "close": 4694.44,
         "change_pct": 0.93,
-        "turnover_yi": 7884.06
+        "turnover_yi": 7884.06,
+        "ma5": 4629.6,
+        "ma5_dist_pct": 1.4
+      },
+      {
+        "name": "上证指数",
+        "close": 3940.04,
+        "change_pct": 1.02,
+        "turnover_yi": 12095.44,
+        "ma5": 3870.15,
+        "ma5_dist_pct": 1.81
       },
       {
         "name": "深证成指",
         "close": 14311.01,
         "change_pct": 1.42,
-        "turnover_yi": 14548.76
+        "turnover_yi": 14548.76,
+        "ma5": 13979.87,
+        "ma5_dist_pct": 2.37
       }
     ],
     "top_boards": [
@@ -576,6 +586,158 @@
     "first_seal_time": "09:25:00",
     "ladder": 2,
     "industry": "通信设备"
+  },
+  "capital": {
+    "institutional_proxy": {
+      "large_cap_zt": [
+        {
+          "name": "光迅科技",
+          "market_cap_yi": 1598.08,
+          "turnover_yi": 132.89,
+          "ladder": 1,
+          "industry": "通信设备"
+        },
+        {
+          "name": "云南锗业",
+          "market_cap_yi": 653.64,
+          "turnover_yi": 117.41,
+          "ladder": 4,
+          "industry": "小金属"
+        },
+        {
+          "name": "生益科技",
+          "market_cap_yi": 3400.12,
+          "turnover_yi": 107.29,
+          "ladder": 1,
+          "industry": "元件"
+        },
+        {
+          "name": "方正科技",
+          "market_cap_yi": 550.03,
+          "turnover_yi": 52.94,
+          "ladder": 2,
+          "industry": "元件"
+        },
+        {
+          "name": "中国稀土",
+          "market_cap_yi": 606.91,
+          "turnover_yi": 33.9,
+          "ladder": 1,
+          "industry": "小金属"
+        },
+        {
+          "name": "景旺电子",
+          "market_cap_yi": 950.64,
+          "turnover_yi": 32.29,
+          "ladder": 2,
+          "industry": "元件"
+        }
+      ]
+    },
+    "hot_money_proxy": {
+      "max_ladder": 4,
+      "high_ladder_count": 7,
+      "first_board_rate_pct": 71.0
+    },
+    "quant_proxy": {
+      "zt_industry_spread": 168,
+      "sealed_total": 74,
+      "first_board_ratio_pct": 82.4,
+      "blast_ratio_pct": 26.7
+    },
+    "northbound_proxy": {
+      "note": "北向日频净买入未披露，以大市值涨停方向（institutional_proxy）替代"
+    },
+    "event_capital_proxy": {
+      "event_tags": {
+        "预增": 11,
+        "重组": 3,
+        "变更": 1,
+        "扭亏": 1,
+        "摘帽": 1,
+        "回购": 1
+      }
+    },
+    "note": "以上为确定性数据代理；机构/游资/量化/北向/产业资本的资金属性定性由 LLM 完成"
+  },
+  "market_leaders": {
+    "market_height": {
+      "code": "002552",
+      "name": "宝鼎科技",
+      "ladder": 4,
+      "first_seal_time": "09:30:00",
+      "industry": "元件"
+    },
+    "capacity_core": {
+      "code": "002281",
+      "name": "光迅科技",
+      "ladder": 1,
+      "industry": "通信设备",
+      "market_cap_yi": 1598.08,
+      "turnover_yi": 132.89,
+      "change_pct": 10.0,
+      "first_seal_time": "10:07:27",
+      "blast_count": 4,
+      "close": 193.04,
+      "ma5": 173.81,
+      "ma10": 171.87,
+      "ma5_dist_pct": 11.06,
+      "ma10_dist_pct": 12.32,
+      "main_flow_yi": 39.61,
+      "tail_behavior": "涨停封板"
+    },
+    "sentiment_barometer": {
+      "code": "002552",
+      "name": "宝鼎科技",
+      "ladder": 4,
+      "first_seal_time": "09:30:00",
+      "industry": "元件"
+    },
+    "index_anchor": {
+      "index": "科创50",
+      "index_change_pct": 2.51,
+      "board": "半导体"
+    }
+  },
+  "risk_matrix": {
+    "rows": [
+      {
+        "risk": "指数风险",
+        "trigger": "沪指收盘跌破 5 日线",
+        "triggered": false,
+        "anchor": {
+          "close": 3940.04,
+          "ma5": 3870.15
+        }
+      },
+      {
+        "risk": "情绪风险",
+        "trigger": "最高板个股跌停",
+        "triggered": false,
+        "anchor": {
+          "top_stock": "宝鼎科技"
+        }
+      },
+      {
+        "risk": "主线风险",
+        "trigger": "成交额最大板块收跌或主力净流出",
+        "triggered": false,
+        "anchor": {
+          "board": "半导体",
+          "change_pct": 3.37,
+          "main_flow_yi": 108.2
+        }
+      },
+      {
+        "risk": "资金风险",
+        "trigger": "两市成交跌破 20000 亿",
+        "triggered": false,
+        "anchor": {
+          "total_turnover_yi": 26644.2
+        }
+      }
+    ],
+    "note": "triggered 为当日可计算值（None=数据不足）；动作（降仓/清仓/切换/防守）由 LLM 按触发状态给出"
   },
   "diagnostics": [
     {

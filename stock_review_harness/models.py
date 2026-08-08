@@ -55,6 +55,7 @@ class IndexQuote:
     close: Optional[float] = None
     change_pct: Optional[float] = None
     turnover: Optional[float] = None  # 亿元
+    ma5: Optional[float] = None        # 5 日均线（含当日，供"跌破5日线"等条件）
 
 
 @dataclass

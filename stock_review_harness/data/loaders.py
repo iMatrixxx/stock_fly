@@ -50,6 +50,7 @@ def _to_index(q: dict) -> IndexQuote:
         close=q.get("close"),
         change_pct=q.get("change_pct"),
         turnover=q.get("turnover"),
+        ma5=q.get("ma5"),
     )
 
 

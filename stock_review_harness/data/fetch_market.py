@@ -126,6 +126,7 @@ def fetch_market(date_str: str, use_cache: bool = True) -> MarketData:
             continue  # 仅用于两市总额
         prev_close = idx_rows[name].get(prev_date.replace("-", ""))
         change = round((row["close"] / prev_close["close"] - 1) * 100, 2) if prev_close else None
+        ma5 = _index_ma5(idx_rows[name], ymd)
         indices.append(
             IndexQuote(
                 name=name,
@@ -133,6 +134,7 @@ def fetch_market(date_str: str, use_cache: bool = True) -> MarketData:
                 close=row["close"],
                 change_pct=change,
                 turnover=round(row["amount"] / 1e8, 2),
+                ma5=ma5,
             )
         )
     sh = r30.get("上证指数") or {}
@@ -311,3 +313,16 @@ def fetch_market(date_str: str, use_cache: bool = True) -> MarketData:
     # use_cache 只控制"读取"；抓取结果始终回写快照缓存（--refresh 也刷新缓存）
     save_market_cache(market)
     return market
+
+
+def _index_ma5(rows: dict[str, dict], ymd: str) -> float | None:
+    """指数 5 日均线（含当日）；数据不足返回 None。"""
+    dates = sorted(rows)
+    try:
+        i = dates.index(ymd)
+    except ValueError:
+        return None
+    seg = [rows[d]["close"] for d in dates[max(0, i - 4): i + 1]]
+    if len(seg) < 5:
+        return None
+    return round(sum(seg) / 5, 2)

@@ -8,6 +8,7 @@
 from __future__ import annotations
 
 import json
+from collections import Counter
 from datetime import datetime
 
 from ..data.validate import validate_bundle
@@ -61,6 +62,12 @@ def _market_section(bundle: DataBundle) -> dict:
                 "close": _f(i.close),
                 "change_pct": _f(i.change_pct),
                 "turnover_yi": _f(i.turnover),
+                "ma5": _f(i.ma5),
+                "ma5_dist_pct": (
+                    _f((i.close - i.ma5) / i.ma5 * 100)
+                    if i.close is not None and i.ma5
+                    else None
+                ),
             }
             for i in m.indices
         ],
@@ -216,6 +223,179 @@ def _first_sealer(bundle: DataBundle) -> dict | None:
     }
 
 
+def _capital_proxies(bundle: DataBundle) -> dict:
+    """资金属性拆解的数据代理（确定性聚合；定性由 LLM 完成）。"""
+    m = bundle.market
+    zt = m.zt_pool
+    summary = bundle.dabanke.summary
+
+    # 机构趋势资金代理：大市值涨停股（≥500 亿）
+    large = sorted(
+        (s for s in zt if (s.get("total_mv") or 0) >= 500e8),
+        key=lambda s: s.get("amount") or 0,
+        reverse=True,
+    )
+
+    # 量化资金代理：题材扩散度（大班客行业标签数）、首板占比、炸板占比
+    tags: set[str] = set()
+    for s in bundle.dabanke.pool:
+        for t in (s.get("industry") or "").split("+"):
+            if t.strip():
+                tags.add(t.strip())
+    sealed = summary.get("sealed_total") or len(zt)
+    first_sealed = (summary.get("首板") or {}).get("sealed") or 0
+    blast = summary.get("炸板_total") or 0
+
+    # 产业资本代理：事件类题材标签计数（大班客标签含预增/回购/变更等事件词）
+    event_kw = ("变更", "回购", "增持", "重组", "扭亏", "预增", "举牌", "摘帽", "股权")
+    events: Counter[str] = Counter()
+    for s in bundle.dabanke.pool:
+        ind = s.get("industry") or ""
+        for kw in event_kw:
+            if kw in ind:
+                events[kw] += 1
+
+    return {
+        "institutional_proxy": {
+            "large_cap_zt": [
+                {
+                    "name": s.get("name"),
+                    "market_cap_yi": _f((s.get("total_mv") or 0) / 1e8),
+                    "turnover_yi": _f((s.get("amount") or 0) / 1e8),
+                    "ladder": s.get("ladder") or 1,
+                    "industry": s.get("industry") or "",
+                }
+                for s in large[:6]
+            ],
+        },
+        "hot_money_proxy": {
+            "max_ladder": summary.get("max_连板"),
+            "high_ladder_count": len(_high_ladder_stocks(bundle)),
+            "first_board_rate_pct": _f((summary.get("首板") or {}).get("rate")),
+        },
+        "quant_proxy": {
+            "zt_industry_spread": len(tags),
+            "sealed_total": sealed,
+            "first_board_ratio_pct": (
+                round(first_sealed / sealed * 100, 1) if sealed else None
+            ),
+            "blast_ratio_pct": (
+                round(blast / (sealed + blast) * 100, 1) if (sealed + blast) else None
+            ),
+        },
+        "northbound_proxy": {
+            "note": "北向日频净买入未披露，以大市值涨停方向（institutional_proxy）替代",
+        },
+        "event_capital_proxy": {"event_tags": dict(events.most_common(6))},
+        "note": "以上为确定性数据代理；机构/游资/量化/北向/产业资本的资金属性定性由 LLM 完成",
+    }
+
+
+def _market_leaders(bundle: DataBundle) -> dict:
+    """市场总龙头定位（确定性聚合）。"""
+    highs = _high_ladder_stocks(bundle)
+    cands = _leaders_candidates(bundle)
+    height = highs[0] if highs else None
+    capacity = max(cands, key=lambda c: c["turnover_yi"] or 0.0) if cands else None
+    top_ladder = [h for h in highs if h["ladder"] == (height["ladder"] if height else 0)]
+    barometer = min(top_ladder, key=lambda h: h["first_seal_time"]) if top_ladder else None
+    idx = max(
+        (i for i in bundle.market.indices if i.change_pct is not None),
+        key=lambda i: i.change_pct or -999.0,
+        default=None,
+    )
+    board = (
+        max(
+            (b for b in bundle.market.boards if b.turnover is not None),
+            key=lambda b: b.turnover or 0.0,
+            default=None,
+        )
+        if bundle.market.boards
+        else None
+    )
+    return {
+        "market_height": height,          # 市场总高度（最高连板）
+        "capacity_core": capacity,        # 市场容量核心（涨停池成交最大）
+        "sentiment_barometer": barometer, # 情绪风向标（最高板中最先封板）
+        "index_anchor": {
+            "index": idx.name if idx else None,
+            "index_change_pct": _f(idx.change_pct) if idx else None,
+            "board": board.name if board else None,
+        },
+    }
+
+
+def _risk_matrix(bundle: DataBundle) -> dict:
+    """系统性风险矩阵：触发条件当日可计算，动作由 LLM 给出。"""
+    m = bundle.market
+    sh = next((i for i in m.indices if i.name == "上证指数"), None)
+    idx_triggered = (
+        bool(sh.close is not None and sh.ma5 is not None and sh.close < sh.ma5)
+        if sh
+        else None
+    )
+    idx_unknown = bool(sh is None or sh.close is None or sh.ma5 is None)
+
+    dt_codes = {s.get("code") for s in m.dt_pool}
+    highs = _high_ladder_stocks(bundle)
+    top = highs[0] if highs else None
+    emotion_triggered = bool(top and top["code"] in dt_codes)
+
+    boards = sorted(
+        (b for b in m.boards if b.turnover is not None),
+        key=lambda b: b.turnover or 0.0,
+        reverse=True,
+    )
+    main_board = boards[0] if boards else None
+    main_triggered = bool(
+        main_board
+        and (
+            (main_board.change_pct is not None and main_board.change_pct < 0)
+            or (main_board.main_flow is not None and main_board.main_flow < 0)
+        )
+    )
+
+    total = m.total_turnover
+    cap_triggered = bool(total is not None and total < 20000)
+
+    return {
+        "rows": [
+            {
+                "risk": "指数风险",
+                "trigger": "沪指收盘跌破 5 日线",
+                "triggered": None if idx_unknown else idx_triggered,
+                "anchor": {
+                    "close": sh.close if sh else None,
+                    "ma5": sh.ma5 if sh else None,
+                },
+            },
+            {
+                "risk": "情绪风险",
+                "trigger": "最高板个股跌停",
+                "triggered": emotion_triggered,
+                "anchor": {"top_stock": top["name"] if top else None},
+            },
+            {
+                "risk": "主线风险",
+                "trigger": "成交额最大板块收跌或主力净流出",
+                "triggered": main_triggered,
+                "anchor": {
+                    "board": main_board.name if main_board else None,
+                    "change_pct": _f(main_board.change_pct) if main_board else None,
+                    "main_flow_yi": _f(main_board.main_flow) if main_board else None,
+                },
+            },
+            {
+                "risk": "资金风险",
+                "trigger": "两市成交跌破 20000 亿",
+                "triggered": cap_triggered if total is not None else None,
+                "anchor": {"total_turnover_yi": _f(total)},
+            },
+        ],
+        "note": "triggered 为当日可计算值（None=数据不足）；动作（降仓/清仓/切换/防守）由 LLM 按触发状态给出",
+    }
+
+
 def to_evidence_dict(bundle: DataBundle) -> dict:
     """把数据收集结果压缩为"现象 + 聚合 + 缺失标注"的证据链字典（无任何判定）。"""
     return {
@@ -241,6 +421,9 @@ def to_evidence_dict(bundle: DataBundle) -> dict:
         "leaders_candidates": _leaders_candidates(bundle),
         "high_ladder_stocks": _high_ladder_stocks(bundle),
         "first_sealer": _first_sealer(bundle),
+        "capital": _capital_proxies(bundle),
+        "market_leaders": _market_leaders(bundle),
+        "risk_matrix": _risk_matrix(bundle),
         "diagnostics": diagnose(bundle),
         "quantified": quantify(bundle),
     }
