@@ -201,6 +201,21 @@ def _high_ladder_stocks(bundle: DataBundle) -> list[dict]:
     return sorted(rows, key=lambda r: r["ladder"], reverse=True)
 
 
+def _first_sealer(bundle: DataBundle) -> dict | None:
+    """日内最先封板（涨停池 first_seal 最小者），确定性聚合。"""
+    with_time = [s for s in bundle.market.zt_pool if s.get("first_seal")]
+    if not with_time:
+        return None
+    s = min(with_time, key=lambda x: x["first_seal"])
+    return {
+        "code": s.get("code"),
+        "name": s.get("name"),
+        "first_seal_time": s.get("first_seal"),
+        "ladder": s.get("ladder") or 1,
+        "industry": s.get("industry") or "",
+    }
+
+
 def to_evidence_dict(bundle: DataBundle) -> dict:
     """把数据收集结果压缩为"现象 + 聚合 + 缺失标注"的证据链字典（无任何判定）。"""
     return {
@@ -225,6 +240,7 @@ def to_evidence_dict(bundle: DataBundle) -> dict:
         "emotion": _emotion_section(bundle),
         "leaders_candidates": _leaders_candidates(bundle),
         "high_ladder_stocks": _high_ladder_stocks(bundle),
+        "first_sealer": _first_sealer(bundle),
         "diagnostics": diagnose(bundle),
         "quantified": quantify(bundle),
     }
