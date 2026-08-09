@@ -24,6 +24,16 @@
     <dict>
         <key>PATH</key>
         <string>/usr/local/bin:/usr/bin:/bin:/opt/homebrew/bin</string>
+        <key>SMTP_HOST</key>
+        <string>smtp.gmail.com</string>
+        <key>SMTP_PORT</key>
+        <string>465</string>
+        <key>SMTP_USER</key>
+        <string>imatrixxxlee@gmail.com</string>
+        <key>SMTP_USE_SSL</key>
+        <string>1</string>
+        <key>MAIL_TO</key>
+        <string>imatrixxxlee@gmail.com</string>
     </dict>
 </dict>
 </plist>

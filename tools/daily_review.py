@@ -13,6 +13,9 @@
   SMTP_USE_SSL=1 / MAIL_TO（默认 lixiaotao@whu.edu.cn）
   LLM_API_URL / LLM_API_KEY / LLM_MODEL（可选：自动写报告；否则只出证据链+prompt）
   REVIEW_SKILL_DIR / REVIEW_CACHE_DIR（可选）
+
+凭据也可放入 ~/.stockfly_review.env（chmod 600），脚本启动时自动加载（env 优先）：
+  SMTP_PASSWORD=xxxx  （Gmail 需使用"应用专用密码"）
 """
 
 from __future__ import annotations
@@ -40,7 +43,24 @@ from stock_review_harness.report.prompt import build_prompt  # noqa: E402
 
 DEFAULT_SKILL_DIR = Path("/Users/imatrix/.codex/skills/review-a-share-market")
 DEFAULT_TEMPLATE = ROOT / "assets" / "llm_report_prompt.md"
-DEFAULT_MAIL_TO = "lixiaotao@whu.edu.cn"
+DEFAULT_MAIL_TO = "imatrixxxlee@gmail.com"
+DEFAULT_SMTP_HOST = "smtp.gmail.com"
+DEFAULT_SMTP_PORT = "465"
+DEFAULT_SMTP_USER = "imatrixxxlee@gmail.com"
+ENV_FILE = Path.home() / ".stockfly_review.env"
+
+
+def _load_env_file() -> None:
+    """加载 ~/.stockfly_review.env（已有 os.environ 的值优先）。"""
+    if not ENV_FILE.exists():
+        return
+    for line in ENV_FILE.read_text(encoding="utf-8").splitlines():
+        line = line.strip()
+        if not line or line.startswith("#") or "=" not in line:
+            continue
+        k, _, v = line.partition("=")
+        k, v = k.strip(), v.strip().strip('"').strip("'")
+        os.environ.setdefault(k, v)
 
 
 def _is_weekend(d: _date) -> bool:
@@ -124,14 +144,14 @@ def write_report_with_llm(date_str: str, prompt_path: Path, out: Path) -> bool:
 
 
 def send_email(date_str: str, report_path: Path | None, evidence_path: Path | None) -> bool:
-    host = os.environ.get("SMTP_HOST")
-    user = os.environ.get("SMTP_USER")
+    host = os.environ.get("SMTP_HOST", DEFAULT_SMTP_HOST)
+    user = os.environ.get("SMTP_USER", DEFAULT_SMTP_USER)
     pwd = os.environ.get("SMTP_PASSWORD")
     to = os.environ.get("MAIL_TO", DEFAULT_MAIL_TO)
     if not (host and user and pwd):
         print("[WARN] 未配置 SMTP_HOST/SMTP_USER/SMTP_PASSWORD，跳过邮件发送", flush=True)
         return False
-    port = int(os.environ.get("SMTP_PORT", "465"))
+    port = int(os.environ.get("SMTP_PORT", DEFAULT_SMTP_PORT))
     use_ssl = os.environ.get("SMTP_USE_SSL", "1") == "1"
 
     msg = MIMEMultipart()
@@ -162,6 +182,7 @@ def send_email(date_str: str, report_path: Path | None, evidence_path: Path | No
 
 
 def main(argv=None) -> None:
+    _load_env_file()
     ap = argparse.ArgumentParser(description="每日 A 股复盘自动生成 + 邮件")
     ap.add_argument("--date", help="复盘日期 YYYY-MM-DD（默认今天；周末自动跳过）")
     ap.add_argument("--skill-dir", default=os.environ.get("REVIEW_SKILL_DIR", str(DEFAULT_SKILL_DIR)))
