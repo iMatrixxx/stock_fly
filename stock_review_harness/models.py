@@ -130,3 +130,4 @@ class DataBundle:
     date: str
     market: MarketData
     dabanke: DabankeData
+    context: dict = field(default_factory=dict)  # 多日上下文（zt_history/board_series），尽力而为

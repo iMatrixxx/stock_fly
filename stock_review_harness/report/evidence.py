@@ -13,7 +13,10 @@ from datetime import datetime
 
 from ..data.validate import validate_bundle
 from ..logic.conditions import leader_ma_distances, quantify
+from ..logic.cycle import build_cycle_context
 from ..logic.diagnostics import diagnose
+from ..logic.migration import build_capital_migration
+from ..logic.rivalry import build_leader_rivalry
 from ..models import DataBundle
 
 
@@ -41,6 +44,8 @@ def _data_gaps(bundle: DataBundle) -> list[str]:
         gaps.append(f"以下主要板块主力净流入缺失：{'、'.join(missing_flow)}")
     if not m.yesterday_premiums:
         gaps.append("昨日涨停股今日开盘溢价缺失，接力意愿只能参考晋级率")
+    if not bundle.context:
+        gaps.append("多日上下文缺失（资金迁移/情绪周期/龙头竞争数据不足，只能基于当日判断）")
     return gaps
 
 
@@ -398,6 +403,8 @@ def _risk_matrix(bundle: DataBundle) -> dict:
 
 def to_evidence_dict(bundle: DataBundle) -> dict:
     """把数据收集结果压缩为"现象 + 聚合 + 缺失标注"的证据链字典（无任何判定）。"""
+    zt_history = bundle.context.get("zt_history") or []
+    board_series = bundle.context.get("board_series") or {}
     return {
         "meta": {
             "date": bundle.date,
@@ -426,6 +433,15 @@ def to_evidence_dict(bundle: DataBundle) -> dict:
         "risk_matrix": _risk_matrix(bundle),
         "diagnostics": diagnose(bundle),
         "quantified": quantify(bundle),
+        "cycle_context": build_cycle_context(
+            bundle.date, bundle.market.zt_pool, zt_history
+        ),
+        "capital_migration": build_capital_migration(
+            bundle.date, bundle.market, board_series, zt_history
+        ),
+        "leader_rivalry": build_leader_rivalry(
+            bundle.date, bundle.market.zt_pool, zt_history
+        ),
     }
 
 

@@ -82,6 +82,9 @@ python3 tools/build_llm_prompt.py evidence.json > prompt.md
   主力流出、指数涨 vs 高度独苗），LLM 须逐条调和；
 - `quantified`：**量化条件变量**——中军候选距 MA5/MA10 的百分比、板块主力流入强度，
   操作条件必须引用硬阈值（如"回踩至 MA5±2%""主力净流入为正"），禁止模糊表述；
+- `cycle_context` / `capital_migration` / `leader_rivalry`：**多日上下文**——前 3 个交易日的
+  涨停家数/连板高度/晋级链/龙头命运演变（情绪周期阶段）、板块 3 日动能与行业集中度演变
+  （资金迁移路径）、同高度竞争与昨日龙头断板（龙头竞争关系）；
 - LLM 输出中的每个数字都可回查 `evidence.json` 做防幻觉校验。
 
 ### 自我校验清单 + 确定性数字核对（质量把关）
