@@ -1,7 +1,7 @@
 {
   "meta": {
     "date": "2026-08-07",
-    "generated_at": "2026-08-08T12:02:55",
+    "generated_at": "2026-08-09T09:56:05",
     "note": "本 JSON 仅包含数据与确定性聚合，不含交易判断；请由 LLM 基于数据独立完成四步分析并撰写报告。注意：leaders_candidates 的 industry 为东财涨停池行业标签，可能只反映次要属性，板块归属需结合个股主营判断；涨停池个股尾盘行为统一标注为『涨停封板』。",
     "data_sources": [
       "大班客：https://dabanke.com/index-20260807.html",

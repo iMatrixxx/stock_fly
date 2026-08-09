@@ -80,14 +80,6 @@ def main(argv=None) -> None:
         help="同时组装并写出 LLM 复盘 prompt（默认模板 assets/llm_report_prompt.md）",
     )
     ap.add_argument("--template", default=str(DEFAULT_TEMPLATE), help="LLM prompt 模板路径")
-    ap.add_argument(
-        "--debate",
-        action="store_true",
-        help=(
-            "启用 A/B 对抗式辩论：已配置 LLM_API_URL/LLM_MODEL（可选 LLM_API_KEY）时自动"
-            "多轮辩论并写出终稿与辩论记录；未配置时辩论协议已内嵌在 prompt 中"
-        ),
-    )
     args = ap.parse_args(argv)
 
     if not args.dabanke_json and not args.html:
@@ -126,22 +118,6 @@ def main(argv=None) -> None:
             prompt = build_prompt(evidence, args.template)
             Path(args.prompt).write_text(prompt, encoding="utf-8")
             print(f"[OK] LLM prompt 已写出: {args.prompt}", file=sys.stderr)
-        if args.debate:
-            from .report.debate import run_llm_debate, transcript_to_markdown
-
-            try:
-                result = run_llm_debate(evidence, args.template)
-            except RuntimeError as e:
-                print(f"[INFO] {e}", file=sys.stderr)
-            else:
-                report_out = Path.cwd() / f"复盘报告_{args.date}.md"
-                report_out.write_text(result["final_report"], encoding="utf-8")
-                transcript_out = Path.cwd() / f"辩论记录_{args.date}.md"
-                transcript_out.write_text(
-                    transcript_to_markdown(result), encoding="utf-8"
-                )
-                print(f"[OK] 辩论终稿已写出: {report_out}", file=sys.stderr)
-                print(f"[OK] 辩论记录已写出: {transcript_out}", file=sys.stderr)
 
 
 if __name__ == "__main__":

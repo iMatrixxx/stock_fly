@@ -20,7 +20,7 @@ ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
-from stock_review_harness.report.debate import verify_report_numbers  # noqa: E402
+from stock_review_harness.report.checklist import verify_report_numbers  # noqa: E402
 
 
 def main(argv=None) -> None:
