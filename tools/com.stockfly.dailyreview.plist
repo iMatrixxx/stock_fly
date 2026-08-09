@@ -12,9 +12,17 @@
     <key>StartCalendarInterval</key>
     <dict>
         <key>Hour</key>
-        <integer>18</integer>
+        <integer>19</integer>
         <key>Minute</key>
-        <integer>35</integer>
+        <integer>53</integer>
+        <key>Weekday</key>
+        <array>
+            <integer>1</integer>
+            <integer>2</integer>
+            <integer>3</integer>
+            <integer>4</integer>
+            <integer>5</integer>
+        </array>
     </dict>
     <key>StandardOutPath</key>
     <string>/tmp/stockfly_daily_review.log</string>
