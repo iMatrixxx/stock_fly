@@ -65,6 +65,31 @@ FLOW_CACHE_TTL_DAYS = 7              # 主力净流入历史数据可能有修�
 MARKET_CACHE_TTL_TODAY_SECONDS = 24 * 3600     # 当日行情快照缓存（秒）
 MARKET_CACHE_TTL_PAST_SECONDS = 365 * 24 * 3600  # 已过去交易日的行情快照缓存（秒）
 
+# ========== 次日资金流向预测（规则打分，确定性可回测）==========
+FORECAST_WEIGHTS = {
+    "main_flow_strong": 20,        # 当日主力净流入 |值|>50 亿
+    "main_flow_positive": 10,      # 主力净流入为正
+    "main_flow_negative": -10,     # 主力净流入为负
+    "main_flow_strong_negative": -20,  # 主力净流出 >50 亿
+    "momentum_up": 10,             # 3 日动能增强
+    "momentum_down": -10,          # 动能衰减
+    "momentum_weak": -15,          # 转弱
+    "alignment_force": 15,         # 涨+流入 合力
+    "alignment_diverge": -20,      # 涨+流出 兑现背离
+    "volume_expand_up": 5,         # 放量上涨且主力非流出
+    "volume_expand_down": -10,     # 放量但资金流出/滞涨
+    "volume_shrink": -5,           # 缩量
+    "concentration_shift_to": 10,  # 涨停集中行业向该板块迁移
+    "relative_strength": 5,        # 相对强度：每高于板块均值 1% 加 5 分
+}
+FORECAST_SCORE_BANDS = [
+    (30, "大概率流入"),
+    (10, "倾向流入"),
+    (-10, "中性/分歧"),
+    (-30, "倾向流出"),
+    (-101, "大概率流出"),
+]
+
 # ========== 输出配置 ==========
 REPORT_ENCODING = "utf-8"
 REPORT_SUFFIX = "_复盘报告.md"

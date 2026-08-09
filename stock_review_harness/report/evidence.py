@@ -15,6 +15,7 @@ from ..data.validate import validate_bundle
 from ..logic.conditions import leader_ma_distances, quantify
 from ..logic.cycle import build_cycle_context
 from ..logic.diagnostics import diagnose
+from ..logic.forecast import forecast_capital_migration
 from ..logic.migration import build_capital_migration
 from ..logic.rivalry import build_leader_rivalry
 from ..models import DataBundle
@@ -405,6 +406,9 @@ def to_evidence_dict(bundle: DataBundle) -> dict:
     """把数据收集结果压缩为"现象 + 聚合 + 缺失标注"的证据链字典（无任何判定）。"""
     zt_history = bundle.context.get("zt_history") or []
     board_series = bundle.context.get("board_series") or {}
+    capital_migration = build_capital_migration(
+        bundle.date, bundle.market, board_series, zt_history
+    )
     return {
         "meta": {
             "date": bundle.date,
@@ -436,9 +440,8 @@ def to_evidence_dict(bundle: DataBundle) -> dict:
         "cycle_context": build_cycle_context(
             bundle.date, bundle.market.zt_pool, zt_history
         ),
-        "capital_migration": build_capital_migration(
-            bundle.date, bundle.market, board_series, zt_history
-        ),
+        "capital_migration": capital_migration,
+        "capital_forecast": forecast_capital_migration(capital_migration),
         "leader_rivalry": build_leader_rivalry(
             bundle.date, bundle.market.zt_pool, zt_history
         ),
