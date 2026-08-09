@@ -10,7 +10,7 @@
 
 环境变量：
   SMTP_HOST / SMTP_PORT / SMTP_USER / SMTP_PASSWORD（邮箱授权码）/
-  SMTP_USE_SSL=1 / MAIL_TO（默认 lixiaotao@whu.edu.cn）
+  SMTP_USE_SSL=1 / MAIL_TO（默认 imatrixxxlee@gmail.com）
   LLM_API_URL / LLM_API_KEY / LLM_MODEL（可选：自动写报告；否则只出证据链+prompt）
   REVIEW_SKILL_DIR / REVIEW_CACHE_DIR（可选）
 
