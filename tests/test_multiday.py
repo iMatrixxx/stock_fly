@@ -50,8 +50,11 @@ class MigrationTest(unittest.TestCase):
         )
         self.assertEqual(mig["boards"][0]["board"], "元件")
         self.assertEqual(mig["boards"][0]["today_main_flow_yi"], 124.31)
+        self.assertEqual(mig["boards"][0]["momentum"], "增强")      # 5.12→6.45
+        self.assertEqual(mig["boards"][0]["flow_alignment"], "合力")  # 涨+流入
         self.assertEqual(len(mig["boards"][0]["trend"]), 2)
         self.assertEqual(mig["industry_trend"][-1]["top_industries"][0][0], "PCB")
+        self.assertTrue([e for e in mig["migration_events"] if e["type"] == "持续承接"])
 
 
 class RivalryTest(unittest.TestCase):

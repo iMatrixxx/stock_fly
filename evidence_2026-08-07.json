@@ -1,7 +1,7 @@
 {
   "meta": {
     "date": "2026-08-07",
-    "generated_at": "2026-08-09T10:46:54",
+    "generated_at": "2026-08-09T10:54:20",
     "note": "本 JSON 仅包含数据与确定性聚合，不含交易判断；请由 LLM 基于数据独立完成四步分析并撰写报告。注意：leaders_candidates 的 industry 为东财涨停池行业标签，可能只反映次要属性，板块归属需结合个股主营判断；涨停池个股尾盘行为统一标注为『涨停封板』。",
     "data_sources": [
       "大班客：https://dabanke.com/index-20260807.html",
@@ -1158,6 +1158,10 @@
         "board": "半导体",
         "today_main_flow_yi": 108.2,
         "today_ratio_pct": 14.617590319844467,
+        "today_turnover_yi": 3894.74,
+        "momentum": "增强",
+        "flow_alignment": "合力",
+        "turnover_trend": "放量",
         "trend": [
           {
             "date": "2026-08-04",
@@ -1185,6 +1189,10 @@
         "board": "通信设备",
         "today_main_flow_yi": -22.11,
         "today_ratio_pct": 8.402992020777504,
+        "today_turnover_yi": 2238.91,
+        "momentum": "衰减",
+        "flow_alignment": "兑现背离",
+        "turnover_trend": "放量",
         "trend": [
           {
             "date": "2026-08-04",
@@ -1212,6 +1220,10 @@
         "board": "元件",
         "today_main_flow_yi": 124.31,
         "today_ratio_pct": 6.2370422080602905,
+        "today_turnover_yi": 1661.81,
+        "momentum": "增强",
+        "flow_alignment": "合力",
+        "turnover_trend": "放量",
         "trend": [
           {
             "date": "2026-08-04",
@@ -1239,6 +1251,10 @@
         "board": "电子化学品",
         "today_main_flow_yi": 267.03,
         "today_ratio_pct": 2.8058639403697616,
+        "today_turnover_yi": 747.6,
+        "momentum": "增强",
+        "flow_alignment": "合力",
+        "turnover_trend": "放量",
         "trend": [
           {
             "date": "2026-08-04",
@@ -1266,6 +1282,10 @@
         "board": "通用设备",
         "today_main_flow_yi": 10.14,
         "today_ratio_pct": 2.752418912934147,
+        "today_turnover_yi": 733.36,
+        "momentum": "增强",
+        "flow_alignment": "合力",
+        "turnover_trend": "平量",
         "trend": [
           {
             "date": "2026-08-04",
@@ -1293,6 +1313,10 @@
         "board": "消费电子",
         "today_main_flow_yi": -0.82,
         "today_ratio_pct": 2.703290021843403,
+        "today_turnover_yi": 720.27,
+        "momentum": "增强",
+        "flow_alignment": "兑现背离",
+        "turnover_trend": "平量",
         "trend": [
           {
             "date": "2026-08-04",
@@ -1320,6 +1344,10 @@
         "board": "电池",
         "today_main_flow_yi": 11.18,
         "today_ratio_pct": 2.606533504477522,
+        "today_turnover_yi": 694.49,
+        "momentum": "增强",
+        "flow_alignment": "合力",
+        "turnover_trend": "平量",
         "trend": [
           {
             "date": "2026-08-04",
@@ -1347,6 +1375,10 @@
         "board": "化学制药",
         "today_main_flow_yi": 40.96,
         "today_ratio_pct": 2.537400259718813,
+        "today_turnover_yi": 676.07,
+        "momentum": "增强",
+        "flow_alignment": "合力",
+        "turnover_trend": "放量",
         "trend": [
           {
             "date": "2026-08-04",
@@ -1471,6 +1503,67 @@
             4
           ]
         ]
+      }
+    ],
+    "migration_events": [
+      {
+        "type": "持续承接",
+        "board": "半导体",
+        "detail": "半导体 动能增强且主力净流入 108.2 亿：趋势资金持续加仓方向"
+      },
+      {
+        "type": "兑现背离",
+        "board": "通信设备",
+        "detail": "通信设备 涨 1.35% 但主力净流出 22.1 亿：价涨资金撤，属高位兑现而非增量做多"
+      },
+      {
+        "type": "持续承接",
+        "board": "元件",
+        "detail": "元件 动能增强且主力净流入 124.3 亿：趋势资金持续加仓方向"
+      },
+      {
+        "type": "持续承接",
+        "board": "通用设备",
+        "detail": "通用设备 动能增强且主力净流入 10.1 亿：趋势资金持续加仓方向"
+      },
+      {
+        "type": "兑现背离",
+        "board": "消费电子",
+        "detail": "消费电子 涨 1.68% 但主力净流出 0.8 亿：价涨资金撤，属高位兑现而非增量做多"
+      },
+      {
+        "type": "持续承接",
+        "board": "电池",
+        "detail": "电池 动能增强且主力净流入 11.2 亿：趋势资金持续加仓方向"
+      },
+      {
+        "type": "持续承接",
+        "board": "化学制药",
+        "detail": "化学制药 动能增强且主力净流入 41.0 亿：趋势资金持续加仓方向"
+      },
+      {
+        "type": "高低切",
+        "from": "半导体",
+        "to": "元件",
+        "detail": "前一日领涨的 半导体 动能转向，资金流向 元件（主力 124.3 亿）：同一大方向内部的高低切"
+      },
+      {
+        "type": "行业集中度迁移",
+        "from": "元件",
+        "to": "汽车零部",
+        "detail": "涨停集中行业由 元件（08-04）迁移至 汽车零部（08-05）"
+      },
+      {
+        "type": "行业集中度迁移",
+        "from": "汽车零部",
+        "to": "通信设备",
+        "detail": "涨停集中行业由 汽车零部（08-05）迁移至 通信设备（08-06）"
+      },
+      {
+        "type": "行业集中度迁移",
+        "from": "通信设备",
+        "to": "元件",
+        "detail": "涨停集中行业由 通信设备（08-06）迁移至 元件（08-07）"
       }
     ]
   },
