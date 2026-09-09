@@ -93,6 +93,37 @@ def _northbound_section(bundle: DataBundle) -> dict | None:
     }
 
 
+def _macro_section(bundle: DataBundle) -> dict | None:
+    """当日宏观行情快照（国内商品期货主连，含前夜盘口径）——"当日宏观催化"数据维度。
+
+    数据源：market.macro（fetch_market 步骤 9 抓新浪期货日K主力连续）。
+    用途：回答"当日盘面切向某板块（如工业金属/农化）有无期货端价格印证"——
+    写报告时把 macro.items 的涨跌与当日资金/涨停方向做对照，同向=有期货端催化；
+    若某方向流入但对应期货未同步走强（或反之），须如实写出背离，禁止只讲单边。
+    注意：仅含国内商品期货；美元指数/离岸人民币/外盘未纳入（源见 note），禁止编造。
+    """
+    mc = bundle.market.macro
+    if not mc or not mc.get("items"):
+        return None
+    groups: dict[str, dict] = {}
+    for it in mc["items"]:
+        g = groups.setdefault(it["group"], {"count": 0, "up": 0, "down": 0, "codes": []})
+        g["count"] += 1
+        g["codes"].append(it["code"])
+        if it["chg_pct"] > 0:
+            g["up"] += 1
+        elif it["chg_pct"] < 0:
+            g["down"] += 1
+    return {
+        "date": mc.get("date"),
+        "asof": mc.get("asof"),
+        "source": mc.get("source"),
+        "note": mc.get("note", ""),
+        "groups": groups,  # 每分组 涨/跌/品种数，供快速判断"哪条链有期货端印证"
+        "items": mc["items"],
+    }
+
+
 def _market_section(bundle: DataBundle) -> dict:
     m = bundle.market
     top_boards = sorted(
@@ -151,6 +182,86 @@ def _market_section(bundle: DataBundle) -> dict:
     }
 
 
+def _board_pools(bundle: DataBundle) -> dict:
+    """板块内领涨标的池：当日涨停股按行业标签归组并落到具体个股。
+
+    数据源：market.zt_pool（行业口径与 cycle_context.top_industries /
+    leaders_candidates.industry 同源同口径），只含当日涨停股。
+    用途：LLM 撰写"某板块/主线资金方向"时必须引用本池落到标的（名称+连板）；
+    池中无某行业 = 当日该行业无涨停股（资金驱动为权重/名单外），禁止编造标的；
+    子板块资金（如铜/铝细分）无成分级数据，须标"未披露"。
+    """
+    groups: dict[str, list[dict]] = {}
+    for s in bundle.market.zt_pool:
+        ind = (s.get("industry") or "").strip() or "未知"
+        groups.setdefault(ind, []).append(
+            {
+                "code": s.get("code"),
+                "name": s.get("name"),
+                "ladder": s.get("ladder") or 1,
+                "first_seal_time": s.get("first_seal") or "",
+                "seal_amount_wan": _f((s.get("seal_fund") or 0) / 1e4),
+                "blast_count": s.get("blast_count") or 0,
+                "amount_yi": _f((s.get("amount") or 0) / 1e8),
+            }
+        )
+    boards = [
+        {
+            "industry": ind,
+            "count": len(stocks),
+            "zt_ratio_pct": (
+                round(len(stocks) / len(bundle.market.zt_pool) * 100, 1)
+                if bundle.market.zt_pool
+                else None
+            ),
+            "mainline": (
+                len(stocks) / len(bundle.market.zt_pool) * 100 >= 20.0
+                if bundle.market.zt_pool
+                else False
+            ),
+            "stocks": stocks,
+        }
+        for ind, stocks in sorted(
+            groups.items(), key=lambda kv: (-len(kv[1]), kv[0])
+        )
+    ]
+    return {
+        "note": (
+            "口径：market.zt_pool 行业标签（与 cycle_context.top_industries 同源），仅含当日"
+            "涨停股。写板块/主线必先查本池落到标的（名称+连板，1~5 只）；池中无该行业=当日"
+            "该行业无涨停（资金集中在未涨停权重股，名单未披露）；铜/铝等子板块资金无成分级"
+            "数据，禁止编造细分归属。zt_ratio_pct=该行业涨停数/zt_total×100，≥20 判"
+            "mainline=True（主线行业，分母为东财收盘口径 zt_total，与 emotion 涨停标签浓度"
+            "的分母 sealed_total 不同源，勿混用）。"
+        ),
+        "zt_total": len(bundle.market.zt_pool),
+        "boards": boards,
+    }
+
+
+def _concentration_rows(bundle: DataBundle, top: int = 10) -> list[dict]:
+    """题材集中度数值化：ratio_pct=该题材涨停数/全市场涨停数×100（分母 sealed_total）。
+
+    mainline=True 判定阈值 ≥20%（用户口径：>20% 可定义为"主线题材"；此处用 ≥20 保证
+    ==20 边界不落空）。涨停标签为拆分粒度，行业主线请另看 board_pools（分母 zt_total）。
+    """
+    sealed = (bundle.limit_pool.summary.get("sealed_total") or 0) or len(
+        bundle.market.zt_pool
+    )
+    rows = []
+    for tag, count in bundle.limit_pool.industry_concentration(top):
+        ratio = round(count / sealed * 100, 1) if sealed else None
+        rows.append(
+            {
+                "industry": tag,
+                "count": count,
+                "ratio_pct": ratio,
+                "mainline": ratio is not None and ratio >= 20.0,
+            }
+        )
+    return rows
+
+
 def _industry_zt_groups(pool_data, top: int = 5, max_names: int = 8) -> dict[str, list]:
     """行业标签 → 涨停个股名（供 LLM 判断板块联动与龙头带动）。"""
     groups: dict[str, list[str]] = {}
@@ -189,10 +300,11 @@ def _emotion_section(bundle: DataBundle) -> dict:
         "max_ladder": s.get("max_连板"),
         "ladder": s.get("ladder") or {},
         "yesterday_zt_premium": _premium_agg(bundle),
-        "industry_concentration": [
-            {"industry": tag, "count": n}
-            for tag, n in bundle.limit_pool.industry_concentration(10)
-        ],
+        "concentration_basis": (
+            "分母=当日涨停总数（sealed_total），ratio_pct=该题材涨停数/全市场涨停数×100；"
+            "ratio_pct≥20 判为 mainline=True（主线题材），<20 为支线/轮动题材"
+        ),
+        "industry_concentration": _concentration_rows(bundle),
         "concept_focus": [
             {"concept": c.get("concept"), "sealed": c.get("sealed"), "total": c.get("total")}
             for c in bundle.limit_pool.concept_focus(5)
@@ -388,6 +500,25 @@ def _dragon_section(bundle: DataBundle) -> dict:
     }
 
 
+def _dragon_seats_section(bundle: DataBundle) -> dict | None:
+    """龙虎榜买卖前五席位结构（机构 vs 游资，确定性透传）。
+
+    数据源：market.dragon_seats（fetch_market 步骤 8 抓东财 RPT_BILLBOARD_DAILYDETAILSBUY/SELL）。
+    只覆盖当日净买前 N 的采样；席位名/金额为交易所披露事实，可直接引用；
+    性质判定（org/north/dealer）为确定性规则，机构/游资的"资金属性定性"由 LLM 完成。
+    """
+    ds = bundle.market.dragon_seats
+    if not ds or not ds.get("stocks"):
+        return None
+    return {
+        "date": ds.get("date"),
+        "note": ds.get("note", ""),
+        "total_boarded": ds.get("total_boarded"),
+        "sample_top": ds.get("sample_top"),
+        "stocks": ds.get("stocks") or [],
+    }
+
+
 def _risk_matrix(bundle: DataBundle) -> dict:
     """系统性风险矩阵：触发条件当日可计算，动作由 LLM 给出。"""
     m = bundle.market
@@ -486,8 +617,11 @@ def to_evidence_dict(bundle: DataBundle) -> dict:
             "anomalies": validate_bundle(bundle),
         },
         "market": _market_section(bundle),
+        "macro": _macro_section(bundle),
         "dragon_top": _dragon_section(bundle),
+        "dragon_seats": _dragon_seats_section(bundle),
         "emotion": _emotion_section(bundle),
+        "board_pools": _board_pools(bundle),
         "leaders_candidates": _leaders_candidates(bundle),
         "high_ladder_stocks": _high_ladder_stocks(bundle),
         "first_sealer": _first_sealer(bundle),

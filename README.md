@@ -42,7 +42,7 @@ build_dabanke_from_  │       models.py（统一数据模型）       prompt_<d
 | 入口 | `stock_review_harness/models.py` | 统一数据契约（`MarketData` 等，扩展指南入口） |
 | 数据访问 | `data/loaders.py` | 各源适配器，原始响应 → 统一模型（规范化） |
 | 数据访问 | `data/fetch_market.py` | 多源抓取 / 缓存 / 失败降级（不中断） |
-| 数据访问 | `data/{ths,eastmoney,tencent,sina,northbound}.py` | 各数据源实现（northbound=沪深股通十大活跃股） |
+| 数据访问 | `data/{ths,eastmoney,tencent,sina,northbound,dragon_seats,macro_snapshot}.py` | 各数据源实现（northbound=沪深股通十大活跃股；dragon_seats=龙虎榜买卖前五席位，机构/北向/游资结构；macro_snapshot=国内商品期货主连日K宏观快照） |
 | 数据访问 | `data/multiday.py` | 多日上下文（前 N 交易日数据串联） |
 | 数据访问 | `data/validate.py` | 数据核验，拦截口径异常进 `meta.anomalies` |
 | 确定性分析 | `logic/cycle.py` | 情绪周期演变（晋级链 / 梯队 / 龙头命运） |
@@ -50,7 +50,7 @@ build_dabanke_from_  │       models.py（统一数据模型）       prompt_<d
 | 确定性分析 | `logic/rivalry.py` | 龙头竞争关系（同高度竞争 / 昨日龙头断板） |
 | 确定性分析 | `logic/forecast.py` | 次日资金预测打分 |
 | 确定性分析 | `logic/diagnostics.py` | 矛盾诊断（数据张力清单，LLM 须调和） |
-| 输出组装 | `report/evidence.py` | 证据链 JSON 组装（含 data_gaps/anomalies/diagnostics/quantified） |
+| 输出组装 | `report/evidence.py` | 证据链 JSON 组装（含 data_gaps/anomalies/diagnostics/quantified；`board_pools` 板块内领涨标的池——涨停股按行业归组落到个股，供报告写板块必落标的；题材浓度 ratio_pct+mainline(≥20%)；`dragon_seats` 龙虎榜席位结构；`macro` 当日宏观快照——国内商品期货主连涨跌，供"当日宏观催化"小节对照板块切换有无期货端印证） |
 | 输出组装 | `report/prompt.py` | LLM prompt 模板（数字纪律 / 独立判断要求） |
 | 输出组装 | `report/checklist.py` | 报告核对：`verify_report_numbers` 数字比对（防编造）+ `check_coverage` 覆盖检查（防漏写） |
 | 输出组装 | `report/forecast_cards.py` | M2 次日预测卡：subject 白名单解析、judge 纯代码判卷、报告内预测卡区块提取、候选清单 |
@@ -95,9 +95,9 @@ build_dabanke_from_  │       models.py（统一数据模型）       prompt_<d
 |---|---|---|---|
 | ① | 确定复盘日期 | 脚本/人 | `--date YYYY-MM-DD`；默认前一交易日，周末自动跳过 |
 | ② | 大盘快照 | fuyao SDK（`fetch_market_snapshot.py`） | `hithink_out/raw/pools.json`：指数/板块/涨跌停池/连板天梯/昨日涨停池 + `premiums` 溢价节（步骤 3.5：昨日池 92/93 只逐票算开盘溢价与 A 杀） |
-| ③ | 联网补行情 | harness（东财/同花顺/腾讯/新浪） | 成交额、板块资金流、中军 K 线/溢价/尾盘、跌幅榜；失败降级标注不中断 |
+| ③ | 联网补行情 | harness（东财/同花顺/腾讯/新浪） | 成交额、板块资金流、中军 K 线/溢价/尾盘、跌幅榜、**龙虎榜买卖前五席位（dragon_seats，机构/北向/游资结构，净买前 12 采样）**、北向十大活跃股、**当日宏观快照（macro_snapshot：新浪期货日K主力连续 8 品种，含前夜盘）**；失败降级标注不中断 |
 | ④ | 腾讯补缺 | harness | 同花顺日线缺行时，用腾讯行情补两市成交与沪深 300 |
-| ⑤ | 证据链 + prompt | harness（确定性） | `evidence_<date>.json`（纯数据）+ `prompt_<date>.md` |
+| ⑤ | 证据链 + prompt | harness（确定性） | `evidence_<date>.json`（纯数据：情绪/资金/周期 + **`board_pools` 板块内领涨标的池**——涨停股按行业归组列个股，写板块资金必落标的；无该行业=当日无涨停，子板块资金不编造）+ `prompt_<date>.md` |
 | ⑥ | 资讯增量采集 | `fetch_news.py`（幂等去重） | `hithink_out/raw/news/*.jsonl`；关键词取当日 evidence 题材，摘要注入 prompt 时**按发布时间分 A/B 两桶**——A（≤15:00 盘前/盘中）可作当日归因，B（盘后）仅限次日条件预期 |
 | ⑦ | 报告撰写 | LLM / 人 | `复盘报告_<date>.md`；无既有 md 时需配置 `LLM_API_URL/MODEL/KEY` 自动生成 |
 | ⑦.5 | M2 预测卡冻结 + 判卷 | 全链自动 | 判上一交易日卡片 → `scorecard.jsonl`；报告末尾含 `## 次日预测卡` fenced json 则冻结 `forecast_<date>.json`（均失败不阻断，见 §2 M2 小节） |
@@ -364,6 +364,13 @@ dragon.json 缺失时产物不加键，证据链输出 count=0 + 显式标注（
   → 外资态度定性观察；条目 `{code,name,rank,close_pct,deal_amt_yi,mutual_ratio}`
   （北向成交额 亿 / 北向成交占个股成交比 %）。证据链经 `_northbound_section()`
   输出至 `market.northbound`（无数据为 null），报告第二层"外资观察"引用。
+- `macro`：当日宏观行情快照 `{date, asof, source, note, groups, items[]}`——国内商品
+  期货主力连日K（沪铜/沪铝/沪锌/沪金/尿素/生猪/豆粕/玉米，新浪 `InnerFuturesNewService`），
+  口径=交易日 T 日盘 + T-1 夜盘（A股盘中可感）；条目 `{name, code, group, trade_date,
+  close, prev_close, chg_pct}`；evidence 经 `_macro_section()` 输出顶层 `macro`（含
+  `groups` 每分组涨跌家数汇总，无数据为 null）。报告第二层开头"当日宏观催化"小节引用：
+  与当日资金/涨停方向对照，同向=期货端印证、背离须写明；**不含美元/离岸/外盘
+  （无稳定历史源），禁止编造**。
 
 > **昨日涨停溢价聚合**：`report/evidence.py` 的 `_premium_agg()` 把 `yesterday_premiums`
 > 聚合成 `{count, avg_pct, up_open, flat_open, down_open}`（开盘溢价口径），在
@@ -380,6 +387,9 @@ dragon.json 缺失时产物不加键，证据链输出 count=0 + 显式标注（
   `market.northbound`，报告只可陈述"活跃成交集中于某方向"。
 - 板块级主力净流入仅当日可得（东财 push2delay）；历史日期的板块资金流无免费源，
   由 LLM 用涨停家数集中度等替代指标处理并标注缺失。
+- 美元指数/离岸人民币/外盘商品（COMEX/CBOT/WTI）**无稳定历史公开源**（新浪相关 service
+  已下线、东财 push2his 存在 IP 级风控）→ `macro` 仅含国内商品期货，报告不得臆写外盘
+  涨跌；CPI/PPI 等宏观事件无结构化字段，只可经盘后资讯作"次日条件预期"。
 - 分钟线仅近 3 个交易日可得：复盘日超出窗口时，中军"尾盘行为"标注"未证实"。
 - 东财 push2/push2his 偶发断连：板块列表/资金流走 push2delay 延迟主机（稳定），
   失败自动回退主站并降级标注。
@@ -434,3 +444,13 @@ harness 产出纯数据证据链，由 LLM（或交易员）基于技能方法�
 渲染成功；⑩ 邮件按人工确认后发送。2026-09-06 起 ⑧ 增加覆盖检查（check_coverage，
 防漏写）：09-04 定稿报告四项覆盖达标（必答 3 名全提 / 诊断回应 / 2 条触发风险均映射
 降仓防守 / 缺口免责无违规），构造坏报告"数字全对但漏高标+无防守动作"可被成功拦截。
+
+---
+
+## 11. 设计决策与优化逻辑记录
+
+近几轮用户反馈驱动的优化（板块内领涨标的池 / 每层 🔑 一句话总结 / 题材集中度数值化与
+主线定义 / 龙虎榜席位结构 机构 vs 游资 / 当日宏观催化小节）的**诊断根因、方案权衡与拍板、
+落地改动、验证实证、数据源血泪教训与局限**，以及报告五层结构与 evidence 的映射总览，
+沉淀于 **`assets/design_decisions.md`**。改动报告结构、新增数据维度或扩展宏观源前请先读它，
+避免重复踩坑（如东财 push2his 出口 IP 分钟级风控、新浪期货历史接口正确 host 等）。

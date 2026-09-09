@@ -13,6 +13,7 @@ from stock_review_harness import run_pipeline
 from stock_review_harness.report.evidence import to_evidence_dict, to_evidence_json
 
 SAMPLE = Path(__file__).resolve().parents[1] / "samples" / "dabanke_2026-07-30.json"
+SAMPLE_MARKET = Path(__file__).resolve().parents[1] / "samples" / "market_2026-07-30.json"
 
 
 class EvidenceTest(unittest.TestCase):
@@ -51,6 +52,67 @@ class EvidenceTest(unittest.TestCase):
                 m_prem["count"],
                 m_prem["up_open"] + m_prem["flat_open"] + m_prem["down_open"],
             )
+
+    def test_board_pools_structure(self):
+        """板块内领涨标的池：按行业归组当日涨停个股，count 合计须等于 zt_total。"""
+        ev = to_evidence_dict(
+            run_pipeline(
+                "2026-07-30",
+                limit_pool_json=str(SAMPLE),
+                market_json=str(SAMPLE_MARKET),
+            )
+        )
+        bp = ev.get("board_pools")
+        self.assertIsNotNone(bp, "evidence 必须含 board_pools 节")
+        self.assertIn("note", bp)
+        self.assertIn("zt_total", bp)
+        self.assertIn("boards", bp)
+        # 每行业条目含 stocks 明细，且字段完整
+        for row in bp["boards"]:
+            self.assertIn("industry", row)
+            self.assertIn("count", row)
+            self.assertIn("zt_ratio_pct", row)
+            self.assertIn("mainline", row)
+            self.assertEqual(row["count"], len(row["stocks"]))
+            for s in row["stocks"]:
+                for key in ("code", "name", "ladder", "first_seal_time", "amount_yi"):
+                    self.assertIn(key, s)
+        # count 合计 = zt_total（口径：market.zt_pool 行业标签）
+        self.assertEqual(
+            sum(r["count"] for r in bp["boards"]),
+            bp["zt_total"],
+            "board_pools 各行业 count 之和须等于 zt_total",
+        )
+        # 按 count 降序排列（首行即当日涨停最集中的行业）
+        counts = [r["count"] for r in bp["boards"]]
+        self.assertEqual(counts, sorted(counts, reverse=True))
+        # 浓度一致性：zt_ratio_pct = count/zt_total×100；mainline 仅当 ratio>=20
+        for r in bp["boards"]:
+            expect_ratio = round(r["count"] / bp["zt_total"] * 100, 1)
+            self.assertEqual(r["zt_ratio_pct"], expect_ratio)
+            self.assertEqual(r["mainline"], expect_ratio >= 20.0)
+
+    def test_industry_concentration_ratio(self):
+        """题材集中度数值化：ratio_pct=count/sealed_total×100，mainline=ratio>=20。"""
+        ev = to_evidence_dict(self.bundle)
+        rows = ev["emotion"]["industry_concentration"]
+        self.assertIn("concentration_basis", ev["emotion"])
+        self.assertTrue(rows)
+        for row in rows:
+            for key in ("industry", "count", "ratio_pct", "mainline"):
+                self.assertIn(key, row)
+            if row["ratio_pct"] is not None:
+                self.assertAlmostEqual(
+                    row["ratio_pct"],
+                    round(
+                        row["count"]
+                        / max(ev["emotion"]["sealed_total"], 1)
+                        * 100,
+                        1,
+                    ),
+                    places=1,
+                )
+                self.assertEqual(row["mainline"], row["ratio_pct"] >= 20.0)
 
 
 class PromptBridgeTest(unittest.TestCase):

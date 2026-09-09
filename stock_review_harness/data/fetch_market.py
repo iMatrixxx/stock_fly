@@ -23,6 +23,7 @@ from ..models import (
     MarketData,
     PremiumQuote,
 )
+from . import dragon_seats as dragon_seats_mod
 from . import eastmoney, tencent, ths
 from . import northbound
 from .cache import load_cached_market, save_market_cache
@@ -464,6 +465,37 @@ def fetch_market(
     except Exception as e:  # noqa: BLE001
         print(f"  [warn] 北向十大活跃股抓取失败（{str(e)[:100]}），本次不注入", flush=True)
 
+    # ---------- 8. 龙虎榜买卖前五席位（机构 vs 游资结构；可选，失败不阻断） ----------
+    dragon_seats: Optional[dict] = None
+    try:
+        dragon_seats = dragon_seats_mod.fetch_dragon_seats(date_str)
+        if dragon_seats:
+            print(
+                f"  龙虎榜席位: 当日 {dragon_seats['total_boarded']} 家上榜，"
+                f"净买前 {dragon_seats['sample_top']} 已取买卖前五席位（机构/北向/游资结构）",
+                flush=True,
+            )
+        else:
+            print("  [warn] 龙虎榜席位无数据，本次不注入", flush=True)
+    except Exception as e:  # noqa: BLE001
+        print(f"  [warn] 龙虎榜席位抓取失败（{str(e)[:100]}），本次不注入", flush=True)
+
+    # ---------- 9. 当日宏观行情快照（国内商品期货主连；可选，失败不阻断） ----------
+    macro_snap: Optional[dict] = None
+    try:
+        macro_snap = macro_mod.fetch_macro_snapshot(date_str)
+        if macro_snap:
+            ups = [i for i in macro_snap["items"] if i["chg_pct"] > 0]
+            print(
+                f"  宏观快照: 国内商品主连 {len(macro_snap['items'])} 个品种"
+                f"（{len(ups)} 个上涨；工业金属/农化/农产品链期货端信号）",
+                flush=True,
+            )
+        else:
+            print("  [warn] 宏观快照无数据，本次不注入", flush=True)
+    except Exception as e:  # noqa: BLE001
+        print(f"  [warn] 宏观快照抓取失败（{str(e)[:100]}），本次不注入", flush=True)
+
     market = MarketData(
         date=date_str,
         indices=indices,
@@ -477,6 +509,8 @@ def fetch_market(
         dt_pool=dt,
         yesterday_zt_pool=zt_prev,
         northbound_top10=north_top10,
+        dragon_seats=dragon_seats,
+        macro=macro_snap,
         notes=[
             "数据源：同花顺日线（指数/板块成交额）+ 东方财富涨停/跌停池 + 腾讯个股K线 + 新浪个股资金流；"
             f"板块主力净流入：{flow_note}；中军尾盘行为取自东财分钟线（近 3 个交易日内可得）",
@@ -484,6 +518,12 @@ def fetch_market(
             f"（成交额口径{('：沪股通 ' + str(len(north_top10['sh'])) + ' / 深股通 ' + str(len(north_top10['sz'])) + ' 条') if north_top10 else '，本次缺失'}）；"
             f"涨停池口径为东财（{len(zt)} 家），跌停 {len(dt)} 家",
             premium_note or f"昨日涨停溢价源=东财 zt_prev+腾讯日K（{len(premiums)} 只，fuyao 未提供回退）",
+            (
+                f"宏观快照源=新浪期货日K主力连续（{len(macro_snap['items'])} 品种，"
+                "含前夜盘口径；美元/离岸/外盘未纳入）"
+                if macro_snap
+                else "宏观快照本次缺失（新浪期货接口不可用），报告禁止编造期货涨跌"
+            ),
         ],
     )
     # use_cache 只控制"读取"；抓取结果始终回写快照缓存（--refresh 也刷新缓存）

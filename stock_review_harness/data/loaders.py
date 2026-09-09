@@ -121,6 +121,8 @@ def load_market_json(path: Optional[str | Path]) -> Optional[MarketData]:
     market.dt_pool = raw.get("dt_pool") or []
     market.yesterday_zt_pool = raw.get("yesterday_zt_pool") or []
     market.northbound_top10 = raw.get("northbound_top10") or None
+    market.dragon_seats = raw.get("dragon_seats") or None
+    market.macro = raw.get("macro") or None
     return market
 
 
@@ -139,5 +141,6 @@ def market_to_json(market: MarketData) -> dict:
         "dt_pool": market.dt_pool,
         "yesterday_zt_pool": market.yesterday_zt_pool,
         "northbound_top10": market.northbound_top10,
+        "dragon_seats": market.dragon_seats,
         "notes": market.notes,
     }
