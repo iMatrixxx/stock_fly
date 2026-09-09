@@ -1,7 +1,7 @@
 {
   "meta": {
     "date": "2026-09-08",
-    "generated_at": "2026-09-09T14:41:34",
+    "generated_at": "2026-09-09T15:31:47",
     "note": "本 JSON 仅包含数据与确定性聚合，不含交易判断；请由 LLM 基于数据独立完成四步分析并撰写报告。注意：leaders_candidates 的 industry 为东财涨停池行业标签，可能只反映次要属性，板块归属需结合个股主营判断；涨停池个股尾盘行为统一标注为『涨停封板』。",
     "data_sources": [
       "涨停情绪源：hithink-finance fuyao API（fetch_market_snapshot.py，替代大班客）：涨停 72 / 炸板 37 / 昨日池 92 只。今日各板家数 {'4': 3, '3': 3, '2': 12}（fuyao up 池口径）。缺口：首板尝试数（炸板池无连板属性）、概念聚焦 total 缺失，题材浓度由涨停原因标签（limit_up_reason 拆 +）近似。",
@@ -328,6 +328,124 @@
       ]
     }
   },
+  "macro": {
+    "date": "2026-09-08",
+    "asof": "2026-09-09T15:27:12+08:00",
+    "source": "新浪期货日K（主力连续，InnerFuturesNewService）",
+    "note": "口径：交易日 T 的日K = T 当日日盘 + T-1 夜盘（A股盘中全程可感，视为当日催化）；chg_pct = T 日收盘/前一交易日收盘-1（前一交易日自动跳过休市）；target 日无行时回退最近交易日并在 trade_date 标注。本快照仅含国内商品期货主连——美元指数、离岸人民币与外盘商品（COMEX/CBOT 等）无稳定历史公开源（东财 push2his 有 IP 级风控、新浪相关接口已下线），未纳入，报告引用本数据时禁止编造美元/外盘数值。",
+    "groups": {
+      "农产品链": {
+        "count": 3,
+        "up": 3,
+        "down": 0,
+        "codes": [
+          "C0",
+          "LH0",
+          "M0"
+        ]
+      },
+      "农化/化肥": {
+        "count": 1,
+        "up": 1,
+        "down": 0,
+        "codes": [
+          "UR0"
+        ]
+      },
+      "工业金属": {
+        "count": 3,
+        "up": 3,
+        "down": 0,
+        "codes": [
+          "CU0",
+          "AL0",
+          "ZN0"
+        ]
+      },
+      "贵金属": {
+        "count": 1,
+        "up": 1,
+        "down": 0,
+        "codes": [
+          "AU0"
+        ]
+      }
+    },
+    "items": [
+      {
+        "name": "玉米主连",
+        "code": "C0",
+        "group": "农产品链",
+        "trade_date": "2026-09-08",
+        "close": 2299.0,
+        "prev_close": 2286.0,
+        "chg_pct": 0.57
+      },
+      {
+        "name": "生猪主连",
+        "code": "LH0",
+        "group": "农产品链",
+        "trade_date": "2026-09-08",
+        "close": 11845.0,
+        "prev_close": 11795.0,
+        "chg_pct": 0.42
+      },
+      {
+        "name": "豆粕主连",
+        "code": "M0",
+        "group": "农产品链",
+        "trade_date": "2026-09-08",
+        "close": 3415.0,
+        "prev_close": 3408.0,
+        "chg_pct": 0.21
+      },
+      {
+        "name": "尿素主连",
+        "code": "UR0",
+        "group": "农化/化肥",
+        "trade_date": "2026-09-08",
+        "close": 1822.0,
+        "prev_close": 1816.0,
+        "chg_pct": 0.33
+      },
+      {
+        "name": "沪铜主连",
+        "code": "CU0",
+        "group": "工业金属",
+        "trade_date": "2026-09-08",
+        "close": 110620.0,
+        "prev_close": 109410.0,
+        "chg_pct": 1.11
+      },
+      {
+        "name": "沪铝主连",
+        "code": "AL0",
+        "group": "工业金属",
+        "trade_date": "2026-09-08",
+        "close": 24460.0,
+        "prev_close": 24420.0,
+        "chg_pct": 0.16
+      },
+      {
+        "name": "沪锌主连",
+        "code": "ZN0",
+        "group": "工业金属",
+        "trade_date": "2026-09-08",
+        "close": 27505.0,
+        "prev_close": 27095.0,
+        "chg_pct": 1.51
+      },
+      {
+        "name": "沪金主连",
+        "code": "AU0",
+        "group": "贵金属",
+        "trade_date": "2026-09-08",
+        "close": 953.12,
+        "prev_close": 950.78,
+        "chg_pct": 0.25
+      }
+    ]
+  },
   "dragon_top": {
     "count": 56,
     "trade_date": "2026-09-08",
@@ -592,6 +710,1322 @@
       "688293"
     ]
   },
+  "dragon_seats": {
+    "date": "2026-09-08",
+    "note": "龙虎榜买卖前五席位（东财 RPT_BILLBOARD_DAILYDETAILSBUY/SELL）。席位性质：机构专用=org；深股通/沪股通专用=north（北向通道）；其余营业部=dealer。席位明细只覆盖买卖前五，非全量成交；机构净买>0 通常意味趋势延续性更强，纯 dealer（无机构无北向）偏短线博弈——最终定性由 LLM 基于本结构给出。",
+    "total_boarded": 55,
+    "sample_top": 12,
+    "stocks": [
+      {
+        "code": "000620",
+        "name": "盈新发展",
+        "reason": "日涨幅偏离值达到7%的前5只证券",
+        "net_buy_yi": 4.24,
+        "org_buy_yi": 0.0,
+        "org_sell_yi": 0.63,
+        "org_net_yi": -0.12,
+        "north_buy_yi": 0.76,
+        "north_sell_yi": 0.53,
+        "north_net_yi": 0.48,
+        "dealer_net_yi": 4.13,
+        "total_buy_yi": 5.08,
+        "total_sell_yi": 1.35,
+        "top_buyer": {
+          "name": "国泰海通证券股份有限公司武汉紫阳东路证券营业部",
+          "net_yi": 1.34,
+          "kind": "dealer"
+        },
+        "top_seller": {
+          "name": "深股通专用",
+          "net_yi": 0.24,
+          "kind": "north"
+        },
+        "buy_seats": [
+          {
+            "name": "深股通专用",
+            "buy_yi": 0.76,
+            "sell_yi": 0.53,
+            "net_yi": 0.24,
+            "kind": "north",
+            "side": "buy"
+          },
+          {
+            "name": "开源证券股份有限公司西安西大街证券营业部",
+            "buy_yi": 0.76,
+            "sell_yi": 0.0,
+            "net_yi": 0.76,
+            "kind": "dealer",
+            "side": "buy"
+          },
+          {
+            "name": "国泰海通证券股份有限公司武汉紫阳东路证券营业部",
+            "buy_yi": 1.34,
+            "sell_yi": 0.0,
+            "net_yi": 1.34,
+            "kind": "dealer",
+            "side": "buy"
+          },
+          {
+            "name": "国泰海通证券股份有限公司成都北一环路证券营业部",
+            "buy_yi": 1.33,
+            "sell_yi": 0.0,
+            "net_yi": 1.33,
+            "kind": "dealer",
+            "side": "buy"
+          },
+          {
+            "name": "国新证券股份有限公司北京分公司",
+            "buy_yi": 0.89,
+            "sell_yi": 0.0,
+            "net_yi": 0.89,
+            "kind": "dealer",
+            "side": "buy"
+          }
+        ],
+        "sell_seats": [
+          {
+            "name": "国信证券股份有限公司四川分公司",
+            "buy_yi": 0.0,
+            "sell_yi": 0.19,
+            "net_yi": -0.19,
+            "kind": "dealer",
+            "side": "sell"
+          },
+          {
+            "name": "深股通专用",
+            "buy_yi": 0.76,
+            "sell_yi": 0.53,
+            "net_yi": 0.24,
+            "kind": "north",
+            "side": "sell"
+          },
+          {
+            "name": "机构专用",
+            "buy_yi": 0.21,
+            "sell_yi": 0.29,
+            "net_yi": -0.07,
+            "kind": "org",
+            "side": "sell"
+          },
+          {
+            "name": "机构专用",
+            "buy_yi": 0.16,
+            "sell_yi": 0.15,
+            "net_yi": 0.01,
+            "kind": "org",
+            "side": "sell"
+          },
+          {
+            "name": "机构专用",
+            "buy_yi": 0.13,
+            "sell_yi": 0.19,
+            "net_yi": -0.06,
+            "kind": "org",
+            "side": "sell"
+          }
+        ]
+      },
+      {
+        "code": "002579",
+        "name": "中京电子",
+        "reason": "连续三个交易日内，涨幅偏离值累计达到20%的证券",
+        "net_buy_yi": 3.54,
+        "org_buy_yi": 1.24,
+        "org_sell_yi": 1.82,
+        "org_net_yi": 0.97,
+        "north_buy_yi": 1.89,
+        "north_sell_yi": 1.49,
+        "north_net_yi": 0.8,
+        "dealer_net_yi": 2.99,
+        "total_buy_yi": 6.71,
+        "total_sell_yi": 4.05,
+        "top_buyer": {
+          "name": "国泰海通证券股份有限公司武汉紫阳东路证券营业部",
+          "net_yi": 1.7,
+          "kind": "dealer"
+        },
+        "top_seller": {
+          "name": "机构专用",
+          "net_yi": 0.6,
+          "kind": "org"
+        },
+        "buy_seats": [
+          {
+            "name": "深股通专用",
+            "buy_yi": 1.89,
+            "sell_yi": 1.49,
+            "net_yi": 0.4,
+            "kind": "north",
+            "side": "buy"
+          },
+          {
+            "name": "机构专用",
+            "buy_yi": 1.24,
+            "sell_yi": 0.64,
+            "net_yi": 0.6,
+            "kind": "org",
+            "side": "buy"
+          },
+          {
+            "name": "国新证券股份有限公司北京分公司",
+            "buy_yi": 0.92,
+            "sell_yi": 0.07,
+            "net_yi": 0.85,
+            "kind": "dealer",
+            "side": "buy"
+          },
+          {
+            "name": "国泰海通证券股份有限公司武汉紫阳东路证券营业部",
+            "buy_yi": 1.7,
+            "sell_yi": 0.0,
+            "net_yi": 1.7,
+            "kind": "dealer",
+            "side": "buy"
+          },
+          {
+            "name": "开源证券股份有限公司西安西大街证券营业部",
+            "buy_yi": 0.96,
+            "sell_yi": 0.74,
+            "net_yi": 0.22,
+            "kind": "dealer",
+            "side": "buy"
+          }
+        ],
+        "sell_seats": [
+          {
+            "name": "机构专用",
+            "buy_yi": 1.24,
+            "sell_yi": 0.64,
+            "net_yi": 0.6,
+            "kind": "org",
+            "side": "sell"
+          },
+          {
+            "name": "机构专用",
+            "buy_yi": 0.6,
+            "sell_yi": 0.53,
+            "net_yi": 0.07,
+            "kind": "org",
+            "side": "sell"
+          },
+          {
+            "name": "开源证券股份有限公司西安西大街证券营业部",
+            "buy_yi": 0.96,
+            "sell_yi": 0.74,
+            "net_yi": 0.22,
+            "kind": "dealer",
+            "side": "sell"
+          },
+          {
+            "name": "机构专用",
+            "buy_yi": 0.36,
+            "sell_yi": 0.65,
+            "net_yi": -0.3,
+            "kind": "org",
+            "side": "sell"
+          },
+          {
+            "name": "深股通专用",
+            "buy_yi": 1.89,
+            "sell_yi": 1.49,
+            "net_yi": 0.4,
+            "kind": "north",
+            "side": "sell"
+          }
+        ]
+      },
+      {
+        "code": "603991",
+        "name": "领先股份",
+        "reason": "非S证券连续三个交易日内收盘价格涨幅偏离值累计达到20%的证券",
+        "net_buy_yi": 2.63,
+        "org_buy_yi": 0.0,
+        "org_sell_yi": 0.47,
+        "org_net_yi": -0.47,
+        "north_buy_yi": 2.94,
+        "north_sell_yi": 1.81,
+        "north_net_yi": 1.13,
+        "dealer_net_yi": 1.97,
+        "total_buy_yi": 6.7,
+        "total_sell_yi": 4.07,
+        "top_buyer": {
+          "name": "沪股通专用",
+          "net_yi": 2.94,
+          "kind": "north"
+        },
+        "top_seller": {
+          "name": "沪股通专用",
+          "net_yi": -1.81,
+          "kind": "north"
+        },
+        "buy_seats": [
+          {
+            "name": "国联民生证券股份有限公司无锡洛社镇人民南路证券营业部",
+            "buy_yi": 1.07,
+            "sell_yi": 0.0,
+            "net_yi": 1.07,
+            "kind": "dealer",
+            "side": "buy"
+          },
+          {
+            "name": "国泰海通证券股份有限公司总部",
+            "buy_yi": 1.03,
+            "sell_yi": 0.0,
+            "net_yi": 1.03,
+            "kind": "dealer",
+            "side": "buy"
+          },
+          {
+            "name": "摩根大通证券(中国)有限公司上海银城中路证券营业部",
+            "buy_yi": 0.72,
+            "sell_yi": 0.0,
+            "net_yi": 0.72,
+            "kind": "dealer",
+            "side": "buy"
+          },
+          {
+            "name": "沪股通专用",
+            "buy_yi": 2.94,
+            "sell_yi": 0.0,
+            "net_yi": 2.94,
+            "kind": "north",
+            "side": "buy"
+          },
+          {
+            "name": "瑞银证券有限责任公司上海花园石桥路证券营业部",
+            "buy_yi": 0.94,
+            "sell_yi": 0.0,
+            "net_yi": 0.94,
+            "kind": "dealer",
+            "side": "buy"
+          }
+        ],
+        "sell_seats": [
+          {
+            "name": "中国国际金融股份有限公司上海分公司",
+            "buy_yi": 0.0,
+            "sell_yi": 0.47,
+            "net_yi": -0.47,
+            "kind": "dealer",
+            "side": "sell"
+          },
+          {
+            "name": "开源证券股份有限公司西安西大街证券营业部",
+            "buy_yi": 0.0,
+            "sell_yi": 0.61,
+            "net_yi": -0.61,
+            "kind": "dealer",
+            "side": "sell"
+          },
+          {
+            "name": "国泰海通证券股份有限公司总部",
+            "buy_yi": 0.0,
+            "sell_yi": 0.71,
+            "net_yi": -0.71,
+            "kind": "dealer",
+            "side": "sell"
+          },
+          {
+            "name": "机构专用",
+            "buy_yi": 0.0,
+            "sell_yi": 0.47,
+            "net_yi": -0.47,
+            "kind": "org",
+            "side": "sell"
+          },
+          {
+            "name": "沪股通专用",
+            "buy_yi": 0.0,
+            "sell_yi": 1.81,
+            "net_yi": -1.81,
+            "kind": "north",
+            "side": "sell"
+          }
+        ]
+      },
+      {
+        "code": "002827",
+        "name": "高争民爆",
+        "reason": "日跌幅偏离值达到7%的前5只证券",
+        "net_buy_yi": 2.32,
+        "org_buy_yi": 0.0,
+        "org_sell_yi": 0.48,
+        "org_net_yi": -0.48,
+        "north_buy_yi": 0.57,
+        "north_sell_yi": 0.38,
+        "north_net_yi": 0.38,
+        "dealer_net_yi": 2.61,
+        "total_buy_yi": 4.01,
+        "total_sell_yi": 1.61,
+        "top_buyer": {
+          "name": "东方证券股份有限公司杭州龙井路证券营业部",
+          "net_yi": 2.24,
+          "kind": "dealer"
+        },
+        "top_seller": {
+          "name": "机构专用",
+          "net_yi": -0.48,
+          "kind": "org"
+        },
+        "buy_seats": [
+          {
+            "name": "东亚前海证券有限责任公司苏州分公司",
+            "buy_yi": 0.14,
+            "sell_yi": 0.13,
+            "net_yi": 0.01,
+            "kind": "dealer",
+            "side": "buy"
+          },
+          {
+            "name": "长城证券股份有限公司成都天晖中街证券营业部",
+            "buy_yi": 0.93,
+            "sell_yi": 0.01,
+            "net_yi": 0.92,
+            "kind": "dealer",
+            "side": "buy"
+          },
+          {
+            "name": "东方证券股份有限公司杭州龙井路证券营业部",
+            "buy_yi": 2.24,
+            "sell_yi": 0.0,
+            "net_yi": 2.24,
+            "kind": "dealer",
+            "side": "buy"
+          },
+          {
+            "name": "中信建投证券股份有限公司厦门杏东路证券营业部",
+            "buy_yi": 0.13,
+            "sell_yi": 0.01,
+            "net_yi": 0.11,
+            "kind": "dealer",
+            "side": "buy"
+          },
+          {
+            "name": "深股通专用",
+            "buy_yi": 0.57,
+            "sell_yi": 0.38,
+            "net_yi": 0.19,
+            "kind": "north",
+            "side": "buy"
+          }
+        ],
+        "sell_seats": [
+          {
+            "name": "深股通专用",
+            "buy_yi": 0.57,
+            "sell_yi": 0.38,
+            "net_yi": 0.19,
+            "kind": "north",
+            "side": "sell"
+          },
+          {
+            "name": "东方财富证券股份有限公司江苏分公司",
+            "buy_yi": 0.0,
+            "sell_yi": 0.28,
+            "net_yi": -0.27,
+            "kind": "dealer",
+            "side": "sell"
+          },
+          {
+            "name": "招商证券股份有限公司深圳益田路免税商务大厦证券营业部",
+            "buy_yi": 0.0,
+            "sell_yi": 0.24,
+            "net_yi": -0.23,
+            "kind": "dealer",
+            "side": "sell"
+          },
+          {
+            "name": "中信证券股份有限公司深圳分公司",
+            "buy_yi": 0.06,
+            "sell_yi": 0.23,
+            "net_yi": -0.17,
+            "kind": "dealer",
+            "side": "sell"
+          },
+          {
+            "name": "机构专用",
+            "buy_yi": 0.0,
+            "sell_yi": 0.48,
+            "net_yi": -0.48,
+            "kind": "org",
+            "side": "sell"
+          }
+        ]
+      },
+      {
+        "code": "002470",
+        "name": "金正大",
+        "reason": "连续三个交易日内，涨幅偏离值累计达到20%的证券",
+        "net_buy_yi": 2.05,
+        "org_buy_yi": 0.54,
+        "org_sell_yi": 0.43,
+        "org_net_yi": 0.49,
+        "north_buy_yi": 1.47,
+        "north_sell_yi": 1.28,
+        "north_net_yi": 0.38,
+        "dealer_net_yi": 1.56,
+        "total_buy_yi": 3.97,
+        "total_sell_yi": 2.7,
+        "top_buyer": {
+          "name": "国泰海通证券股份有限公司北京知春路证券营业部",
+          "net_yi": 0.77,
+          "kind": "dealer"
+        },
+        "top_seller": {
+          "name": "深股通专用",
+          "net_yi": 0.19,
+          "kind": "north"
+        },
+        "buy_seats": [
+          {
+            "name": "机构专用",
+            "buy_yi": 0.54,
+            "sell_yi": 0.15,
+            "net_yi": 0.39,
+            "kind": "org",
+            "side": "buy"
+          },
+          {
+            "name": "深股通专用",
+            "buy_yi": 1.47,
+            "sell_yi": 1.28,
+            "net_yi": 0.19,
+            "kind": "north",
+            "side": "buy"
+          },
+          {
+            "name": "开源证券股份有限公司西安西大街证券营业部",
+            "buy_yi": 0.69,
+            "sell_yi": 0.52,
+            "net_yi": 0.17,
+            "kind": "dealer",
+            "side": "buy"
+          },
+          {
+            "name": "国泰海通证券股份有限公司北京知春路证券营业部",
+            "buy_yi": 0.81,
+            "sell_yi": 0.04,
+            "net_yi": 0.77,
+            "kind": "dealer",
+            "side": "buy"
+          },
+          {
+            "name": "国新证券股份有限公司北京分公司",
+            "buy_yi": 0.46,
+            "sell_yi": 0.0,
+            "net_yi": 0.46,
+            "kind": "dealer",
+            "side": "buy"
+          }
+        ],
+        "sell_seats": [
+          {
+            "name": "国泰海通证券股份有限公司南京太平南路证券营业部",
+            "buy_yi": 0.45,
+            "sell_yi": 0.47,
+            "net_yi": -0.01,
+            "kind": "dealer",
+            "side": "sell"
+          },
+          {
+            "name": "开源证券股份有限公司西安西大街证券营业部",
+            "buy_yi": 0.69,
+            "sell_yi": 0.52,
+            "net_yi": 0.17,
+            "kind": "dealer",
+            "side": "sell"
+          },
+          {
+            "name": "机构专用",
+            "buy_yi": 0.25,
+            "sell_yi": 0.24,
+            "net_yi": 0.02,
+            "kind": "org",
+            "side": "sell"
+          },
+          {
+            "name": "深股通专用",
+            "buy_yi": 1.47,
+            "sell_yi": 1.28,
+            "net_yi": 0.19,
+            "kind": "north",
+            "side": "sell"
+          },
+          {
+            "name": "机构专用",
+            "buy_yi": 0.27,
+            "sell_yi": 0.19,
+            "net_yi": 0.08,
+            "kind": "org",
+            "side": "sell"
+          }
+        ]
+      },
+      {
+        "code": "600127",
+        "name": "金健米业",
+        "reason": "有价格涨跌幅限制的日换手率达到20%的前五只证券",
+        "net_buy_yi": 1.56,
+        "org_buy_yi": 0.0,
+        "org_sell_yi": 0.0,
+        "org_net_yi": 0,
+        "north_buy_yi": 1.55,
+        "north_sell_yi": 0.91,
+        "north_net_yi": 0.64,
+        "dealer_net_yi": 0.93,
+        "total_buy_yi": 4.43,
+        "total_sell_yi": 2.86,
+        "top_buyer": {
+          "name": "沪股通专用",
+          "net_yi": 1.55,
+          "kind": "north"
+        },
+        "top_seller": {
+          "name": "沪股通专用",
+          "net_yi": -0.91,
+          "kind": "north"
+        },
+        "buy_seats": [
+          {
+            "name": "沪股通专用",
+            "buy_yi": 1.55,
+            "sell_yi": 0.0,
+            "net_yi": 1.55,
+            "kind": "north",
+            "side": "buy"
+          },
+          {
+            "name": "摩根大通证券(中国)有限公司上海银城中路证券营业部",
+            "buy_yi": 0.79,
+            "sell_yi": 0.0,
+            "net_yi": 0.79,
+            "kind": "dealer",
+            "side": "buy"
+          },
+          {
+            "name": "国泰海通证券股份有限公司顺德大良证券营业部",
+            "buy_yi": 0.56,
+            "sell_yi": 0.0,
+            "net_yi": 0.56,
+            "kind": "dealer",
+            "side": "buy"
+          },
+          {
+            "name": "华泰证券股份有限公司天津东丽开发区二纬路证券营业部",
+            "buy_yi": 0.48,
+            "sell_yi": 0.0,
+            "net_yi": 0.48,
+            "kind": "dealer",
+            "side": "buy"
+          },
+          {
+            "name": "国泰海通证券股份有限公司总部",
+            "buy_yi": 1.05,
+            "sell_yi": 0.0,
+            "net_yi": 1.05,
+            "kind": "dealer",
+            "side": "buy"
+          }
+        ],
+        "sell_seats": [
+          {
+            "name": "沪股通专用",
+            "buy_yi": 0.0,
+            "sell_yi": 0.91,
+            "net_yi": -0.91,
+            "kind": "north",
+            "side": "sell"
+          },
+          {
+            "name": "东莞证券股份有限公司江门分公司",
+            "buy_yi": 0.0,
+            "sell_yi": 0.38,
+            "net_yi": -0.38,
+            "kind": "dealer",
+            "side": "sell"
+          },
+          {
+            "name": "国泰海通证券股份有限公司总部",
+            "buy_yi": 0.0,
+            "sell_yi": 0.69,
+            "net_yi": -0.69,
+            "kind": "dealer",
+            "side": "sell"
+          },
+          {
+            "name": "东方财富证券股份有限公司拉萨东环路第二证券营业部",
+            "buy_yi": 0.0,
+            "sell_yi": 0.37,
+            "net_yi": -0.37,
+            "kind": "dealer",
+            "side": "sell"
+          },
+          {
+            "name": "国联民生证券股份有限公司宁波财神殿南路证券营业部",
+            "buy_yi": 0.0,
+            "sell_yi": 0.51,
+            "net_yi": -0.51,
+            "kind": "dealer",
+            "side": "sell"
+          }
+        ]
+      },
+      {
+        "code": "000833",
+        "name": "粤桂股份",
+        "reason": "日涨幅偏离值达到7%的前5只证券",
+        "net_buy_yi": 1.45,
+        "org_buy_yi": 0.19,
+        "org_sell_yi": 0.35,
+        "org_net_yi": 0.02,
+        "north_buy_yi": 0.74,
+        "north_sell_yi": 0.42,
+        "north_net_yi": 0.64,
+        "dealer_net_yi": 1.12,
+        "total_buy_yi": 2.39,
+        "total_sell_yi": 1.09,
+        "top_buyer": {
+          "name": "开源证券股份有限公司西安西大街证券营业部",
+          "net_yi": 1.08,
+          "kind": "dealer"
+        },
+        "top_seller": {
+          "name": "深股通专用",
+          "net_yi": 0.32,
+          "kind": "north"
+        },
+        "buy_seats": [
+          {
+            "name": "深股通专用",
+            "buy_yi": 0.74,
+            "sell_yi": 0.42,
+            "net_yi": 0.32,
+            "kind": "north",
+            "side": "buy"
+          },
+          {
+            "name": "国泰海通证券股份有限公司上海长宁区江苏路证券营业部",
+            "buy_yi": 0.18,
+            "sell_yi": 0.02,
+            "net_yi": 0.16,
+            "kind": "dealer",
+            "side": "buy"
+          },
+          {
+            "name": "机构专用",
+            "buy_yi": 0.19,
+            "sell_yi": 0.08,
+            "net_yi": 0.12,
+            "kind": "org",
+            "side": "buy"
+          },
+          {
+            "name": "开源证券股份有限公司西安西大街证券营业部",
+            "buy_yi": 1.08,
+            "sell_yi": 0.0,
+            "net_yi": 1.08,
+            "kind": "dealer",
+            "side": "buy"
+          },
+          {
+            "name": "东亚前海证券有限责任公司深圳分公司",
+            "buy_yi": 0.2,
+            "sell_yi": 0.0,
+            "net_yi": 0.2,
+            "kind": "dealer",
+            "side": "buy"
+          }
+        ],
+        "sell_seats": [
+          {
+            "name": "机构专用",
+            "buy_yi": 0.09,
+            "sell_yi": 0.15,
+            "net_yi": -0.05,
+            "kind": "org",
+            "side": "sell"
+          },
+          {
+            "name": "中信证券华南股份有限公司广州万博证券营业部",
+            "buy_yi": 0.0,
+            "sell_yi": 0.19,
+            "net_yi": -0.19,
+            "kind": "dealer",
+            "side": "sell"
+          },
+          {
+            "name": "中国银河证券股份有限公司温州三友路证券营业部",
+            "buy_yi": 0.0,
+            "sell_yi": 0.13,
+            "net_yi": -0.13,
+            "kind": "dealer",
+            "side": "sell"
+          },
+          {
+            "name": "深股通专用",
+            "buy_yi": 0.74,
+            "sell_yi": 0.42,
+            "net_yi": 0.32,
+            "kind": "north",
+            "side": "sell"
+          },
+          {
+            "name": "机构专用",
+            "buy_yi": 0.15,
+            "sell_yi": 0.2,
+            "net_yi": -0.05,
+            "kind": "org",
+            "side": "sell"
+          }
+        ]
+      },
+      {
+        "code": "300788",
+        "name": "中信出版",
+        "reason": "日涨幅达到15%的前5只证券",
+        "net_buy_yi": 1.09,
+        "org_buy_yi": 0.08,
+        "org_sell_yi": 0.12,
+        "org_net_yi": 0.09,
+        "north_buy_yi": 0.28,
+        "north_sell_yi": 0.13,
+        "north_net_yi": 0.28,
+        "dealer_net_yi": 0.87,
+        "total_buy_yi": 1.51,
+        "total_sell_yi": 0.49,
+        "top_buyer": {
+          "name": "国泰海通证券股份有限公司南京太平南路证券营业部",
+          "net_yi": 0.8,
+          "kind": "dealer"
+        },
+        "top_seller": {
+          "name": "华福证券股份有限公司福州鼓屏路证券营业部",
+          "net_yi": -0.16,
+          "kind": "dealer"
+        },
+        "buy_seats": [
+          {
+            "name": "机构专用",
+            "buy_yi": 0.08,
+            "sell_yi": 0.0,
+            "net_yi": 0.08,
+            "kind": "org",
+            "side": "buy"
+          },
+          {
+            "name": "深股通专用",
+            "buy_yi": 0.28,
+            "sell_yi": 0.13,
+            "net_yi": 0.14,
+            "kind": "north",
+            "side": "buy"
+          },
+          {
+            "name": "开源证券股份有限公司西安西大街证券营业部",
+            "buy_yi": 0.26,
+            "sell_yi": 0.0,
+            "net_yi": 0.26,
+            "kind": "dealer",
+            "side": "buy"
+          },
+          {
+            "name": "国泰海通证券股份有限公司南京太平南路证券营业部",
+            "buy_yi": 0.8,
+            "sell_yi": 0.0,
+            "net_yi": 0.8,
+            "kind": "dealer",
+            "side": "buy"
+          },
+          {
+            "name": "中国银河证券股份有限公司北京学院南路证券营业部",
+            "buy_yi": 0.09,
+            "sell_yi": 0.04,
+            "net_yi": 0.05,
+            "kind": "dealer",
+            "side": "buy"
+          }
+        ],
+        "sell_seats": [
+          {
+            "name": "深股通专用",
+            "buy_yi": 0.28,
+            "sell_yi": 0.13,
+            "net_yi": 0.14,
+            "kind": "north",
+            "side": "sell"
+          },
+          {
+            "name": "华福证券股份有限公司福州鼓屏路证券营业部",
+            "buy_yi": 0.0,
+            "sell_yi": 0.16,
+            "net_yi": -0.16,
+            "kind": "dealer",
+            "side": "sell"
+          },
+          {
+            "name": "机构专用",
+            "buy_yi": 0.06,
+            "sell_yi": 0.06,
+            "net_yi": -0.0,
+            "kind": "org",
+            "side": "sell"
+          },
+          {
+            "name": "机构专用",
+            "buy_yi": 0.07,
+            "sell_yi": 0.06,
+            "net_yi": 0.01,
+            "kind": "org",
+            "side": "sell"
+          },
+          {
+            "name": "国投证券股份有限公司北京东直门内大街证券营业部",
+            "buy_yi": 0.0,
+            "sell_yi": 0.08,
+            "net_yi": -0.08,
+            "kind": "dealer",
+            "side": "sell"
+          }
+        ]
+      },
+      {
+        "code": "601595",
+        "name": "上海电影",
+        "reason": "非S证券连续三个交易日内收盘价格涨幅偏离值累计达到20%的证券",
+        "net_buy_yi": 1.04,
+        "org_buy_yi": 1.92,
+        "org_sell_yi": 0.0,
+        "org_net_yi": 1.92,
+        "north_buy_yi": 0.84,
+        "north_sell_yi": 0.99,
+        "north_net_yi": -0.15,
+        "dealer_net_yi": -0.74,
+        "total_buy_yi": 3.4,
+        "total_sell_yi": 2.37,
+        "top_buyer": {
+          "name": "机构专用",
+          "net_yi": 1.68,
+          "kind": "org"
+        },
+        "top_seller": {
+          "name": "沪股通专用",
+          "net_yi": -0.99,
+          "kind": "north"
+        },
+        "buy_seats": [
+          {
+            "name": "高盛(中国)证券有限责任公司上海浦东新区世纪大道证券营业部",
+            "buy_yi": 0.24,
+            "sell_yi": 0.0,
+            "net_yi": 0.24,
+            "kind": "dealer",
+            "side": "buy"
+          },
+          {
+            "name": "国泰海通证券股份有限公司总部",
+            "buy_yi": 0.4,
+            "sell_yi": 0.0,
+            "net_yi": 0.4,
+            "kind": "dealer",
+            "side": "buy"
+          },
+          {
+            "name": "机构专用",
+            "buy_yi": 0.24,
+            "sell_yi": 0.0,
+            "net_yi": 0.24,
+            "kind": "org",
+            "side": "buy"
+          },
+          {
+            "name": "沪股通专用",
+            "buy_yi": 0.84,
+            "sell_yi": 0.0,
+            "net_yi": 0.84,
+            "kind": "north",
+            "side": "buy"
+          },
+          {
+            "name": "机构专用",
+            "buy_yi": 1.68,
+            "sell_yi": 0.0,
+            "net_yi": 1.68,
+            "kind": "org",
+            "side": "buy"
+          }
+        ],
+        "sell_seats": [
+          {
+            "name": "高盛(中国)证券有限责任公司上海浦东新区世纪大道证券营业部",
+            "buy_yi": 0.0,
+            "sell_yi": 0.35,
+            "net_yi": -0.35,
+            "kind": "dealer",
+            "side": "sell"
+          },
+          {
+            "name": "瑞银证券有限责任公司上海花园石桥路证券营业部",
+            "buy_yi": 0.0,
+            "sell_yi": 0.26,
+            "net_yi": -0.26,
+            "kind": "dealer",
+            "side": "sell"
+          },
+          {
+            "name": "国泰海通证券股份有限公司总部",
+            "buy_yi": 0.0,
+            "sell_yi": 0.44,
+            "net_yi": -0.44,
+            "kind": "dealer",
+            "side": "sell"
+          },
+          {
+            "name": "中信证券股份有限公司上海分公司",
+            "buy_yi": 0.0,
+            "sell_yi": 0.33,
+            "net_yi": -0.33,
+            "kind": "dealer",
+            "side": "sell"
+          },
+          {
+            "name": "沪股通专用",
+            "buy_yi": 0.0,
+            "sell_yi": 0.99,
+            "net_yi": -0.99,
+            "kind": "north",
+            "side": "sell"
+          }
+        ]
+      },
+      {
+        "code": "603626",
+        "name": "科森科技",
+        "reason": "非S证券连续三个交易日内收盘价格涨幅偏离值累计达到20%的证券",
+        "net_buy_yi": 1.04,
+        "org_buy_yi": 0.0,
+        "org_sell_yi": 0.0,
+        "org_net_yi": 0,
+        "north_buy_yi": 1.11,
+        "north_sell_yi": 0.51,
+        "north_net_yi": 0.6,
+        "dealer_net_yi": 0.45,
+        "total_buy_yi": 3.27,
+        "total_sell_yi": 2.22,
+        "top_buyer": {
+          "name": "沪股通专用",
+          "net_yi": 1.11,
+          "kind": "north"
+        },
+        "top_seller": {
+          "name": "东方证券股份有限公司山东分公司",
+          "net_yi": -0.6,
+          "kind": "dealer"
+        },
+        "buy_seats": [
+          {
+            "name": "高盛(中国)证券有限责任公司上海浦东新区世纪大道证券营业部",
+            "buy_yi": 0.47,
+            "sell_yi": 0.0,
+            "net_yi": 0.47,
+            "kind": "dealer",
+            "side": "buy"
+          },
+          {
+            "name": "沪股通专用",
+            "buy_yi": 1.11,
+            "sell_yi": 0.0,
+            "net_yi": 1.11,
+            "kind": "north",
+            "side": "buy"
+          },
+          {
+            "name": "华鑫证券有限责任公司上海陆家嘴证券营业部",
+            "buy_yi": 0.48,
+            "sell_yi": 0.0,
+            "net_yi": 0.48,
+            "kind": "dealer",
+            "side": "buy"
+          },
+          {
+            "name": "国泰海通证券股份有限公司总部",
+            "buy_yi": 0.76,
+            "sell_yi": 0.0,
+            "net_yi": 0.76,
+            "kind": "dealer",
+            "side": "buy"
+          },
+          {
+            "name": "国泰海通证券股份有限公司武汉紫阳东路证券营业部",
+            "buy_yi": 0.45,
+            "sell_yi": 0.0,
+            "net_yi": 0.45,
+            "kind": "dealer",
+            "side": "buy"
+          }
+        ],
+        "sell_seats": [
+          {
+            "name": "天风证券股份有限公司浙江分公司",
+            "buy_yi": 0.0,
+            "sell_yi": 0.28,
+            "net_yi": -0.28,
+            "kind": "dealer",
+            "side": "sell"
+          },
+          {
+            "name": "东方证券股份有限公司山东分公司",
+            "buy_yi": 0.0,
+            "sell_yi": 0.6,
+            "net_yi": -0.6,
+            "kind": "dealer",
+            "side": "sell"
+          },
+          {
+            "name": "中信证券股份有限公司东阳吴宁西路证券营业部",
+            "buy_yi": 0.0,
+            "sell_yi": 0.34,
+            "net_yi": -0.34,
+            "kind": "dealer",
+            "side": "sell"
+          },
+          {
+            "name": "沪股通专用",
+            "buy_yi": 0.0,
+            "sell_yi": 0.51,
+            "net_yi": -0.51,
+            "kind": "north",
+            "side": "sell"
+          },
+          {
+            "name": "国泰海通证券股份有限公司武汉紫阳东路证券营业部",
+            "buy_yi": 0.0,
+            "sell_yi": 0.49,
+            "net_yi": -0.49,
+            "kind": "dealer",
+            "side": "sell"
+          }
+        ]
+      },
+      {
+        "code": "603823",
+        "name": "百合花",
+        "reason": "非S证券连续三个交易日内收盘价格涨幅偏离值累计达到20%的证券",
+        "net_buy_yi": 0.87,
+        "org_buy_yi": 0.0,
+        "org_sell_yi": 0.0,
+        "org_net_yi": 0,
+        "north_buy_yi": 0.55,
+        "north_sell_yi": 0.58,
+        "north_net_yi": -0.03,
+        "dealer_net_yi": 0.9,
+        "total_buy_yi": 2.45,
+        "total_sell_yi": 1.58,
+        "top_buyer": {
+          "name": "国新证券股份有限公司北京分公司",
+          "net_yi": 0.89,
+          "kind": "dealer"
+        },
+        "top_seller": {
+          "name": "沪股通专用",
+          "net_yi": -0.58,
+          "kind": "north"
+        },
+        "buy_seats": [
+          {
+            "name": "国泰海通证券股份有限公司总部",
+            "buy_yi": 0.48,
+            "sell_yi": 0.0,
+            "net_yi": 0.48,
+            "kind": "dealer",
+            "side": "buy"
+          },
+          {
+            "name": "国新证券股份有限公司北京分公司",
+            "buy_yi": 0.89,
+            "sell_yi": 0.0,
+            "net_yi": 0.89,
+            "kind": "dealer",
+            "side": "buy"
+          },
+          {
+            "name": "沪股通专用",
+            "buy_yi": 0.55,
+            "sell_yi": 0.0,
+            "net_yi": 0.55,
+            "kind": "north",
+            "side": "buy"
+          },
+          {
+            "name": "国新证券股份有限公司北京中关村大街证券营业部",
+            "buy_yi": 0.24,
+            "sell_yi": 0.0,
+            "net_yi": 0.24,
+            "kind": "dealer",
+            "side": "buy"
+          },
+          {
+            "name": "华泰证券股份有限公司总部",
+            "buy_yi": 0.29,
+            "sell_yi": 0.0,
+            "net_yi": 0.29,
+            "kind": "dealer",
+            "side": "buy"
+          }
+        ],
+        "sell_seats": [
+          {
+            "name": "沪股通专用",
+            "buy_yi": 0.0,
+            "sell_yi": 0.58,
+            "net_yi": -0.58,
+            "kind": "north",
+            "side": "sell"
+          },
+          {
+            "name": "国泰海通证券股份有限公司总部",
+            "buy_yi": 0.0,
+            "sell_yi": 0.18,
+            "net_yi": -0.18,
+            "kind": "dealer",
+            "side": "sell"
+          },
+          {
+            "name": "中国国际金融股份有限公司上海分公司",
+            "buy_yi": 0.0,
+            "sell_yi": 0.25,
+            "net_yi": -0.25,
+            "kind": "dealer",
+            "side": "sell"
+          },
+          {
+            "name": "中信证券股份有限公司上海分公司",
+            "buy_yi": 0.0,
+            "sell_yi": 0.16,
+            "net_yi": -0.16,
+            "kind": "dealer",
+            "side": "sell"
+          },
+          {
+            "name": "高盛(中国)证券有限责任公司上海浦东新区世纪大道证券营业部",
+            "buy_yi": 0.0,
+            "sell_yi": 0.41,
+            "net_yi": -0.41,
+            "kind": "dealer",
+            "side": "sell"
+          }
+        ]
+      },
+      {
+        "code": "600881",
+        "name": "亚泰集团",
+        "reason": "有价格涨跌幅限制的日收盘价格涨幅偏离值达到7%的前五只证券",
+        "net_buy_yi": 0.72,
+        "org_buy_yi": 0.0,
+        "org_sell_yi": 0.0,
+        "org_net_yi": 0,
+        "north_buy_yi": 0.62,
+        "north_sell_yi": 0.33,
+        "north_net_yi": 0.29,
+        "dealer_net_yi": 0.45,
+        "total_buy_yi": 1.43,
+        "total_sell_yi": 0.69,
+        "top_buyer": {
+          "name": "沪股通专用",
+          "net_yi": 0.62,
+          "kind": "north"
+        },
+        "top_seller": {
+          "name": "沪股通专用",
+          "net_yi": -0.33,
+          "kind": "north"
+        },
+        "buy_seats": [
+          {
+            "name": "高盛(中国)证券有限责任公司上海浦东新区世纪大道证券营业部",
+            "buy_yi": 0.14,
+            "sell_yi": 0.0,
+            "net_yi": 0.14,
+            "kind": "dealer",
+            "side": "buy"
+          },
+          {
+            "name": "中信证券股份有限公司上海分公司",
+            "buy_yi": 0.2,
+            "sell_yi": 0.0,
+            "net_yi": 0.2,
+            "kind": "dealer",
+            "side": "buy"
+          },
+          {
+            "name": "华鑫证券有限责任公司绍兴胜利东路证券营业部",
+            "buy_yi": 0.16,
+            "sell_yi": 0.0,
+            "net_yi": 0.16,
+            "kind": "dealer",
+            "side": "buy"
+          },
+          {
+            "name": "开源证券股份有限公司西安西大街证券营业部",
+            "buy_yi": 0.31,
+            "sell_yi": 0.0,
+            "net_yi": 0.31,
+            "kind": "dealer",
+            "side": "buy"
+          },
+          {
+            "name": "沪股通专用",
+            "buy_yi": 0.62,
+            "sell_yi": 0.0,
+            "net_yi": 0.62,
+            "kind": "north",
+            "side": "buy"
+          }
+        ],
+        "sell_seats": [
+          {
+            "name": "国泰海通证券股份有限公司总部",
+            "buy_yi": 0.0,
+            "sell_yi": 0.07,
+            "net_yi": -0.07,
+            "kind": "dealer",
+            "side": "sell"
+          },
+          {
+            "name": "中信证券股份有限公司上海分公司",
+            "buy_yi": 0.0,
+            "sell_yi": 0.08,
+            "net_yi": -0.08,
+            "kind": "dealer",
+            "side": "sell"
+          },
+          {
+            "name": "沪股通专用",
+            "buy_yi": 0.0,
+            "sell_yi": 0.33,
+            "net_yi": -0.33,
+            "kind": "north",
+            "side": "sell"
+          },
+          {
+            "name": "瑞银证券有限责任公司上海花园石桥路证券营业部",
+            "buy_yi": 0.0,
+            "sell_yi": 0.09,
+            "net_yi": -0.09,
+            "kind": "dealer",
+            "side": "sell"
+          },
+          {
+            "name": "高盛(中国)证券有限责任公司上海浦东新区世纪大道证券营业部",
+            "buy_yi": 0.0,
+            "sell_yi": 0.12,
+            "net_yi": -0.12,
+            "kind": "dealer",
+            "side": "sell"
+          }
+        ]
+      }
+    ]
+  },
   "emotion": {
     "sealed_total": 72,
     "blast_total": 37,
@@ -637,46 +2071,67 @@
       "flat_open": 4,
       "down_open": 10
     },
+    "concentration_basis": "分母=当日涨停总数（sealed_total），ratio_pct=该题材涨停数/全市场涨停数×100；ratio_pct≥20 判为 mainline=True（主线题材），<20 为支线/轮动题材",
     "industry_concentration": [
       {
         "industry": "AI应用",
-        "count": 6
+        "count": 6,
+        "ratio_pct": 8.3,
+        "mainline": false
       },
       {
         "industry": "中报增长",
-        "count": 3
+        "count": 3,
+        "ratio_pct": 4.2,
+        "mainline": false
       },
       {
         "industry": "中报扭亏",
-        "count": 3
+        "count": 3,
+        "ratio_pct": 4.2,
+        "mainline": false
       },
       {
         "industry": "业绩增长",
-        "count": 3
+        "count": 3,
+        "ratio_pct": 4.2,
+        "mainline": false
       },
       {
         "industry": "商业零售",
-        "count": 2
+        "count": 2,
+        "ratio_pct": 2.8,
+        "mainline": false
       },
       {
         "industry": "海峡两岸",
-        "count": 2
+        "count": 2,
+        "ratio_pct": 2.8,
+        "mainline": false
       },
       {
         "industry": "磷化工",
-        "count": 2
+        "count": 2,
+        "ratio_pct": 2.8,
+        "mainline": false
       },
       {
         "industry": "低空经济",
-        "count": 2
+        "count": 2,
+        "ratio_pct": 2.8,
+        "mainline": false
       },
       {
         "industry": "尿素",
-        "count": 2
+        "count": 2,
+        "ratio_pct": 2.8,
+        "mainline": false
       },
       {
         "industry": "半年报增长",
-        "count": 2
+        "count": 2,
+        "ratio_pct": 2.8,
+        "mainline": false
       }
     ],
     "concept_focus": [],
@@ -709,6 +2164,989 @@
         "中百集团"
       ]
     }
+  },
+  "board_pools": {
+    "note": "口径：market.zt_pool 行业标签（与 cycle_context.top_industries 同源），仅含当日涨停股。写板块/主线必先查本池落到标的（名称+连板，1~5 只）；池中无该行业=当日该行业无涨停（资金集中在未涨停权重股，名单未披露）；铜/铝等子板块资金无成分级数据，禁止编造细分归属。zt_ratio_pct=该行业涨停数/zt_total×100，≥20 判mainline=True（主线行业，分母为东财收盘口径 zt_total，与 emotion 涨停标签浓度的分母 sealed_total 不同源，勿混用）。",
+    "zt_total": 73,
+    "boards": [
+      {
+        "industry": "农化制品",
+        "count": 8,
+        "zt_ratio_pct": 11.0,
+        "mainline": false,
+        "stocks": [
+          {
+            "code": "000912",
+            "name": "泸天化",
+            "ladder": 1,
+            "first_seal_time": "09:34:51",
+            "seal_amount_wan": 12494.63,
+            "blast_count": 0,
+            "amount_yi": 2.27
+          },
+          {
+            "code": "002312",
+            "name": "川发龙蟒",
+            "ladder": 1,
+            "first_seal_time": "09:51:45",
+            "seal_amount_wan": 9100.81,
+            "blast_count": 0,
+            "amount_yi": 4.21
+          },
+          {
+            "code": "002470",
+            "name": "金正大",
+            "ladder": 2,
+            "first_seal_time": "09:52:03",
+            "seal_amount_wan": 12032.14,
+            "blast_count": 0,
+            "amount_yi": 8.14
+          },
+          {
+            "code": "600227",
+            "name": "赤天化",
+            "ladder": 1,
+            "first_seal_time": "10:03:48",
+            "seal_amount_wan": 9683.46,
+            "blast_count": 0,
+            "amount_yi": 13.81
+          },
+          {
+            "code": "603077",
+            "name": "和邦生物",
+            "ladder": 1,
+            "first_seal_time": "10:52:01",
+            "seal_amount_wan": 4146.97,
+            "blast_count": 1,
+            "amount_yi": 14.58
+          },
+          {
+            "code": "600691",
+            "name": "潞化科技",
+            "ladder": 1,
+            "first_seal_time": "10:59:37",
+            "seal_amount_wan": 6239.18,
+            "blast_count": 0,
+            "amount_yi": 5.62
+          },
+          {
+            "code": "600596",
+            "name": "新安股份",
+            "ladder": 1,
+            "first_seal_time": "11:05:34",
+            "seal_amount_wan": 1679.65,
+            "blast_count": 3,
+            "amount_yi": 15.62
+          },
+          {
+            "code": "002999",
+            "name": "天禾股份",
+            "ladder": 1,
+            "first_seal_time": "11:08:33",
+            "seal_amount_wan": 3651.8,
+            "blast_count": 3,
+            "amount_yi": 3.52
+          }
+        ]
+      },
+      {
+        "industry": "农产品加",
+        "count": 4,
+        "zt_ratio_pct": 5.5,
+        "mainline": false,
+        "stocks": [
+          {
+            "code": "600737",
+            "name": "中粮糖业",
+            "ladder": 1,
+            "first_seal_time": "09:30:12",
+            "seal_amount_wan": 28882.94,
+            "blast_count": 1,
+            "amount_yi": 17.67
+          },
+          {
+            "code": "000930",
+            "name": "中粮科技",
+            "ladder": 1,
+            "first_seal_time": "09:31:18",
+            "seal_amount_wan": 11932.66,
+            "blast_count": 0,
+            "amount_yi": 2.33
+          },
+          {
+            "code": "002286",
+            "name": "保龄宝",
+            "ladder": 1,
+            "first_seal_time": "11:07:33",
+            "seal_amount_wan": 5319.49,
+            "blast_count": 2,
+            "amount_yi": 4.8
+          },
+          {
+            "code": "920371",
+            "name": "欧福蛋业",
+            "ladder": 1,
+            "first_seal_time": "11:20:02",
+            "seal_amount_wan": 409.78,
+            "blast_count": 8,
+            "amount_yi": 2.73
+          }
+        ]
+      },
+      {
+        "industry": "出版",
+        "count": 4,
+        "zt_ratio_pct": 5.5,
+        "mainline": false,
+        "stocks": [
+          {
+            "code": "603999",
+            "name": "读者传媒",
+            "ladder": 2,
+            "first_seal_time": "09:25:03",
+            "seal_amount_wan": 12988.56,
+            "blast_count": 0,
+            "amount_yi": 0.69
+          },
+          {
+            "code": "601949",
+            "name": "中国出版",
+            "ladder": 3,
+            "first_seal_time": "09:30:42",
+            "seal_amount_wan": 9795.76,
+            "blast_count": 0,
+            "amount_yi": 3.79
+          },
+          {
+            "code": "300788",
+            "name": "中信出版",
+            "ladder": 1,
+            "first_seal_time": "09:35:51",
+            "seal_amount_wan": 5106.99,
+            "blast_count": 0,
+            "amount_yi": 4.74
+          },
+          {
+            "code": "601999",
+            "name": "出版传媒",
+            "ladder": 1,
+            "first_seal_time": "13:08:57",
+            "seal_amount_wan": 1809.82,
+            "blast_count": 2,
+            "amount_yi": 6.06
+          }
+        ]
+      },
+      {
+        "industry": "一般零售",
+        "count": 3,
+        "zt_ratio_pct": 4.1,
+        "mainline": false,
+        "stocks": [
+          {
+            "code": "600865",
+            "name": "百大集团",
+            "ladder": 4,
+            "first_seal_time": "09:25:01",
+            "seal_amount_wan": 23505.35,
+            "blast_count": 0,
+            "amount_yi": 0.59
+          },
+          {
+            "code": "000759",
+            "name": "中百集团",
+            "ladder": 2,
+            "first_seal_time": "09:30:06",
+            "seal_amount_wan": 17374.9,
+            "blast_count": 1,
+            "amount_yi": 4.55
+          },
+          {
+            "code": "000679",
+            "name": "大连友谊",
+            "ladder": 1,
+            "first_seal_time": "14:14:06",
+            "seal_amount_wan": 6075.43,
+            "blast_count": 0,
+            "amount_yi": 1.1
+          }
+        ]
+      },
+      {
+        "industry": "化学制品",
+        "count": 3,
+        "zt_ratio_pct": 4.1,
+        "mainline": false,
+        "stocks": [
+          {
+            "code": "603823",
+            "name": "百合花",
+            "ladder": 2,
+            "first_seal_time": "09:30:55",
+            "seal_amount_wan": 16913.77,
+            "blast_count": 0,
+            "amount_yi": 4.28
+          },
+          {
+            "code": "002909",
+            "name": "集泰股份",
+            "ladder": 2,
+            "first_seal_time": "10:28:18",
+            "seal_amount_wan": 1853.35,
+            "blast_count": 9,
+            "amount_yi": 11.43
+          },
+          {
+            "code": "605077",
+            "name": "华康股份",
+            "ladder": 1,
+            "first_seal_time": "11:04:48",
+            "seal_amount_wan": 5788.17,
+            "blast_count": 0,
+            "amount_yi": 2.46
+          }
+        ]
+      },
+      {
+        "industry": "化学原料",
+        "count": 3,
+        "zt_ratio_pct": 4.1,
+        "mainline": false,
+        "stocks": [
+          {
+            "code": "603938",
+            "name": "三孚股份",
+            "ladder": 1,
+            "first_seal_time": "09:25:02",
+            "seal_amount_wan": 21210.7,
+            "blast_count": 0,
+            "amount_yi": 1.84
+          },
+          {
+            "code": "002274",
+            "name": "华昌化工",
+            "ladder": 1,
+            "first_seal_time": "10:51:45",
+            "seal_amount_wan": 6203.86,
+            "blast_count": 0,
+            "amount_yi": 4.99
+          },
+          {
+            "code": "600722",
+            "name": "金牛化工",
+            "ladder": 1,
+            "first_seal_time": "14:39:01",
+            "seal_amount_wan": 19999.68,
+            "blast_count": 0,
+            "amount_yi": 29.69
+          }
+        ]
+      },
+      {
+        "industry": "房地产开",
+        "count": 3,
+        "zt_ratio_pct": 4.1,
+        "mainline": false,
+        "stocks": [
+          {
+            "code": "000011",
+            "name": "深物业A",
+            "ladder": 1,
+            "first_seal_time": "09:43:45",
+            "seal_amount_wan": 5840.62,
+            "blast_count": 1,
+            "amount_yi": 3.23
+          },
+          {
+            "code": "600162",
+            "name": "香江控股",
+            "ladder": 1,
+            "first_seal_time": "10:15:28",
+            "seal_amount_wan": 7539.23,
+            "blast_count": 0,
+            "amount_yi": 9.74
+          },
+          {
+            "code": "000620",
+            "name": "盈新发展",
+            "ladder": 1,
+            "first_seal_time": "10:23:57",
+            "seal_amount_wan": 4477.92,
+            "blast_count": 7,
+            "amount_yi": 18.26
+          }
+        ]
+      },
+      {
+        "industry": "种植业",
+        "count": 3,
+        "zt_ratio_pct": 4.1,
+        "mainline": false,
+        "stocks": [
+          {
+            "code": "600108",
+            "name": "亚盛集团",
+            "ladder": 4,
+            "first_seal_time": "09:25:03",
+            "seal_amount_wan": 55541.51,
+            "blast_count": 0,
+            "amount_yi": 0.89
+          },
+          {
+            "code": "600354",
+            "name": "敦煌种业",
+            "ladder": 3,
+            "first_seal_time": "09:31:03",
+            "seal_amount_wan": 12026.53,
+            "blast_count": 2,
+            "amount_yi": 5.13
+          },
+          {
+            "code": "601952",
+            "name": "苏垦农发",
+            "ladder": 1,
+            "first_seal_time": "09:51:35",
+            "seal_amount_wan": 3126.79,
+            "blast_count": 1,
+            "amount_yi": 6.01
+          }
+        ]
+      },
+      {
+        "industry": "综合Ⅱ",
+        "count": 3,
+        "zt_ratio_pct": 4.1,
+        "mainline": false,
+        "stocks": [
+          {
+            "code": "000523",
+            "name": "红棉股份",
+            "ladder": 1,
+            "first_seal_time": "09:25:00",
+            "seal_amount_wan": 20119.2,
+            "blast_count": 0,
+            "amount_yi": 4.97
+          },
+          {
+            "code": "000833",
+            "name": "粤桂股份",
+            "ladder": 1,
+            "first_seal_time": "09:53:42",
+            "seal_amount_wan": 12293.1,
+            "blast_count": 0,
+            "amount_yi": 9.0
+          },
+          {
+            "code": "600881",
+            "name": "亚泰集团",
+            "ladder": 1,
+            "first_seal_time": "10:25:02",
+            "seal_amount_wan": 2534.82,
+            "blast_count": 1,
+            "amount_yi": 5.16
+          }
+        ]
+      },
+      {
+        "industry": "专业工程",
+        "count": 2,
+        "zt_ratio_pct": 2.7,
+        "mainline": false,
+        "stocks": [
+          {
+            "code": "000928",
+            "name": "中钢国际",
+            "ladder": 1,
+            "first_seal_time": "11:02:42",
+            "seal_amount_wan": 839.35,
+            "blast_count": 10,
+            "amount_yi": 5.28
+          },
+          {
+            "code": "603163",
+            "name": "圣晖集成",
+            "ladder": 1,
+            "first_seal_time": "13:06:14",
+            "seal_amount_wan": 12434.51,
+            "blast_count": 0,
+            "amount_yi": 3.88
+          }
+        ]
+      },
+      {
+        "industry": "光学光电",
+        "count": 2,
+        "zt_ratio_pct": 2.7,
+        "mainline": false,
+        "stocks": [
+          {
+            "code": "603679",
+            "name": "华体科技",
+            "ladder": 2,
+            "first_seal_time": "09:35:52",
+            "seal_amount_wan": 4399.64,
+            "blast_count": 0,
+            "amount_yi": 2.52
+          },
+          {
+            "code": "000020",
+            "name": "深华发Ａ",
+            "ladder": 1,
+            "first_seal_time": "10:09:00",
+            "seal_amount_wan": 2182.87,
+            "blast_count": 0,
+            "amount_yi": 1.46
+          }
+        ]
+      },
+      {
+        "industry": "化学制药",
+        "count": 2,
+        "zt_ratio_pct": 2.7,
+        "mainline": false,
+        "stocks": [
+          {
+            "code": "605177",
+            "name": "东亚药业",
+            "ladder": 1,
+            "first_seal_time": "10:26:13",
+            "seal_amount_wan": 2634.56,
+            "blast_count": 1,
+            "amount_yi": 2.3
+          },
+          {
+            "code": "002365",
+            "name": "永安药业",
+            "ladder": 1,
+            "first_seal_time": "10:42:00",
+            "seal_amount_wan": 7175.22,
+            "blast_count": 0,
+            "amount_yi": 7.26
+          }
+        ]
+      },
+      {
+        "industry": "影视院线",
+        "count": 2,
+        "zt_ratio_pct": 2.7,
+        "mainline": false,
+        "stocks": [
+          {
+            "code": "002343",
+            "name": "慈文传媒",
+            "ladder": 1,
+            "first_seal_time": "09:53:45",
+            "seal_amount_wan": 4563.81,
+            "blast_count": 0,
+            "amount_yi": 2.8
+          },
+          {
+            "code": "601595",
+            "name": "上海电影",
+            "ladder": 2,
+            "first_seal_time": "10:16:22",
+            "seal_amount_wan": 5152.26,
+            "blast_count": 1,
+            "amount_yi": 10.1
+          }
+        ]
+      },
+      {
+        "industry": "房地产服",
+        "count": 2,
+        "zt_ratio_pct": 2.7,
+        "mainline": false,
+        "stocks": [
+          {
+            "code": "000560",
+            "name": "我爱我家",
+            "ladder": 1,
+            "first_seal_time": "09:31:33",
+            "seal_amount_wan": 5764.42,
+            "blast_count": 3,
+            "amount_yi": 21.79
+          },
+          {
+            "code": "002285",
+            "name": "世联行",
+            "ladder": 1,
+            "first_seal_time": "11:07:42",
+            "seal_amount_wan": 195.31,
+            "blast_count": 1,
+            "amount_yi": 3.95
+          }
+        ]
+      },
+      {
+        "industry": "教育",
+        "count": 2,
+        "zt_ratio_pct": 2.7,
+        "mainline": false,
+        "stocks": [
+          {
+            "code": "600880",
+            "name": "博瑞传播",
+            "ladder": 1,
+            "first_seal_time": "09:25:03",
+            "seal_amount_wan": 10046.93,
+            "blast_count": 0,
+            "amount_yi": 0.67
+          },
+          {
+            "code": "002093",
+            "name": "国脉科技",
+            "ladder": 1,
+            "first_seal_time": "09:41:36",
+            "seal_amount_wan": 6023.58,
+            "blast_count": 1,
+            "amount_yi": 2.06
+          }
+        ]
+      },
+      {
+        "industry": "炼化及贸",
+        "count": 2,
+        "zt_ratio_pct": 2.7,
+        "mainline": false,
+        "stocks": [
+          {
+            "code": "603353",
+            "name": "和顺石油",
+            "ladder": 1,
+            "first_seal_time": "10:19:40",
+            "seal_amount_wan": 1273.56,
+            "blast_count": 2,
+            "amount_yi": 5.01
+          },
+          {
+            "code": "000059",
+            "name": "华锦股份",
+            "ladder": 1,
+            "first_seal_time": "14:38:12",
+            "seal_amount_wan": 4515.19,
+            "blast_count": 0,
+            "amount_yi": 5.21
+          }
+        ]
+      },
+      {
+        "industry": "通信设备",
+        "count": 2,
+        "zt_ratio_pct": 2.7,
+        "mainline": false,
+        "stocks": [
+          {
+            "code": "603042",
+            "name": "华脉科技",
+            "ladder": 2,
+            "first_seal_time": "09:25:03",
+            "seal_amount_wan": 7446.32,
+            "blast_count": 0,
+            "amount_yi": 1.13
+          },
+          {
+            "code": "002194",
+            "name": "武汉凡谷",
+            "ladder": 1,
+            "first_seal_time": "09:39:03",
+            "seal_amount_wan": 8649.88,
+            "blast_count": 0,
+            "amount_yi": 5.73
+          }
+        ]
+      },
+      {
+        "industry": "中药Ⅱ",
+        "count": 1,
+        "zt_ratio_pct": 1.4,
+        "mainline": false,
+        "stocks": [
+          {
+            "code": "002349",
+            "name": "精华制药",
+            "ladder": 1,
+            "first_seal_time": "11:22:39",
+            "seal_amount_wan": 8553.26,
+            "blast_count": 1,
+            "amount_yi": 6.71
+          }
+        ]
+      },
+      {
+        "industry": "元件",
+        "count": 1,
+        "zt_ratio_pct": 1.4,
+        "mainline": false,
+        "stocks": [
+          {
+            "code": "002579",
+            "name": "中京电子",
+            "ladder": 2,
+            "first_seal_time": "09:30:36",
+            "seal_amount_wan": 24018.77,
+            "blast_count": 0,
+            "amount_yi": 8.37
+          }
+        ]
+      },
+      {
+        "industry": "军工电子",
+        "count": 1,
+        "zt_ratio_pct": 1.4,
+        "mainline": false,
+        "stocks": [
+          {
+            "code": "002383",
+            "name": "合众思壮",
+            "ladder": 1,
+            "first_seal_time": "13:24:30",
+            "seal_amount_wan": 2725.61,
+            "blast_count": 3,
+            "amount_yi": 2.83
+          }
+        ]
+      },
+      {
+        "industry": "医疗服务",
+        "count": 1,
+        "zt_ratio_pct": 1.4,
+        "mainline": false,
+        "stocks": [
+          {
+            "code": "002172",
+            "name": "澳洋健康",
+            "ladder": 2,
+            "first_seal_time": "13:43:42",
+            "seal_amount_wan": 5805.25,
+            "blast_count": 1,
+            "amount_yi": 8.17
+          }
+        ]
+      },
+      {
+        "industry": "塑料",
+        "count": 1,
+        "zt_ratio_pct": 1.4,
+        "mainline": false,
+        "stocks": [
+          {
+            "code": "603580",
+            "name": "艾艾精工",
+            "ladder": 1,
+            "first_seal_time": "13:16:58",
+            "seal_amount_wan": 4738.35,
+            "blast_count": 1,
+            "amount_yi": 6.74
+          }
+        ]
+      },
+      {
+        "industry": "家居用品",
+        "count": 1,
+        "zt_ratio_pct": 1.4,
+        "mainline": false,
+        "stocks": [
+          {
+            "code": "002790",
+            "name": "瑞尔特",
+            "ladder": 1,
+            "first_seal_time": "10:57:30",
+            "seal_amount_wan": 3297.2,
+            "blast_count": 1,
+            "amount_yi": 0.83
+          }
+        ]
+      },
+      {
+        "industry": "家电零部",
+        "count": 1,
+        "zt_ratio_pct": 1.4,
+        "mainline": false,
+        "stocks": [
+          {
+            "code": "603075",
+            "name": "热威股份",
+            "ladder": 1,
+            "first_seal_time": "09:37:02",
+            "seal_amount_wan": 3476.85,
+            "blast_count": 1,
+            "amount_yi": 1.21
+          }
+        ]
+      },
+      {
+        "industry": "小家电",
+        "count": 1,
+        "zt_ratio_pct": 1.4,
+        "mainline": false,
+        "stocks": [
+          {
+            "code": "002403",
+            "name": "爱仕达",
+            "ladder": 4,
+            "first_seal_time": "09:25:00",
+            "seal_amount_wan": 8371.84,
+            "blast_count": 1,
+            "amount_yi": 5.92
+          }
+        ]
+      },
+      {
+        "industry": "工业金属",
+        "count": 1,
+        "zt_ratio_pct": 1.4,
+        "mainline": false,
+        "stocks": [
+          {
+            "code": "002295",
+            "name": "精艺股份",
+            "ladder": 1,
+            "first_seal_time": "09:30:30",
+            "seal_amount_wan": 9143.62,
+            "blast_count": 1,
+            "amount_yi": 1.81
+          }
+        ]
+      },
+      {
+        "industry": "广告营销",
+        "count": 1,
+        "zt_ratio_pct": 1.4,
+        "mainline": false,
+        "stocks": [
+          {
+            "code": "002264",
+            "name": "新 华 都",
+            "ladder": 1,
+            "first_seal_time": "09:39:24",
+            "seal_amount_wan": 3285.69,
+            "blast_count": 1,
+            "amount_yi": 3.12
+          }
+        ]
+      },
+      {
+        "industry": "数字媒体",
+        "count": 1,
+        "zt_ratio_pct": 1.4,
+        "mainline": false,
+        "stocks": [
+          {
+            "code": "002095",
+            "name": "生 意 宝",
+            "ladder": 1,
+            "first_seal_time": "09:50:30",
+            "seal_amount_wan": 4166.2,
+            "blast_count": 4,
+            "amount_yi": 2.3
+          }
+        ]
+      },
+      {
+        "industry": "旅游及景",
+        "count": 1,
+        "zt_ratio_pct": 1.4,
+        "mainline": false,
+        "stocks": [
+          {
+            "code": "000978",
+            "name": "桂林旅游",
+            "ladder": 2,
+            "first_seal_time": "09:30:00",
+            "seal_amount_wan": 16516.29,
+            "blast_count": 0,
+            "amount_yi": 2.05
+          }
+        ]
+      },
+      {
+        "industry": "橡胶",
+        "count": 1,
+        "zt_ratio_pct": 1.4,
+        "mainline": false,
+        "stocks": [
+          {
+            "code": "002068",
+            "name": "黑猫股份",
+            "ladder": 1,
+            "first_seal_time": "10:08:21",
+            "seal_amount_wan": 11091.36,
+            "blast_count": 0,
+            "amount_yi": 4.79
+          }
+        ]
+      },
+      {
+        "industry": "汽车零部",
+        "count": 1,
+        "zt_ratio_pct": 1.4,
+        "mainline": false,
+        "stocks": [
+          {
+            "code": "000980",
+            "name": "众泰汽车",
+            "ladder": 1,
+            "first_seal_time": "09:33:48",
+            "seal_amount_wan": 3879.33,
+            "blast_count": 4,
+            "amount_yi": 6.42
+          }
+        ]
+      },
+      {
+        "industry": "油服工程",
+        "count": 1,
+        "zt_ratio_pct": 1.4,
+        "mainline": false,
+        "stocks": [
+          {
+            "code": "603619",
+            "name": "中曼石油",
+            "ladder": 1,
+            "first_seal_time": "14:02:39",
+            "seal_amount_wan": 5272.95,
+            "blast_count": 3,
+            "amount_yi": 11.4
+          }
+        ]
+      },
+      {
+        "industry": "焦炭Ⅱ",
+        "count": 1,
+        "zt_ratio_pct": 1.4,
+        "mainline": false,
+        "stocks": [
+          {
+            "code": "600792",
+            "name": "云煤能源",
+            "ladder": 1,
+            "first_seal_time": "10:14:33",
+            "seal_amount_wan": 5940.81,
+            "blast_count": 0,
+            "amount_yi": 2.16
+          }
+        ]
+      },
+      {
+        "industry": "燃气Ⅱ",
+        "count": 1,
+        "zt_ratio_pct": 1.4,
+        "mainline": false,
+        "stocks": [
+          {
+            "code": "600903",
+            "name": "贵州燃气",
+            "ladder": 1,
+            "first_seal_time": "09:49:54",
+            "seal_amount_wan": 4415.82,
+            "blast_count": 0,
+            "amount_yi": 4.24
+          }
+        ]
+      },
+      {
+        "industry": "环保设备",
+        "count": 1,
+        "zt_ratio_pct": 1.4,
+        "mainline": false,
+        "stocks": [
+          {
+            "code": "000890",
+            "name": "法尔胜",
+            "ladder": 1,
+            "first_seal_time": "10:41:18",
+            "seal_amount_wan": 6010.15,
+            "blast_count": 1,
+            "amount_yi": 5.03
+          }
+        ]
+      },
+      {
+        "industry": "环境治理",
+        "count": 1,
+        "zt_ratio_pct": 1.4,
+        "mainline": false,
+        "stocks": [
+          {
+            "code": "600769",
+            "name": "祥龙电业",
+            "ladder": 1,
+            "first_seal_time": "11:19:58",
+            "seal_amount_wan": 3267.39,
+            "blast_count": 0,
+            "amount_yi": 2.93
+          }
+        ]
+      },
+      {
+        "industry": "生物制品",
+        "count": 1,
+        "zt_ratio_pct": 1.4,
+        "mainline": false,
+        "stocks": [
+          {
+            "code": "688293",
+            "name": "奥浦迈",
+            "ladder": 1,
+            "first_seal_time": "13:57:28",
+            "seal_amount_wan": 2824.65,
+            "blast_count": 1,
+            "amount_yi": 5.32
+          }
+        ]
+      },
+      {
+        "industry": "电网设备",
+        "count": 1,
+        "zt_ratio_pct": 1.4,
+        "mainline": false,
+        "stocks": [
+          {
+            "code": "002980",
+            "name": "华盛昌",
+            "ladder": 2,
+            "first_seal_time": "09:54:42",
+            "seal_amount_wan": 770.11,
+            "blast_count": 27,
+            "amount_yi": 22.89
+          }
+        ]
+      },
+      {
+        "industry": "铁路公路",
+        "count": 1,
+        "zt_ratio_pct": 1.4,
+        "mainline": false,
+        "stocks": [
+          {
+            "code": "002357",
+            "name": "富临运业",
+            "ladder": 1,
+            "first_seal_time": "11:22:54",
+            "seal_amount_wan": 2500.85,
+            "blast_count": 10,
+            "amount_yi": 3.06
+          }
+        ]
+      },
+      {
+        "industry": "食品加工",
+        "count": 1,
+        "zt_ratio_pct": 1.4,
+        "mainline": false,
+        "stocks": [
+          {
+            "code": "002702",
+            "name": "海欣食品",
+            "ladder": 3,
+            "first_seal_time": "09:25:00",
+            "seal_amount_wan": 6884.92,
+            "blast_count": 2,
+            "amount_yi": 5.98
+          }
+        ]
+      }
+    ]
   },
   "leaders_candidates": [
     {
