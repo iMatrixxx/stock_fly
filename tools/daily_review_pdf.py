@@ -213,8 +213,13 @@ def patch_market_from_tencent(market_paths: list[Path]) -> bool:
 
 
 def md_to_pdf(report_md: Path, pdf_path: Path, html_path: Path) -> bool:
-    """Markdown → HTML → Chrome headless → PDF。"""
+    """Markdown → HTML → Chrome headless → PDF。
+
+    先删除已存在的旧 PDF：等待循环用「文件存在且 >1000B」判断 Chrome 是否写完，
+    若目标已存在会把旧文件误判为新产物、提前终止 Chrome，导致重渲染不生效。
+    """
     md_to_html(report_md, html_path)
+    pdf_path.unlink(missing_ok=True)
     profile = tempfile.mkdtemp(prefix="chrome_pdf_")
     cmd = [
         CHROME,
