@@ -17,21 +17,28 @@ JSON → 由 LLM 完成判断与报告撰写**。harness 只负责"算得准"，
 ```
 输入层                       数据层（确定性聚合）              输出层
 ───────────────────        ──────────────────────        ──────────────────────
-fuyao 快照 pools ────┐      data/loaders.py（规范化）        evidence_<date>.json
+fuyao 快照 pools ────┐      data/loaders.py（规范化）        outputs/<date>/evidence.json
   (fetch_market_     │       fetch_market.py（多源抓取，     （纯数据证据链：指数/成交/
   snapshot.py)       │        缓存/TTL/重试/降级）           板块资金流/涨停情绪/中军候选）
     │ 桥接            ├─ data/ │                            ↓
-build_dabanke_from_  │       models.py（统一数据模型）       prompt_<date>.md
+build_dabanke_from_  │       models.py（统一数据模型）       outputs/<date>/prompt.md
   fuyao.py 桥接      │         validate.py（数据核验）        （内嵌证据链 + 数字纪律 +
   等价 schema，失败   │          cache.py / net.py            外部资讯参考）
   回退东财池）         │                                     ↓
-联网补数（可选） ────┼─ data/ │                    LLM 独立判断 → 复盘报告_<date>.md
+联网补数（可选） ────┼─ data/ │        LLM 独立判断 → outputs/<date>/复盘报告.md
   ths/eastmoney/     │        logic/（确定性分析）           ↓ verify_report.py 数字校验
   tencent/sina       │         cycle / migration /          ↓ md2html + Chrome headless
-行情补充 JSON ───────┘         rivalry / forecast /         复盘报告_<date>.pdf
+行情补充 JSON ───────┘         rivalry / forecast /         outputs/<date>/复盘报告.pdf
                                diagnostics                     ↓ SMTP（可选）
                                                                邮件（PDF + Markdown）
 ```
+
+> **产物目录约定（2026-09-09 起）**：每日复盘产物（evidence/prompt/复盘报告 md+pdf/
+> forecast 等）一律集中 `outputs/<date>/`（文件名无日期前缀，如 `evidence.json`），
+> 路径唯一定义见 `stock_review_harness/artifact_paths.py`；`outputs/` 已在 `.gitignore`
+> 排除，**任何 git push 都不会携带复盘产物**。跨日累积产物（M2 判卷流水）为
+> `outputs/scorecard.jsonl`。历史散落根目录的产物已全部迁入。`samples/` 仍入库
+> （行情快照/涨停池**样例**，供测试与离线回放），注意与每日产物区分。
 
 ### 1.1 代码地图（四层职责）
 
@@ -67,8 +74,8 @@ build_dabanke_from_  │       models.py（统一数据模型）       prompt_<d
 | `fetch_news.py` | ⑥ 资讯/公告增量采集（cls/em/notice/cctv/csrc/miit/ndrc，幂等断点） |
 | `md2html.py` | Markdown → 自包含 HTML（⑨ PDF 前置） |
 | `verify_report.py` | ⑧ 报告核对：数字比对（证据外可疑数字）+ 覆盖检查（该覆盖未覆盖清单），`--no-coverage` 只跑数字 |
-| `forecast_card.py` | M2 生成侧：把报告末尾 `## 次日预测卡` fenced json 冻结为 `forecast_<date>.json`；`hint` 子命令打印当日候选 |
-| `score_predictions.py` | M2 判卷侧：判上一交易日预测卡（hit/miss/na），追加 `scorecard.jsonl`（幂等） |
+| `forecast_card.py` | M2 生成侧：把报告末尾 `## 次日预测卡` fenced json 冻结为 `outputs/<date>/forecast.json`；`hint` 子命令打印当日候选 |
+| `score_predictions.py` | M2 判卷侧：判上一交易日预测卡（hit/miss/na），追加 `outputs/scorecard.jsonl`（幂等） |
 | `build_llm_prompt.py` | 底层：由 evidence JSON 单独组装 prompt |
 | `fetch_m5_leaders.py` / `fetch_quotes_tx.py` / `build_market_json*.py` 等 | 专项补数/调试脚本（离线回放用） |
 
@@ -97,12 +104,12 @@ build_dabanke_from_  │       models.py（统一数据模型）       prompt_<d
 | ② | 大盘快照 | fuyao SDK（`fetch_market_snapshot.py`） | `hithink_out/raw/pools.json`：指数/板块/涨跌停池/连板天梯/昨日涨停池 + `premiums` 溢价节（步骤 3.5：昨日池 92/93 只逐票算开盘溢价与 A 杀） |
 | ③ | 联网补行情 | harness（东财/同花顺/腾讯/新浪） | 成交额、板块资金流、中军 K 线/溢价/尾盘、跌幅榜、**龙虎榜买卖前五席位（dragon_seats，机构/北向/游资结构，净买前 12 采样）**、北向十大活跃股、**当日宏观快照（macro_snapshot：新浪期货日K主力连续 8 品种，含前夜盘）**；失败降级标注不中断 |
 | ④ | 腾讯补缺 | harness | 同花顺日线缺行时，用腾讯行情补两市成交与沪深 300 |
-| ⑤ | 证据链 + prompt | harness（确定性） | `evidence_<date>.json`（纯数据：情绪/资金/周期 + **`board_pools` 板块内领涨标的池**——涨停股按行业归组列个股，写板块资金必落标的；无该行业=当日无涨停，子板块资金不编造）+ `prompt_<date>.md` |
+| ⑤ | 证据链 + prompt | harness（确定性） | `outputs/<date>/evidence.json`（纯数据：情绪/资金/周期 + **`board_pools` 板块内领涨标的池**——涨停股按行业归组列个股，写板块资金必落标的；无该行业=当日无涨停，子板块资金不编造）+ `outputs/<date>/prompt.md` |
 | ⑥ | 资讯增量采集 | `fetch_news.py`（幂等去重） | `hithink_out/raw/news/*.jsonl`；关键词取当日 evidence 题材，摘要注入 prompt 时**按发布时间分 A/B 两桶**——A（≤15:00 盘前/盘中）可作当日归因，B（盘后）仅限次日条件预期 |
-| ⑦ | 报告撰写 | LLM / 人 | `复盘报告_<date>.md`；无既有 md 时需配置 `LLM_API_URL/MODEL/KEY` 自动生成 |
-| ⑦.5 | M2 预测卡冻结 + 判卷 | 全链自动 | 判上一交易日卡片 → `scorecard.jsonl`；报告末尾含 `## 次日预测卡` fenced json 则冻结 `forecast_<date>.json`（均失败不阻断，见 §2 M2 小节） |
+| ⑦ | 报告撰写 | LLM / 人 | `outputs/<date>/复盘报告.md`；无既有 md 时需配置 `LLM_API_URL/MODEL/KEY` 自动生成 |
+| ⑦.5 | M2 预测卡冻结 + 判卷 | 全链自动 | 判上一交易日卡片 → `outputs/scorecard.jsonl`；报告末尾含 `## 次日预测卡` fenced json 则冻结 `outputs/<date>/forecast.json`（均失败不阻断，见 §2 M2 小节） |
 | ⑧ | 报告校验 | `verify_report.py` | 双重检查：① 报告每个数字与证据链比对（防编造，输出"证据外可疑数字"）；② 覆盖检查——证据链点名的高标/锚点/首封名字、diagnostics 调和、risk_matrix 触发→动作、data_gaps 免责措辞是否被报告覆盖（防漏写，输出"该覆盖未覆盖"清单） |
-| ⑨ | PDF 渲染 | md2html + Chrome headless | `复盘报告_<date>.pdf`（本机需装 Google Chrome） |
+| ⑨ | PDF 渲染 | md2html + Chrome headless | `outputs/<date>/复盘报告.pdf`（本机需装 Google Chrome） |
 | ⑩ | 邮件 | SMTP（gmail 465 SSL） | 发送 PDF + Markdown 至 `MAIL_TO`（默认 imatrixxxlee@gmail.com） |
 
 **全链命令（推荐）**：
@@ -123,7 +130,7 @@ python3 tools/daily_review.py --date 2026-09-04
 --limit-pool-json <桥接产物>` → `fetch_news.py` → 人工撰写 → `verify_report.py` → `md2html.py` +
 Chrome headless（详见 §5 离线/底层用法）。
 
-> **⑨ 之前：报告正文优先复用**已存在的 `复盘报告_<date>.md`（例如由 LLM 网页版撰写、
+> **⑨ 之前：报告正文优先复用**已存在的 `outputs/<date>/复盘报告.md`（例如由 LLM 网页版撰写、
 > 人工润色后的版本），脚本不会覆盖；不存在时才走 LLM API 自动成稿。⑧ 校验与 ⑨ 渲染
 > 都只读 md，不改写内容。
 
@@ -137,20 +144,20 @@ Chrome headless（详见 §5 离线/底层用法）。
   都是"次日涨停必上榜、指标必出现"的确定对象）。LLM 按模板在报告末尾输出
   `## 次日预测卡` + fenced json（≤5 条：`hypothesis` 定性 + `subject` 白名单 +
   `op`∈{ge,le,gt,lt,eq} + `target` 数值）。全链跑完后 `export_forecast_cards()` 提取冻结为
-  `forecast_<date>.json`（解析失败/无区块仅提示，不阻断）。
+  `outputs/<date>/forecast.json`（解析失败/无区块仅提示，不阻断）。
 - **判卷（T+1 开盘前，全链自动）**：证据链就绪后 `score_predictions.py run` 判上一交易日
   卡片——`subject` 从次日 evidence 复算：点路径（`emotion.seal_rate_pct` 等）、
   查询式（`stock:<代码>:ladder|in_zt`、`board:<板块名>:limit_ups`、
   `index:<指数名>:close|change_pct`、`industry:<行业名>:count`）。次日取不到值（板块消失/
   接口缺字段/仅上榜但板数不可复算）判 **na 不计分**；个股不在涨停名单视为未涨停
-  （ladder=0，客观可判）。结果追加 `scorecard.jsonl`（幂等，同卡不重计）。
-- **产物**：`forecast_<date>.json`（冻结卡片 + warnings）、`scorecard.jsonl`（逐条判卷流水，
-  累计命中率校准）。
+  （ladder=0，客观可判）。结果追加 `outputs/scorecard.jsonl`（幂等，同卡不重计）。
+- **产物**：`outputs/<date>/forecast.json`（冻结卡片 + warnings）、`outputs/scorecard.jsonl`
+  （逐条判卷流水，累计命中率校准）。
 - 手工命令：
   ```bash
-  python3 tools/forecast_card.py extract 复盘报告_2026-09-07.md   # 冻结
-  python3 tools/forecast_card.py hint evidence_2026-09-07.json     # 当日候选清单
-  python3 tools/score_predictions.py --date 2026-09-08             # 判昨日卡
+  python3 tools/forecast_card.py extract outputs/2026-09-08/复盘报告.md   # 冻结
+  python3 tools/forecast_card.py hint outputs/2026-09-08/evidence.json     # 当日候选清单
+  python3 tools/score_predictions.py --date 2026-09-08                     # 判昨日卡
   ```
 - 预测卡 fenced json 里的数字（阈值 target 等）在 verify 数字核对中**整块剥离**，不会误报
   可疑数字（见 §4）。
@@ -196,7 +203,7 @@ $PY tools/fetch_news.py --notice-days 5                # 首次运行建议回�
 
 ## 4. 证据链约定与质量护栏（防幻觉核心）
 
-证据链 JSON（`evidence_<date>.json`）的约定：
+证据链 JSON（`outputs/<date>/evidence.json`）的约定：
 
 - 仅含现象数据与确定性聚合：`market`（指数/成交/板块资金流/跌幅榜）、`emotion`
   （封板率/晋级率/溢价/梯队/行业集中度）、`dragon_top`（龙虎榜异动股资金聚合，可选）、
@@ -247,7 +254,7 @@ $PY tools/fetch_news.py --notice-days 5                # 首次运行建议回�
 python3 -m stock_review_harness.cli 2026-09-04 \
   --limit-pool-json hithink_out/limit_pool_2026-09-04.json \
   --market-json samples/market_2026-09-04.json \
-  --json evidence_2026-09-04.json --prompt prompt_2026-09-04.md
+  --json outputs/2026-09-04/evidence.json --prompt outputs/2026-09-04/prompt.md
 
 # 联网模式（自动抓指数/板块/涨跌停池/中军/溢价/跌幅榜，不提供 --market-json 时）
 python3 -m stock_review_harness.cli 2026-09-04 --limit-pool-json hithink_out/limit_pool_2026-09-04.json
@@ -404,8 +411,8 @@ dragon.json 缺失时产物不加键，证据链输出 count=0 + 显式标注（
 - **触发方式**：全手动。launchd 定时任务已于 2026-09-04 清理，无任何自动调度残留。
 - **每日例行**（收盘后）：`python3 tools/daily_review_pdf.py --date <当日> --no-email` 出 PDF，
   人工审阅数字校验输出后决定是否补发邮件（`去掉 --no-email` 即发送）。
-- **报告正文**：脚本优先复用已存在的 `复盘报告_<date>.md`；若由 LLM 网页版撰写，直接另存
-  为 `复盘报告_<date>.md` 放仓库根目录，再跑 ⑧⑨ 即可（verify + PDF 只读 md 不覆盖）。
+- **报告正文**：脚本优先复用已存在的 `outputs/<date>/复盘报告.md`；若由 LLM 网页版撰写，
+  直接另存为 `outputs/<date>/复盘报告.md`，再跑 ⑧⑨ 即可（verify + PDF 只读 md 不覆盖）。
 - **LLM 自动成稿**（无既有 md 时）需配置环境变量：`LLM_API_URL` / `LLM_MODEL` /
   `LLM_API_KEY`；凭据文件可放 `_load_env_file()` 约定路径（见 `tools/daily_review.py`）。
 - **PDF 渲染**依赖本机 Chrome：`/Applications/Google Chrome.app/Contents/MacOS/Google Chrome

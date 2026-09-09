@@ -11,6 +11,10 @@ data_cache/
 # hithink 技能输出（报告/原始 JSON/新闻 jsonl/断点状态，均可重跑生成）
 hithink_out/
 
+# 复盘产物集中目录（2026-09-09 起）：outputs/<date>/ 下含 evidence/prompt/复盘报告
+# md+pdf/forecast 等每日产物，均不入库、不 push（可由主链/离线重建再生）
+outputs/
+
 # 复盘 PDF（由 md2html+Chrome 重建，md 入库即可，PDF 不入库）
 复盘报告_*.pdf
 结构化复盘_*.pdf

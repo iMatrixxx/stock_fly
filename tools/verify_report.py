@@ -2,7 +2,7 @@
 """数据核对（确定性"数据检察官"）：把 LLM 产出的报告与证据链比对。
 
 用法：
-  python3 tools/verify_report.py 复盘报告_2026-08-05.md evidence_2026-08-05.json
+  python3 tools/verify_report.py outputs/2026-09-08/复盘报告.md outputs/2026-09-08/evidence.json
   python3 tools/verify_report.py report.md evidence.json --json   # 机器可读
 
 两项检查（默认全开，--no-coverage 可只跑数字核对）：

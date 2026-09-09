@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
-"""次日预测卡判卷（M2 判卷侧）：纯代码复算 forecast_<T>.json 命中/落空。
+"""次日预测卡判卷（M2 判卷侧）：纯代码复算 outputs/<T>/forecast.json 命中/落空。
 
 用法：
   python3 tools/score_predictions.py --date 2026-09-08
-  # 读 forecast_2026-09-07.json + evidence_2026-09-08.json，
-  # 逐卡判卷后追加 scorecard.jsonl（幂等：同 (forecast_date,id) 不重复计分）。
+  # 读 outputs/2026-09-07/forecast.json + outputs/2026-09-08/evidence.json，
+  # 逐卡判卷后追加 outputs/scorecard.jsonl（幂等：同 (forecast_date,id) 不重复计分）。
 
-产物：scorecard.jsonl —— 每行一条判卷结果，供累计校准 LLM 次日判断命中率。
+产物：outputs/scorecard.jsonl —— 每行一条判卷结果，供累计校准 LLM 次日判断命中率。
 verdict：hit=命中 / miss=落空 / na=次日不可复算（不计命中率）。
 """
 
@@ -24,9 +24,12 @@ ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
+from stock_review_harness.artifact_paths import (  # noqa: E402
+    evidence_path,
+    forecast_path,
+    scorecard_path,
+)
 from stock_review_harness.report.forecast_cards import judge_card  # noqa: E402
-
-SCORECARD = "scorecard.jsonl"
 
 
 def prev_trading_day(today: _date) -> _date:
@@ -40,14 +43,14 @@ def run(date_str: str, root: Path = ROOT, force: bool = False) -> dict | None:
     """判卷 T-1 预测卡（当日 evidence 需已生成）。返回摘要 dict；无预测卡返回 None。"""
     d = _date.fromisoformat(date_str)
     prev = prev_trading_day(d)
-    fc_path = root / f"forecast_{prev.isoformat()}.json"
-    ev_path = root / f"evidence_{date_str}.json"
+    fc_path = forecast_path(root, prev.isoformat())
+    ev_path = evidence_path(root, date_str)
     if not fc_path.exists():
-        print(f"[score] 无 {prev.isoformat()} 的预测卡（{fc_path.name}），跳过判卷",
+        print(f"[score] 无 {prev.isoformat()} 的预测卡（{fc_path}），跳过判卷",
               flush=True)
         return None
     if not ev_path.exists():
-        print(f"[score] {date_str} 证据链缺失（{ev_path.name}），无法判卷", flush=True)
+        print(f"[score] {date_str} 证据链缺失（{ev_path}），无法判卷", flush=True)
         return None
     forecast = json.loads(fc_path.read_text(encoding="utf-8"))
     evidence = json.loads(ev_path.read_text(encoding="utf-8"))
@@ -55,7 +58,9 @@ def run(date_str: str, root: Path = ROOT, force: bool = False) -> dict | None:
 
     seen = _scored_ids(prev.isoformat(), date_str, root)
     rows, hits, misses, nas = [], 0, 0, 0
-    with (root / SCORECARD).open("a", encoding="utf-8") as f:
+    sc_path = scorecard_path(root)
+    sc_path.parent.mkdir(parents=True, exist_ok=True)
+    with sc_path.open("a", encoding="utf-8") as f:
         for card in cards:
             cid = str(card.get("id") or "")
             if cid and f"{prev.isoformat()}:{cid}" in seen and not force:
@@ -93,7 +98,7 @@ def run(date_str: str, root: Path = ROOT, force: bool = False) -> dict | None:
 
 def _scored_ids(forecast_date: str, trade_date: str, root: Path) -> set[str]:
     """已计分键集合（幂等防重复）。"""
-    path = root / SCORECARD
+    path = scorecard_path(root)
     if not path.exists():
         return set()
     keys: set[str] = set()
@@ -110,7 +115,7 @@ def _scored_ids(forecast_date: str, trade_date: str, root: Path) -> set[str]:
 def main(argv=None) -> None:
     ap = argparse.ArgumentParser(description="次日预测卡判卷（scorecard.jsonl 校准）")
     ap.add_argument("--date", help="判卷日 YYYY-MM-DD（默认今天；自动找上一交易日预测卡）")
-    ap.add_argument("--root", default=str(ROOT), help="产物根目录（默认仓库根目录）")
+    ap.add_argument("--root", default=str(ROOT), help="仓库根（产物在 <root>/outputs/<date>/，默认仓库根）")
     ap.add_argument("--force", action="store_true", help="同卡重判（覆盖幂等跳过）")
     args = ap.parse_args(argv)
     d = _date.fromisoformat(args.date) if args.date else _date.today()

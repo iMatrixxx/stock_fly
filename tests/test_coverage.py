@@ -93,7 +93,7 @@ class CheckCoveragePipelineSmokeTest(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
-        p = Path(__file__).resolve().parents[1] / "evidence_2026-09-04.json"
+        p = Path(__file__).resolve().parents[1] / "outputs" / "2026-09-04" / "evidence.json"
         cls.evidence = json.loads(p.read_text(encoding="utf-8"))
 
     def test_full_coverage_report_passes(self):

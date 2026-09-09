@@ -40,6 +40,11 @@ ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
+from stock_review_harness.artifact_paths import (  # noqa: E402
+    evidence_path,
+    prompt_path,
+    report_md_path,
+)
 from stock_review_harness.data.net import post_json  # noqa: E402
 from stock_review_harness.report.prompt import build_prompt  # noqa: E402
 
@@ -148,8 +153,9 @@ def run_harness(
     workdir: Path,
     fuyao_pools: Path | None = None,
 ) -> dict:
-    evidence_out = workdir / f"evidence_{date_str}.json"
-    prompt_out = workdir / f"prompt_{date_str}.md"
+    evidence_out = evidence_path(workdir, date_str)
+    prompt_out = prompt_path(workdir, date_str)
+    evidence_out.parent.mkdir(parents=True, exist_ok=True)
     cmd = [
         sys.executable, "-m", "stock_review_harness.cli", date_str,
         "--limit-pool-json", str(limit_pool_json),
@@ -220,7 +226,7 @@ def _news_brief(date_str: str, max_items: int = 40) -> str:
                "黄金", "白银", "有色", "稀土", "并购", "重组", "股权", "消费", "零售",
                "免税", "旅游", "汽车零部件", "国企改革", "业绩", "预增")
     kw = set(base_kw)
-    ev = ROOT / f"evidence_{date_str}.json"
+    ev = evidence_path(ROOT, date_str)
     if ev.exists():
         try:
             d = _json.loads(ev.read_text(encoding="utf-8"))
@@ -403,7 +409,7 @@ def main(argv=None) -> None:
         arts = run_harness(date_str, limit_pool, workdir)
         # 2.5) 资讯增量采集 + 消息面摘要注入 prompt（失败不阻断）
         fetch_news_incremental()
-        report_path = workdir / f"复盘报告_{date_str}.md"
+        report_path = report_md_path(workdir, date_str)
         if not report_path.exists():
             append_news_brief_to_prompt(arts["prompt"], date_str)
         wrote = write_report_with_llm(date_str, arts["prompt"], report_path)

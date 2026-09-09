@@ -10,7 +10,7 @@
 （历史兼容入口，大班客已退役，新链路用 --limit-pool-json）；
 技能目录可用 --skill-dir 或环境变量 REVIEW_SKILL_DIR 覆盖。
 
-产出：纯数据证据链 JSON（默认 evidence_<date>.json）与可选 LLM prompt。
+产出：纯数据证据链 JSON（默认 outputs/<date>/evidence.json）与可选 LLM prompt。
 最终复盘报告由 LLM 基于证据链撰写（工具：tools/build_llm_prompt.py 或 --prompt）。
 """
 
@@ -25,6 +25,7 @@ import tempfile
 from pathlib import Path
 
 from . import run_pipeline
+from .artifact_paths import REPO_ROOT, evidence_path
 from .data.cache import is_cached_market
 from .data.fetch_market import fetch_market
 from .data.loaders import market_to_json
@@ -84,7 +85,7 @@ def main(argv=None) -> None:
         default=os.environ.get("REVIEW_SKILL_DIR", str(DEFAULT_SKILL_DIR)),
         help="review-a-share-market 技能目录（默认 %(default)s）",
     )
-    ap.add_argument("--json", dest="json_out", help="证据链 JSON 输出路径（默认 ./evidence_<date>.json）")
+    ap.add_argument("--json", dest="json_out", help="证据链 JSON 输出路径（默认 outputs/<date>/evidence.json）")
     ap.add_argument(
         "--prompt",
         help="同时组装并写出 LLM 复盘 prompt（默认模板 assets/llm_report_prompt.md）",
@@ -122,7 +123,8 @@ def main(argv=None) -> None:
             print(f"[INFO] {verb}行情并保存: {save}", file=sys.stderr)
         bundle = run_pipeline(args.date, limit_pool_json=limit_pool_json, market_json=market_json)
         evidence = to_evidence_dict(bundle)
-        out = Path(args.json_out) if args.json_out else Path.cwd() / f"evidence_{args.date}.json"
+        out = Path(args.json_out) if args.json_out else evidence_path(REPO_ROOT, args.date)
+        out.parent.mkdir(parents=True, exist_ok=True)
         out.write_text(
             json.dumps(evidence, ensure_ascii=False, indent=2),
             encoding="utf-8",

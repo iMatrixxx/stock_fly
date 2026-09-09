@@ -50,6 +50,13 @@ from tools.daily_review import (  # noqa: E402
     fetch_snapshot_limit_pool,
     write_report_with_llm,
 )
+from stock_review_harness.artifact_paths import (  # noqa: E402
+    evidence_path,
+    prompt_path,
+    report_html_path,
+    report_md_path,
+    report_pdf_path,
+)
 from tools.md2html import md_to_html  # noqa: E402
 
 CHROME = "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
@@ -103,8 +110,9 @@ def run_harness_market(
     fuyao_pools: fetch_market_snapshot.py 产出的 raw/pools.json（含 premiums 溢价节），
     有则 CLI 的溢价/A杀 走 fuyao 口径（腾讯日K 降级回退）。
     """
-    evidence_out = workdir / f"evidence_{date_str}.json"
-    prompt_out = workdir / f"prompt_{date_str}.md"
+    evidence_out = evidence_path(workdir, date_str)
+    prompt_out = prompt_path(workdir, date_str)
+    evidence_out.parent.mkdir(parents=True, exist_ok=True)
     cmd = [
         sys.executable, "-m", "stock_review_harness.cli", date_str,
         "--limit-pool-json", str(limit_pool_json),
@@ -337,13 +345,13 @@ def main(argv=None) -> None:
         except Exception as e:  # noqa: BLE001 - 判卷失败不阻断复盘
             print(f"[WARN] 昨日预测卡判卷失败（不影响复盘）: {str(e)[:120]}", flush=True)
 
-        report_md = ROOT / f"复盘报告_{date_str}.md"
+        report_md = report_md_path(ROOT, date_str)
         if not (report_md.exists() and report_md.stat().st_size > 500):
-            append_news_brief_to_prompt(ROOT / f"prompt_{date_str}.md", date_str)
+            append_news_brief_to_prompt(prompt_path(ROOT, date_str), date_str)
             try:
                 from tools.forecast_card import append_forecast_hint_to_prompt
                 append_forecast_hint_to_prompt(
-                    ROOT / f"prompt_{date_str}.md", arts["evidence"])
+                    prompt_path(ROOT, date_str), arts["evidence"])
             except Exception as e:  # noqa: BLE001
                 print(f"[WARN] 预测卡候选提示注入失败: {str(e)[:100]}", flush=True)
             wrote = write_report_with_llm(date_str, arts["prompt"], report_md)
@@ -362,8 +370,9 @@ def main(argv=None) -> None:
         except Exception as e:  # noqa: BLE001 - 冻结失败不阻断复盘
             print(f"[WARN] 预测卡冻结失败（不影响复盘）: {str(e)[:120]}", flush=True)
 
-        pdf = ROOT / f"复盘报告_{date_str}.pdf"
-        html = ROOT / f"复盘报告_{date_str}.html"
+        pdf = report_pdf_path(ROOT, date_str)
+        html = report_html_path(ROOT, date_str)
+        pdf.parent.mkdir(parents=True, exist_ok=True)
         ok = md_to_pdf(report_md, pdf, html)
         if not ok:
             print("[FAIL] PDF 生成失败，跳过邮件", flush=True)
