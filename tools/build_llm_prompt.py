@@ -2,7 +2,7 @@
 """把 harness 导出的纯数据证据链 JSON 嵌入 LLM 提示词模板。
 
 用法：
-  python3 -m stock_review_harness.cli 2026-08-07 --dabanke-json ... --json evidence.json
+  python3 -m stock_review_harness.cli 2026-08-07 --limit-pool-json ... --json evidence.json
   python3 tools/build_llm_prompt.py evidence.json > prompt.md
 
 模板默认 <repo>/assets/llm_report_prompt.md，可用 --template 覆盖。

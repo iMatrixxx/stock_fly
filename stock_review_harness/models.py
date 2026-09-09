@@ -13,8 +13,12 @@ from typing import Optional
 # ========== 输入数据 ==========
 
 @dataclass
-class DabankeData:
-    """大班客网涨停数据（fetch_daily_stats.py 的输出）。"""
+class LimitPoolData:
+    """涨停池数据（涨停情绪源 JSON 的统一模型：fuyao 桥接 / 东财回退 / 历史大班客等价产物）。
+
+    harness 消费层与"涨停情绪源来自哪个供应商"解耦——任何源只要产出同一 schema
+    （summary/pool/blasted/concepts）即可即插即用。
+    """
 
     date: str
     summary: dict
@@ -23,6 +27,7 @@ class DabankeData:
     concepts: list[dict]
     url: str = ""
     fetched_at: Optional[str] = None
+    dragon_top: Optional[dict] = None  # 龙虎榜异动股资金聚合（fuyao raw/dragon.json 桥接，可选）
 
     def industry_concentration(self, top: int = 8) -> list[tuple[str, int]]:
         """涨停池按行业标签聚合（拆 "+" 到标签级：国企改革、数据中心…）。"""
@@ -46,6 +51,10 @@ class DabankeData:
         ]
         out.sort(key=lambda c: c["sealed"] or 0, reverse=True)
         return out[:top]
+
+
+# 兼容别名：历史命名（大班客已退役，archive/ 旧参考代码仍按旧名 import）
+DabankeData = LimitPoolData
 
 
 @dataclass
@@ -118,6 +127,7 @@ class MarketData:
     zt_pool: list[dict] = field(default_factory=list)       # 东财涨停池（含市值/成交额/连板）
     dt_pool: list[dict] = field(default_factory=list)       # 东财跌停池
     yesterday_zt_pool: list[dict] = field(default_factory=list)
+    northbound_top10: Optional[dict] = None  # 沪深股通十大活跃股 {date, sh[], sz[], note}（可选）
     notes: list[str] = field(default_factory=list)
 
 
@@ -125,9 +135,14 @@ class MarketData:
 
 @dataclass
 class DataBundle:
-    """纯数据包：行情 + 涨停情绪原始/聚合数据，不含任何规则判定。"""
+    """纯数据包：行情 + 涨停池数据，不含任何规则判定。"""
 
     date: str
     market: MarketData
-    dabanke: DabankeData
+    limit_pool: LimitPoolData
     context: dict = field(default_factory=dict)  # 多日上下文（zt_history/board_series），尽力而为
+
+    @property
+    def dabanke(self) -> LimitPoolData:
+        """兼容别名：历史命名（archive/ 旧代码仍按 bundle.dabanke 访问）。"""
+        return self.limit_pool

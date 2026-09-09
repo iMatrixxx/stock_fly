@@ -18,7 +18,7 @@ class VerifyReportNumbersTest(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.evidence = to_evidence_dict(
-            run_pipeline("2026-07-30", dabanke_json=str(SAMPLE))
+            run_pipeline("2026-07-30", limit_pool_json=str(SAMPLE))
         )
 
     def test_real_numbers_pass(self):

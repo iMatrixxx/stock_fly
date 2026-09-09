@@ -18,12 +18,12 @@ class DataPipelineTest(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
-        cls.bundle = run_pipeline("2026-07-30", dabanke_json=str(DABANKE_0730))
+        cls.bundle = run_pipeline("2026-07-30", limit_pool_json=str(DABANKE_0730))
 
     def test_bundle_is_data_only(self):
         self.assertEqual(self.bundle.date, "2026-07-30")
         self.assertIsNotNone(self.bundle.market)
-        self.assertIsNotNone(self.bundle.dabanke)
+        self.assertIsNotNone(self.bundle.limit_pool)
         # 不再有规则判定结果字段
         self.assertFalse(hasattr(self.bundle, "battlefield"))
         self.assertFalse(hasattr(self.bundle, "anchors"))
@@ -61,7 +61,7 @@ class MarketDataPipelineTest(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.bundle = run_pipeline(
-            "2026-07-30", dabanke_json=str(DABANKE_0730), market_json=str(MARKET_0730)
+            "2026-07-30", limit_pool_json=str(DABANKE_0730), market_json=str(MARKET_0730)
         )
 
     def test_market_section(self):

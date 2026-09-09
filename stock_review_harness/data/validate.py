@@ -77,7 +77,7 @@ def validate_bundle(bundle: DataBundle) -> list[dict]:
                   f"涨停池个股涨跌幅 {chg:+.2f}% 超出 A 股涨停极限（±{STOCK_CHANGE_PCT_LIMIT:.1f}%）")
 
     # 5) 情绪指标区间
-    summary = bundle.dabanke.summary
+    summary = bundle.limit_pool.summary
     seal = summary.get("封板率")
     if seal is not None and not (0 <= seal <= 100):
         _flag(anomalies, "seal_rate_out_of_range", "封板率",

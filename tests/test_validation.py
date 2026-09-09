@@ -9,8 +9,8 @@ from stock_review_harness.logic.conditions import leader_ma_distances
 from stock_review_harness.logic.diagnostics import diagnose
 from stock_review_harness.models import (
     BoardQuote,
-    DabankeData,
     DataBundle,
+    LimitPoolData,
     LeaderQuote,
     MarketData,
 )
@@ -32,14 +32,14 @@ def _bundle(
         prev_total_turnover=prev,
         zt_pool=zt_pool or [],
     )
-    dabanke = DabankeData(
+    limit_pool = LimitPoolData(
         date="2026-08-07",
         summary=summary or {},
         pool=[],
         blasted=[],
         concepts=[],
     )
-    return DataBundle(date="2026-08-07", market=market, dabanke=dabanke)
+    return DataBundle(date="2026-08-07", market=market, limit_pool=limit_pool)
 
 
 class ValidateTest(unittest.TestCase):

@@ -3,10 +3,11 @@
 
 用法：
   python3 -m stock_review_harness.cli 2026-07-30 --html index-20260730.html
-  python3 -m stock_review_harness.cli 2026-07-30 --dabanke-json dabanke.json --market-json market.json
-  python3 -m stock_review_harness.cli 2026-07-30 --dabanke-json dabanke.json --json evidence.json --prompt prompt.md
+  python3 -m stock_review_harness.cli 2026-07-30 --limit-pool-json pool.json --market-json market.json
+  python3 -m stock_review_harness.cli 2026-07-30 --limit-pool-json pool.json --json evidence.json --prompt prompt.md
 
---html 模式会自动调用 review-a-share-market 技能内的 fetch_daily_stats.py 完成页面解析；
+--html 模式会自动调用 review-a-share-market 技能内的 fetch_daily_stats.py 完成页面解析
+（历史兼容入口，大班客已退役，新链路用 --limit-pool-json）；
 技能目录可用 --skill-dir 或环境变量 REVIEW_SKILL_DIR 覆盖。
 
 产出：纯数据证据链 JSON（默认 evidence_<date>.json）与可选 LLM prompt。
@@ -34,11 +35,12 @@ DEFAULT_SKILL_DIR = Path("/Users/imatrix/.codex/skills/review-a-share-market")
 DEFAULT_TEMPLATE = Path(__file__).resolve().parents[1] / "assets" / "llm_report_prompt.md"
 
 
-def _fetch_dabanke(date: str, html: str, skill_dir: str, tmp: Path) -> str:
+def _fetch_html_pool(date: str, html: str, skill_dir: str, tmp: Path) -> str:
+    """历史兼容：解析本地保存的涨停页 HTML（fetch_daily_stats.py；大班客已退役）。"""
     script = Path(skill_dir) / "scripts" / "fetch_daily_stats.py"
     if not script.exists():
         sys.exit(f"[ERROR] 解析脚本不存在: {script}，可用 --skill-dir 指定")
-    out = tmp / "dabanke.json"
+    out = tmp / "pool.json"
     cmd = [
         sys.executable, str(script), date, "--html", str(html),
         "--output", str(out),
@@ -55,13 +57,21 @@ def main(argv=None) -> None:
         description="A 股复盘数据收集引擎：产出纯数据证据链，判断与报告由 LLM 完成",
     )
     ap.add_argument("date", help="交易日，格式 YYYY-MM-DD，如 2026-07-30")
-    ap.add_argument("--html", help="本地已保存的大班客页面 HTML（自动调用技能脚本解析）")
-    ap.add_argument("--dabanke-json", help="fetch_daily_stats.py 输出的涨停数据 JSON")
+    ap.add_argument("--html", help="兼容入口：本地已保存的涨停页 HTML（自动调用技能脚本解析；大班客已退役）")
+    ap.add_argument(
+        "--limit-pool-json", "--dabanke-json", dest="limit_pool_json",
+        help="涨停池数据 JSON（fuyao 桥接 / 东财回退 / 历史样本；--dabanke-json 为兼容旧名）",
+    )
     ap.add_argument("--market-json", help="行情补充 JSON（可选）：指数/板块/中军/溢价/跌幅榜")
+    ap.add_argument(
+        "--fuyao-pools",
+        help="fuyao 快照 pools.json（可选，含 premiums 昨日涨停溢价节）：溢价/A杀优先用 "
+             "fuyao 口径，缺失时回退东财 zt_prev+腾讯日K",
+    )
     ap.add_argument(
         "--offline",
         action="store_true",
-        help="不联网补数：仅使用 --dabanke-json / --market-json 提供的本地数据",
+        help="不联网补数：仅使用 --limit-pool-json / --market-json 提供的本地数据",
     )
     ap.add_argument(
         "--refresh",
@@ -82,16 +92,20 @@ def main(argv=None) -> None:
     ap.add_argument("--template", default=str(DEFAULT_TEMPLATE), help="LLM prompt 模板路径")
     args = ap.parse_args(argv)
 
-    if not args.dabanke_json and not args.html:
-        ap.error("必须提供 --dabanke-json 或 --html 之一")
+    if not args.limit_pool_json and not args.html:
+        ap.error("必须提供 --limit-pool-json 或 --html 之一")
 
     with tempfile.TemporaryDirectory(prefix="stock_review_") as td:
-        dabanke_json = args.dabanke_json
-        if not dabanke_json:
-            dabanke_json = _fetch_dabanke(args.date, args.html, args.skill_dir, Path(td))
+        limit_pool_json = args.limit_pool_json
+        if not limit_pool_json:
+            limit_pool_json = _fetch_html_pool(args.date, args.html, args.skill_dir, Path(td))
         market_json = args.market_json
         if not market_json and not args.offline:
-            market = fetch_market(args.date, use_cache=not args.refresh)
+            market = fetch_market(
+                args.date,
+                use_cache=not args.refresh,
+                fuyao_pools_path=args.fuyao_pools,
+            )
             save = (
                 Path(args.save_market)
                 if args.save_market
@@ -106,7 +120,7 @@ def main(argv=None) -> None:
             from_cache = is_cached_market(market)
             verb = "命中本地缓存" if from_cache else "已联网抓取"
             print(f"[INFO] {verb}行情并保存: {save}", file=sys.stderr)
-        bundle = run_pipeline(args.date, dabanke_json=dabanke_json, market_json=market_json)
+        bundle = run_pipeline(args.date, limit_pool_json=limit_pool_json, market_json=market_json)
         evidence = to_evidence_dict(bundle)
         out = Path(args.json_out) if args.json_out else Path.cwd() / f"evidence_{args.date}.json"
         out.write_text(

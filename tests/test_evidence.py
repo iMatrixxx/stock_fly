@@ -18,7 +18,7 @@ SAMPLE = Path(__file__).resolve().parents[1] / "samples" / "dabanke_2026-07-30.j
 class EvidenceTest(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        cls.bundle = run_pipeline("2026-07-30", dabanke_json=str(SAMPLE))
+        cls.bundle = run_pipeline("2026-07-30", limit_pool_json=str(SAMPLE))
 
     def test_structure(self):
         ev = to_evidence_dict(self.bundle)
@@ -34,6 +34,23 @@ class EvidenceTest(unittest.TestCase):
         text = to_evidence_json(self.bundle)
         data = json.loads(text)  # 必须是合法 JSON（不含 NaN/Infinity）
         self.assertEqual(data["meta"]["date"], "2026-07-30")
+
+    def test_premium_dual_sections(self):
+        """昨日涨停溢价聚合须在 market 与 emotion 双节可见（防漏读），且结构一致。"""
+        ev = to_evidence_dict(self.bundle)
+        m_prem = ev["market"].get("yesterday_zt_premium")
+        e_prem = ev["emotion"].get("yesterday_zt_premium")
+        # 键必须存在；样本无 market 补数时二者均为 None 属正常
+        self.assertIn("yesterday_zt_premium", ev["market"])
+        self.assertIn("yesterday_zt_premium", ev["emotion"])
+        self.assertEqual(m_prem, e_prem)
+        if m_prem is not None:
+            for k in ("count", "avg_pct", "up_open", "flat_open", "down_open"):
+                self.assertIn(k, m_prem)
+            self.assertEqual(
+                m_prem["count"],
+                m_prem["up_open"] + m_prem["flat_open"] + m_prem["down_open"],
+            )
 
 
 class PromptBridgeTest(unittest.TestCase):
@@ -65,7 +82,7 @@ class PromptBridgeTest(unittest.TestCase):
 
     @staticmethod
     def _bundle():
-        return run_pipeline("2026-07-30", dabanke_json=str(SAMPLE))
+        return run_pipeline("2026-07-30", limit_pool_json=str(SAMPLE))
 
 
 if __name__ == "__main__":

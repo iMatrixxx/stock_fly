@@ -65,9 +65,30 @@ def daily_klines(code: str, n: int = 20, end: str | None = None) -> list[dict] |
                     "volume": float(r[5]),
                 }
             )
+        # 当日/近期复盘：腾讯区间接口在收盘结算前不返回 end 当日行，
+        # 而"最新 N 根"接口含当日——缺行时合并最新接口的更新行。
+        if end and out and out[-1]["date"] < end and _is_recent(end):
+            latest = daily_klines(code, n=max(n, 8), end=None)
+            if latest:
+                last_date = out[-1]["date"]
+                merged = {
+                    r["date"]: r for r in out
+                }
+                for r in latest:
+                    if r["date"] > last_date:
+                        merged[r["date"]] = r
+                out = [merged[d] for d in sorted(merged)]
         return out or None
     except Exception:  # noqa: BLE001
         return None
+
+
+def _is_recent(d: str, days: int = 5) -> bool:
+    """end 距今是否在 days 个自然日内（仅近期复盘才补当日行，历史复盘不受影响）。"""
+    try:
+        return (_date.today() - _date.fromisoformat(d)).days <= days
+    except ValueError:
+        return False
 
 
 def ma_on_date(rows: list[dict] | None, date: str, n: int) -> float | None:

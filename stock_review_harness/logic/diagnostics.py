@@ -13,7 +13,7 @@ def diagnose(bundle: DataBundle) -> list[dict]:
     """返回矛盾诊断清单 [{type, detail}]；无张力返回空列表。"""
     out: list[dict] = []
     m = bundle.market
-    s = bundle.dabanke.summary
+    s = bundle.limit_pool.summary
 
     # 1) 封板率高但低位晋级率低（涨停多但接不动）
     seal = s.get("封板率")

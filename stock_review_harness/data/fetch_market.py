@@ -11,8 +11,10 @@
 
 from __future__ import annotations
 
+import json
 from datetime import date as _date
 from datetime import timedelta
+from pathlib import Path
 
 from ..models import (
     BoardQuote,
@@ -22,11 +24,58 @@ from ..models import (
     PremiumQuote,
 )
 from . import eastmoney, tencent, ths
+from . import northbound
 from .cache import load_cached_market, save_market_cache
 from .net import fetch_many
 from .sina import stock_flow_history
 
 BOARD_KEEP = 8  # 量化筛选后保留的板块数量（报告取前 3）
+
+
+def _load_fuyao_premiums(source: str | Path | None, date_str: str) -> tuple[list[PremiumQuote], list[dict], str | None]:
+    """读取 fuyao 快照产出的昨日涨停溢价（tools/fetch_market_snapshot.py 计算）。
+
+    source 指向含顶层 `premiums` 键的 pools.json（或独立 premiums JSON）：
+      {"date": "YYYY-MM-DD", "items": [{code,name,open_premium_pct,close_pct,ladder}]}
+    返回 (premiums, a_kill_candidates, note)；不可用返回 (None, [], None) → 调用方回退腾讯日K。
+    """
+    if not source:
+        return None, [], None
+    try:
+        raw = json.loads(Path(source).read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        return None, [], None
+    prem = raw.get("premiums") if isinstance(raw, dict) else None
+    if not isinstance(prem, dict) or prem.get("date") != date_str:
+        return None, [], None
+    items = prem.get("items") or []
+    if not items:
+        return None, [], None
+    quotes: list[PremiumQuote] = []
+    a_kill: list[dict] = []
+    for it in items:
+        quotes.append(
+            PremiumQuote(
+                code=str(it.get("code") or ""),
+                name=str(it.get("name") or ""),
+                open_premium_pct=it.get("open_premium_pct"),
+            )
+        )
+        close_pct = it.get("close_pct")
+        if close_pct is not None and float(close_pct) <= -7.0 and int(it.get("ladder") or 1) >= 2:
+            a_kill.append(
+                {
+                    "code": str(it.get("code") or ""),
+                    "name": str(it.get("name") or ""),
+                    "change_pct": float(close_pct),
+                    "note": f"昨日{it.get('ladder')}连板今日大跌（A杀嫌疑，fuyao 口径）",
+                }
+            )
+    note = (
+        f"昨日涨停溢价源=fuyao（up_prev+prices_historical 日K，{len(quotes)} 只；"
+        f"原东财 zt_prev+腾讯日K 已降级为回退）"
+    )
+    return quotes, a_kill, note
 
 
 def _prev_trade_date(d: str, probe) -> str:
@@ -95,8 +144,78 @@ def _em_secid(code: str) -> str:
     return "1." + code if str(code).startswith(("60", "68", "90")) else "0." + code
 
 
-def fetch_market(date_str: str, use_cache: bool = True) -> MarketData:
-    """抓齐复盘日行情；use_cache 时先查 data_cache/samples 的快照缓存。"""
+# 腾讯指数行情符号 → 同花顺指数名（INDEX_LINES 键）
+_TENCENT_INDEX = {
+    "sh000001": "上证指数",
+    "sz399001": "深证成指",
+    "sz399006": "创业板指",
+    "sh000300": "沪深300",
+    "sh000688": "科创50",
+    "sz399106": "深证综指",
+}
+
+
+def _patch_index_close_from_tencent(date_str: str, idx_rows: dict) -> None:
+    """当日/近期复盘（距今 ≤5 个自然日）：同花顺指数当日行在收盘结算前
+    是盘中快照（如 08-17 上证被报成 3960.19，而腾讯/新浪/东财一致为 3982.65），
+    用腾讯收盘行情覆盖/补全当日行，保证指数与两市成交口径正确。历史日期跳过。
+    """
+    try:
+        if (_date.today() - _date.fromisoformat(date_str)).days > 5:
+            return
+    except ValueError:
+        return
+    ymd = date_str.replace("-", "")
+    try:
+        import urllib.request
+
+        url = "https://qt.gtimg.cn/q=" + ",".join(_TENCENT_INDEX)
+        req = urllib.request.Request(
+            url,
+            headers={"User-Agent": "Mozilla/5.0", "Referer": "https://gu.qq.com/"},
+        )
+        raw = urllib.request.urlopen(req, timeout=15).read().decode("gbk", errors="replace")
+    except Exception:  # noqa: BLE001
+        return
+    for line in raw.strip().split(";"):
+        line = line.strip()
+        if "=" not in line or '"' not in line:
+            continue
+        key = line.split("=")[0].strip().replace("v_", "")
+        name = _TENCENT_INDEX.get(key)
+        if not name:
+            continue
+        f = line.split('"')[1].split("~")
+        if len(f) <= 37:
+            continue
+        try:
+            close = float(f[3])
+            amount = float(f[37]) * 1e4  # 万元 → 元（与同花顺 amount 同单位）
+        except ValueError:
+            continue
+        rows = idx_rows.get(name) or {}
+        rows[ymd] = {
+            "open": None,
+            "high": None,
+            "low": None,
+            "close": close,
+            "volume": None,
+            "amount": amount,
+        }
+        idx_rows[name] = rows
+
+
+def fetch_market(
+    date_str: str,
+    use_cache: bool = True,
+    fuyao_pools_path: str | Path | None = None,
+) -> MarketData:
+    """抓齐复盘日行情；use_cache 时先查 data_cache/samples 的快照缓存。
+
+    fuyao_pools_path: 可选。指向 fetch_market_snapshot.py 产出的 pools.json
+    （含昨日涨停溢价 premiums 节）。提供且可用时，步骤 5 溢价/A杀直接用 fuyao
+    口径，跳过东财 zt_prev + 腾讯日K 逐票拉取（腾讯路径降级为纯回退）。
+    """
     if use_cache:
         cached = load_cached_market(date_str)
         if cached is not None:
@@ -113,6 +232,8 @@ def fetch_market(date_str: str, use_cache: bool = True) -> MarketData:
         timeout=40,
     )
     idx_rows.pop("_errors", None)
+    # 当日/近期复盘：同花顺指数当日行是盘中快照/缺失 → 腾讯收盘行情覆盖
+    _patch_index_close_from_tencent(date_str, idx_rows)
     r30 = {name: rows.get(ymd) for name, rows in idx_rows.items() if rows}
     r30 = {k: v for k, v in r30.items() if v}
     prev_date = _prev_trade_date(
@@ -179,6 +300,32 @@ def fetch_market(date_str: str, use_cache: bool = True) -> MarketData:
             )
         )
     boards.sort(key=lambda b: (b.turnover or 0), reverse=True)
+    # 同花顺板块日线当日行未完整发布（< 15 个）或为盘中快照（板块成交合计
+    # 显著小于两市成交，如暴跌/当日复盘时同花顺未结算）时，用东财行业板块
+    # 全量补全（东财当日板块数据完整：涨跌幅/成交额/主力净流入同源）
+    total_board_turnover = sum(b.turnover or 0 for b in boards)
+    snapshot_like = (
+        total is not None
+        and total > 0
+        and 0 < total_board_turnover < total * 0.3
+    )
+    if len(boards) < 15 or snapshot_like:
+        try:
+            em_b = eastmoney.board_flows()
+            if len(em_b) >= 15:
+                boards = [
+                    BoardQuote(
+                        name=name,
+                        turnover=q.get("turnover_yi"),
+                        market_turnover=total if total else None,
+                        change_pct=q.get("change_pct"),
+                        main_flow=q.get("main_flow_yi"),
+                    )
+                    for name, q in em_b.items()
+                ]
+                boards.sort(key=lambda b: (b.turnover or 0), reverse=True)
+        except Exception:  # noqa: BLE001 - 东财补全失败则保留同花顺部分数据
+            pass
     # 东财行业板块今日主力净流入（填补 THS 板块无资金流的口径缺口）
     flow_hit = 0
     try:
@@ -246,33 +393,41 @@ def fetch_market(date_str: str, use_cache: bool = True) -> MarketData:
     # ---------- 5. 昨日涨停溢价 + 高位股 A 杀监测 ----------
     premiums: list[PremiumQuote] = []
     a_kill: list[dict] = []
-    k_prev = fetch_many(
-        [s["code"] for s in zt_prev],
-        lambda c: tencent.daily_klines(c, 8, end=date_str),
-        workers=10,
-        timeout=120,
-    )
-    k_prev.pop("_errors", None)
-    for s in zt_prev:
-        klines = k_prev.get(s["code"]) or []
-        row = next((r for r in klines if r["date"] == date_str), None)
-        if not row or not s.get("price"):
-            continue
-        prev_close = s["price"]
-        premium = round((row["open"] / prev_close - 1) * 100, 2)
-        change = round((row["close"] / prev_close - 1) * 100, 2)
-        premiums.append(
-            PremiumQuote(code=s["code"], name=s["name"], open_premium_pct=premium)
+    premium_note: str | None = None
+    # 5a. 优先：fuyao 快照侧已算好的溢价（up_prev + prices_historical 日K）
+    fq, fak, fnote = _load_fuyao_premiums(fuyao_pools_path, date_str)
+    if fq:
+        premiums, a_kill, premium_note = fq, fak, fnote
+    else:
+        # 5b. 回退：东财 zt_prev + 腾讯日K 逐票计算（fuyao 缺失/失败/回放历史样本时）
+        k_prev = fetch_many(
+            [s["code"] for s in zt_prev],
+            lambda c: tencent.daily_klines(c, 8, end=date_str),
+            workers=10,
+            timeout=120,
         )
-        if change <= -7.0 and (s.get("ladder") or 1) >= 2:
-            a_kill.append(
-                {
-                    "code": s["code"],
-                    "name": s["name"],
-                    "change_pct": change,
-                    "note": f"昨日{s.get('ladder')}连板今日大跌（A杀嫌疑）",
-                }
+        k_prev.pop("_errors", None)
+        for s in zt_prev:
+            klines = k_prev.get(s["code"]) or []
+            row = next((r for r in klines if r["date"] == date_str), None)
+            if not row or not s.get("price"):
+                continue
+            prev_close = s["price"]
+            premium = round((row["open"] / prev_close - 1) * 100, 2)
+            change = round((row["close"] / prev_close - 1) * 100, 2)
+            premiums.append(
+                PremiumQuote(code=s["code"], name=s["name"], open_premium_pct=premium)
             )
+            if change <= -7.0 and (s.get("ladder") or 1) >= 2:
+                a_kill.append(
+                    {
+                        "code": s["code"],
+                        "name": s["name"],
+                        "change_pct": change,
+                        "note": f"昨日{s.get('ladder')}连板今日大跌（A杀嫌疑）",
+                    }
+                )
+        premium_note = f"昨日涨停溢价源=东财 zt_prev+腾讯日K（{len(premiums)} 只，fuyao 不可用回退）"
 
     # ---------- 6. 跌幅榜（跌停池 + 昨日涨停A杀） ----------
     top_fallers = [
@@ -292,6 +447,23 @@ def fetch_market(date_str: str, use_cache: bool = True) -> MarketData:
             dedup[f["code"]] = f
     top_fallers = list(dedup.values())
 
+    # ---------- 7. 沪深股通前十大成交活跃股（外资态度观察；可选，失败不阻断） ----------
+    north_top10: Optional[dict] = None
+    try:
+        north_top10 = northbound.fetch_top10_deal(date_str)
+        if north_top10:
+            sh_n = len(north_top10["sh"])
+            sz_n = len(north_top10["sz"])
+            print(
+                f"  北向十大活跃股: 沪股通 {sh_n} / 深股通 {sz_n} 条"
+                f"（成交额口径，净买入未披露）",
+                flush=True,
+            )
+        else:
+            print("  [warn] 北向十大活跃股无数据，本次不注入", flush=True)
+    except Exception as e:  # noqa: BLE001
+        print(f"  [warn] 北向十大活跃股抓取失败（{str(e)[:100]}），本次不注入", flush=True)
+
     market = MarketData(
         date=date_str,
         indices=indices,
@@ -304,10 +476,14 @@ def fetch_market(date_str: str, use_cache: bool = True) -> MarketData:
         zt_pool=zt,
         dt_pool=dt,
         yesterday_zt_pool=zt_prev,
+        northbound_top10=north_top10,
         notes=[
             "数据源：同花顺日线（指数/板块成交额）+ 东方财富涨停/跌停池 + 腾讯个股K线 + 新浪个股资金流；"
             f"板块主力净流入：{flow_note}；中军尾盘行为取自东财分钟线（近 3 个交易日内可得）",
-            f"北向资金日频净买入未披露；涨停池口径为东财（{len(zt)} 家），跌停 {len(dt)} 家",
+            "北向资金日频净买入未披露（2024-08-19 起），仅披露成交总额与沪深股通前十大成交活跃股"
+            f"（成交额口径{('：沪股通 ' + str(len(north_top10['sh'])) + ' / 深股通 ' + str(len(north_top10['sz'])) + ' 条') if north_top10 else '，本次缺失'}）；"
+            f"涨停池口径为东财（{len(zt)} 家），跌停 {len(dt)} 家",
+            premium_note or f"昨日涨停溢价源=东财 zt_prev+腾讯日K（{len(premiums)} 只，fuyao 未提供回退）",
         ],
     )
     # use_cache 只控制"读取"；抓取结果始终回写快照缓存（--refresh 也刷新缓存）

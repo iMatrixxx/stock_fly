@@ -6,8 +6,8 @@ import unittest
 
 from stock_review_harness.models import (
     BoardQuote,
-    DabankeData,
     DataBundle,
+    LimitPoolData,
     IndexQuote,
     MarketData,
 )
@@ -28,7 +28,7 @@ def _bundle(indices=None, boards=None, zt_pool=None, dt_pool=None, summary=None,
         dt_pool=dt_pool or [],
         total_turnover=total,
     )
-    dabanke = DabankeData(
+    limit_pool = LimitPoolData(
         date="2026-08-07",
         summary=summary
         or {
@@ -42,7 +42,7 @@ def _bundle(indices=None, boards=None, zt_pool=None, dt_pool=None, summary=None,
         blasted=[],
         concepts=[],
     )
-    return DataBundle(date="2026-08-07", market=market, dabanke=dabanke)
+    return DataBundle(date="2026-08-07", market=market, limit_pool=limit_pool)
 
 
 class CapitalProxiesTest(unittest.TestCase):

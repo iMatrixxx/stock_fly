@@ -152,6 +152,7 @@ def board_flows() -> dict[str, dict]:
                 "code": b.get("f12"),
                 "main_flow_yi": round((b.get("f62") or 0) / 1e8, 2),
                 "change_pct": b.get("f3"),
+                "turnover_yi": round((b.get("f6") or 0) / 1e8, 2),
             }
         total = body.get("total") or 0
         if pn * 100 >= total or not diff:

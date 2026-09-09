@@ -8,6 +8,16 @@ __pycache__/
 # 运行时缓存（可随时联网重抓/重建）
 data_cache/
 
+# hithink 技能输出（报告/原始 JSON/新闻 jsonl/断点状态，均可重跑生成）
+hithink_out/
+
+# 复盘 PDF（由 md2html+Chrome 重建，md 入库即可，PDF 不入库）
+复盘报告_*.pdf
+结构化复盘_*.pdf
+
+# 工作区记忆（本地会话上下文，不入库）
+.workbuddy/
+
 # 本地临时文件
 *.log
 *.tmp

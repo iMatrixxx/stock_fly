@@ -1,7 +1,9 @@
 """数据加载：把外部 JSON 规范化为内部模型。
 
 两条输入：
-1. 大班客涨停数据 JSON —— 由 skills/review-a-share-market/scripts/fetch_daily_stats.py 产出；
+1. 涨停池 JSON —— 由 fuyao 桥接（tools/build_dabanke_from_fuyao.py，主源）或东财回退
+   （tools/build_dabanke_from_eastmoney.py）产出；schema 与历史 fetch_daily_stats.py
+   产物同构，故离线样本 samples/dabanke_*.json 亦可直接回放；
 2. 行情补充 JSON（可选）—— 指数/两市成交/板块/中军个股/昨日涨停溢价/跌幅榜，
    schema 见 samples/market_schema.json。缺失字段允许为空，分析层标注"数据缺失"。
 """
@@ -14,7 +16,7 @@ from typing import Optional
 
 from ..models import (
     BoardQuote,
-    DabankeData,
+    LimitPoolData,
     IndexQuote,
     LeaderQuote,
     MarketData,
@@ -27,11 +29,11 @@ def _strip_meta(obj: dict) -> dict:
     return {k: v for k, v in obj.items() if not str(k).startswith("_")}
 
 
-def load_dabanke_json(path: str | Path) -> DabankeData:
-    """加载 fetch_daily_stats.py 输出的涨停数据 JSON。"""
+def load_limit_pool_json(path: str | Path) -> LimitPoolData:
+    """加载涨停池数据 JSON（fuyao 桥接 / 东财回退 / 历史样本）。"""
     p = Path(path)
     raw = json.loads(p.read_text(encoding="utf-8"))
-    return DabankeData(
+    return LimitPoolData(
         date=raw.get("date", ""),
         summary=raw.get("limit_up_summary") or {},
         pool=raw.get("limit_up_pool") or [],
@@ -39,7 +41,12 @@ def load_dabanke_json(path: str | Path) -> DabankeData:
         concepts=raw.get("concepts") or [],
         url=raw.get("url", ""),
         fetched_at=raw.get("fetched_at"),
+        dragon_top=raw.get("dragon_top"),  # 可选：龙虎榜异动股资金聚合（fuyao 桥接产物），无则 None
     )
+
+
+# 兼容别名：历史命名
+load_dabanke_json = load_limit_pool_json
 
 
 def _to_index(q: dict) -> IndexQuote:
@@ -113,6 +120,7 @@ def load_market_json(path: Optional[str | Path]) -> Optional[MarketData]:
     market.zt_pool = raw.get("zt_pool") or []
     market.dt_pool = raw.get("dt_pool") or []
     market.yesterday_zt_pool = raw.get("yesterday_zt_pool") or []
+    market.northbound_top10 = raw.get("northbound_top10") or None
     return market
 
 
@@ -130,5 +138,6 @@ def market_to_json(market: MarketData) -> dict:
         "zt_pool": market.zt_pool,
         "dt_pool": market.dt_pool,
         "yesterday_zt_pool": market.yesterday_zt_pool,
+        "northbound_top10": market.northbound_top10,
         "notes": market.notes,
     }

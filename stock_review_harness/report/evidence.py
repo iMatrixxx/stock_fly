@@ -39,7 +39,10 @@ def _data_gaps(bundle: DataBundle) -> list[str]:
     gaps: list[str] = []
     m = bundle.market
     if not any(b.north_flow is not None for b in m.boards):
-        gaps.append("北向资金日频净买入自 2024-08-19 起未披露，不得编造北向数据")
+        gaps.append(
+            "北向资金净买入额自 2024-08-19 起未披露（仅披露成交总额与沪深股通前十大活跃股"
+            "成交额口径），禁止编造北向净买入/净流出方向"
+        )
     missing_flow = [b.name for b in m.boards[:8] if b.main_flow is None]
     if missing_flow:
         gaps.append(f"以下主要板块主力净流入缺失：{'、'.join(missing_flow)}")
@@ -50,6 +53,46 @@ def _data_gaps(bundle: DataBundle) -> list[str]:
     return gaps
 
 
+def _premium_agg(bundle: DataBundle) -> dict | None:
+    """昨日涨停股今日开盘溢价聚合（count + 均值 + 高开/平开/低开分布）。
+
+    数据源：market.yesterday_premiums（fetch_market 第 5 步用腾讯日 K 计算）。
+    market 节与 emotion 节均引用本聚合，避免撰写/判卷时漏读。
+    """
+    m = bundle.market
+    premiums = [p.open_premium_pct for p in m.yesterday_premiums if p.open_premium_pct is not None]
+    if not premiums:
+        return None
+    up = sum(1 for p in premiums if p > 0)
+    flat = sum(1 for p in premiums if p == 0)
+    down = sum(1 for p in premiums if p < 0)
+    return {
+        "count": len(premiums),
+        "avg_pct": _f(sum(premiums) / len(premiums)),
+        "up_open": up,
+        "flat_open": flat,
+        "down_open": down,
+    }
+
+
+def _northbound_section(bundle: DataBundle) -> dict | None:
+    """沪深股通前十大成交活跃股（外资态度观察，成交额口径）。
+
+    数据源：market.northbound_top10（fetch_market 第 7 步抓东财 RPT_MUTUAL_TOP10DEAL）。
+    净买入额自 2024-08-19 起停披露，禁止据此推断净流入/加仓方向；"行业流向"定性
+    由 LLM 基于名单中的个股行业属性归纳（如"活跃成交集中于 PCB/光模块"）。
+    """
+    nb = bundle.market.northbound_top10
+    if not nb or not (nb.get("sh") or nb.get("sz")):
+        return None
+    return {
+        "date": nb.get("date"),
+        "note": nb.get("note", ""),
+        "sh": nb.get("sh") or [],
+        "sz": nb.get("sz") or [],
+    }
+
+
 def _market_section(bundle: DataBundle) -> dict:
     m = bundle.market
     top_boards = sorted(
@@ -57,7 +100,6 @@ def _market_section(bundle: DataBundle) -> dict:
         key=lambda b: b.turnover or 0.0,
         reverse=True,
     )[:8]
-    premiums = [p.open_premium_pct for p in m.yesterday_premiums if p.open_premium_pct is not None]
     return {
         "total_turnover_yi": _f(m.total_turnover),
         "prev_total_turnover_yi": _f(m.prev_total_turnover),
@@ -95,11 +137,7 @@ def _market_section(bundle: DataBundle) -> dict:
         ],
         "zt_pool_count": len(m.zt_pool),
         "dt_pool_count": len(m.dt_pool),
-        "yesterday_zt_premium": (
-            {"count": len(premiums), "avg_pct": _f(sum(premiums) / len(premiums))}
-            if premiums
-            else None
-        ),
+        "yesterday_zt_premium": _premium_agg(bundle),
         "top_fallers": [
             {
                 "code": f.get("code"),
@@ -109,13 +147,14 @@ def _market_section(bundle: DataBundle) -> dict:
             }
             for f in m.top_fallers
         ],
+        "northbound": _northbound_section(bundle),
     }
 
 
-def _industry_zt_groups(dabanke, top: int = 5, max_names: int = 8) -> dict[str, list]:
+def _industry_zt_groups(pool_data, top: int = 5, max_names: int = 8) -> dict[str, list]:
     """行业标签 → 涨停个股名（供 LLM 判断板块联动与龙头带动）。"""
     groups: dict[str, list[str]] = {}
-    for s in dabanke.pool:
+    for s in pool_data.pool:
         ind = (s.get("industry") or "").strip()
         for tag in ind.split("+") or ["未知"]:
             tag = tag.strip() or "未知"
@@ -125,7 +164,7 @@ def _industry_zt_groups(dabanke, top: int = 5, max_names: int = 8) -> dict[str, 
 
 
 def _emotion_section(bundle: DataBundle) -> dict:
-    s = bundle.dabanke.summary
+    s = bundle.limit_pool.summary
     first = s.get("首板") or {}
     promote = {
         (lv.get("level") or ""): {
@@ -149,15 +188,16 @@ def _emotion_section(bundle: DataBundle) -> dict:
         "promote_rates": promote,
         "max_ladder": s.get("max_连板"),
         "ladder": s.get("ladder") or {},
+        "yesterday_zt_premium": _premium_agg(bundle),
         "industry_concentration": [
             {"industry": tag, "count": n}
-            for tag, n in bundle.dabanke.industry_concentration(10)
+            for tag, n in bundle.limit_pool.industry_concentration(10)
         ],
         "concept_focus": [
             {"concept": c.get("concept"), "sealed": c.get("sealed"), "total": c.get("total")}
-            for c in bundle.dabanke.concept_focus(5)
+            for c in bundle.limit_pool.concept_focus(5)
         ],
-        "industry_zt_groups": _industry_zt_groups(bundle.dabanke),
+        "industry_zt_groups": _industry_zt_groups(bundle.limit_pool),
     }
 
 
@@ -233,7 +273,7 @@ def _capital_proxies(bundle: DataBundle) -> dict:
     """资金属性拆解的数据代理（确定性聚合；定性由 LLM 完成）。"""
     m = bundle.market
     zt = m.zt_pool
-    summary = bundle.dabanke.summary
+    summary = bundle.limit_pool.summary
 
     # 机构趋势资金代理：大市值涨停股（≥500 亿）
     large = sorted(
@@ -244,7 +284,7 @@ def _capital_proxies(bundle: DataBundle) -> dict:
 
     # 量化资金代理：题材扩散度（大班客行业标签数）、首板占比、炸板占比
     tags: set[str] = set()
-    for s in bundle.dabanke.pool:
+    for s in bundle.limit_pool.pool:
         for t in (s.get("industry") or "").split("+"):
             if t.strip():
                 tags.add(t.strip())
@@ -255,7 +295,7 @@ def _capital_proxies(bundle: DataBundle) -> dict:
     # 产业资本代理：事件类题材标签计数（大班客标签含预增/回购/变更等事件词）
     event_kw = ("变更", "回购", "增持", "重组", "扭亏", "预增", "举牌", "摘帽", "股权")
     events: Counter[str] = Counter()
-    for s in bundle.dabanke.pool:
+    for s in bundle.limit_pool.pool:
         ind = s.get("industry") or ""
         for kw in event_kw:
             if kw in ind:
@@ -328,6 +368,23 @@ def _market_leaders(bundle: DataBundle) -> dict:
             "index_change_pct": _f(idx.change_pct) if idx else None,
             "board": board.name if board else None,
         },
+    }
+
+
+def _dragon_section(bundle: DataBundle) -> dict:
+    """龙虎榜异动股资金聚合（可选，确定性透传）。
+
+    数据来自桥接产物 `limit_pool.dragon_top`（fuyao raw/dragon.json，净买入/游资净买/热度），
+    为交易所异动披露的**聚合事实**，非买卖前五席位明细——LLM 不得虚构席位级归属。
+    无数据时给出 count=0 显式标注（与 evidence 一贯的"缺失即标注"一致）。
+    """
+    return bundle.limit_pool.dragon_top or {
+        "count": 0,
+        "source": "hithink-finance fuyao（无 dragon_top，未启用/缺失）",
+        "note": "无龙虎榜异动股资金数据（桥接产物未含 dragon_top），不得编造席位或资金行为",
+        "top_net_buy": [],
+        "high_ladder_on_board": [],
+        "boarded_zt_codes": [],
     }
 
 
@@ -421,13 +478,15 @@ def to_evidence_dict(bundle: DataBundle) -> dict:
                 "涨停池个股尾盘行为统一标注为『涨停封板』。"
             ),
             "data_sources": [
-                f"大班客：{bundle.dabanke.url}" if bundle.dabanke.url else "大班客（无 URL）",
+                (f"涨停情绪源：{bundle.limit_pool.url}" if bundle.limit_pool.url
+                 else "涨停情绪源：无 URL（数据缺失）"),
                 *bundle.market.notes,
             ],
             "data_gaps": _data_gaps(bundle),
             "anomalies": validate_bundle(bundle),
         },
         "market": _market_section(bundle),
+        "dragon_top": _dragon_section(bundle),
         "emotion": _emotion_section(bundle),
         "leaders_candidates": _leaders_candidates(bundle),
         "high_ladder_stocks": _high_ladder_stocks(bundle),
