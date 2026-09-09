@@ -81,6 +81,45 @@
     ],
     "note": "沪深股通前十大成交活跃股（成交额口径）；净买入额自 2024-08-19 起未披露，禁止据此推断净流入/加仓"
   },
+  "dragon_seats": {
+    "date": "2026-07-30",
+    "total_boarded": 55,
+    "sample_top": 12,
+    "note": "龙虎榜买卖前五席位（东财 RPT_BILLBOARD_DAILYDETAILSBUY/SELL，净买前 N 采样）；机构专用=org，深/沪股通专用=north，其余营业部=dealer；席位明细只覆盖买卖前五，非全量成交",
+    "stocks": [
+      {
+        "code": "000001",
+        "name": "示例上榜股",
+        "reason": "日涨幅偏离值达到7%的前5只证券",
+        "net_buy_yi": 3.54,
+        "org_buy_yi": 0.5,
+        "org_sell_yi": 0.1,
+        "org_net_yi": 0.4,
+        "north_net_yi": 0.3,
+        "dealer_net_yi": 2.8,
+        "top_buyer": { "name": "机构专用", "net_yi": 0.5, "kind": "org" },
+        "buy_seats": [],
+        "sell_seats": []
+      }
+    ]
+  },
+  "macro": {
+    "date": "2026-07-30",
+    "asof": "2026-07-30T15:30:00+08:00",
+    "source": "新浪期货日K（主力连续，InnerFuturesNewService）",
+    "note": "国内商品期货主连日K，口径=T 当日日盘+T-1 夜盘；不含美元/离岸/外盘（无稳定历史源），禁止编造",
+    "items": [
+      {
+        "name": "沪铜主连",
+        "code": "CU0",
+        "group": "工业金属",
+        "trade_date": "2026-07-30",
+        "close": 110620.0,
+        "prev_close": 109410.0,
+        "chg_pct": 1.11
+      }
+    ]
+  },
   "_example": {
     "说明": "上方字段为示例值，直接替换为真实行情即可；示例板块/个股数据不是 2026-07-30 的真实数据，正式使用时务必用实际行情覆盖。"
   },
