@@ -1,0 +1,1254 @@
+{
+  "date": "2026-08-19",
+  "url": "https://dabanke.com/index-20260819.html",
+  "fetched_at": null,
+  "limit_up_summary": {
+    "sealed_total": 36,
+    "炸板_total": 18,
+    "封板率": 66.7,
+    "炸板股平均收盘跌幅": 3.22,
+    "首板": {
+      "sealed": 29,
+      "attempted": 42,
+      "rate": 69.0
+    },
+    "levels": [
+      {
+        "level": "4进5",
+        "sealed": 0,
+        "attempted": 1,
+        "rate": 0.0
+      },
+      {
+        "level": "3进4",
+        "sealed": 0,
+        "attempted": 4,
+        "rate": 0.0
+      },
+      {
+        "level": "2进3",
+        "sealed": 3,
+        "attempted": 13,
+        "rate": 23.0
+      },
+      {
+        "level": "1进2",
+        "sealed": 5,
+        "attempted": 62,
+        "rate": 8.0
+      }
+    ],
+    "ladder": {
+      "2": 4,
+      "3": 3
+    },
+    "max_连板": 3
+  },
+  "炸板股": [
+    {
+      "code": "600613",
+      "name": "神奇制药",
+      "status": "炸",
+      "change_pct": 0.26,
+      "industry": "中药",
+      "level": "4进5"
+    },
+    {
+      "code": "600313",
+      "name": "农发种业",
+      "status": "炸",
+      "change_pct": 5.16,
+      "industry": "种植业",
+      "level": "2进3"
+    },
+    {
+      "code": "603958",
+      "name": "哈森股份",
+      "status": "炸",
+      "change_pct": -8.02,
+      "industry": "中报扭亏",
+      "level": "2进3"
+    },
+    {
+      "code": "000153",
+      "name": "丰原药业",
+      "status": "炸",
+      "change_pct": -1.05,
+      "industry": "化学制药",
+      "level": "1进2"
+    },
+    {
+      "code": "600108",
+      "name": "亚盛集团",
+      "status": "炸",
+      "change_pct": -1.97,
+      "industry": "种植业",
+      "level": "1进2"
+    },
+    {
+      "code": "000703",
+      "name": "恒逸石化",
+      "status": "炸",
+      "change_pct": 9.22,
+      "industry": "基础化工",
+      "level": "首板"
+    },
+    {
+      "code": "601609",
+      "name": "金田股份",
+      "status": "炸",
+      "change_pct": 8.37,
+      "industry": "算力散热",
+      "level": "首板"
+    },
+    {
+      "code": "300155",
+      "name": "安居宝",
+      "status": "炸",
+      "change_pct": 8.16,
+      "industry": "电子设备",
+      "level": "首板"
+    },
+    {
+      "code": "603207",
+      "name": "小方制药",
+      "status": "炸",
+      "change_pct": 7.6,
+      "industry": "医药生物",
+      "level": "首板"
+    },
+    {
+      "code": "600121",
+      "name": "郑州煤电",
+      "status": "炸",
+      "change_pct": 6.65,
+      "industry": "化石能源",
+      "level": "首板"
+    },
+    {
+      "code": "002165",
+      "name": "红宝丽",
+      "status": "炸",
+      "change_pct": 5.86,
+      "industry": "环氧丙烷技改...",
+      "level": "首板"
+    },
+    {
+      "code": "000523",
+      "name": "红棉股份",
+      "status": "炸",
+      "change_pct": 5.59,
+      "industry": "食品饮料",
+      "level": "首板"
+    },
+    {
+      "code": "000025",
+      "name": "特力A",
+      "status": "炸",
+      "change_pct": 4.05,
+      "industry": "轻工制造",
+      "level": "首板"
+    },
+    {
+      "code": "000788",
+      "name": "北大医药",
+      "status": "炸",
+      "change_pct": 2.97,
+      "industry": "医药生物",
+      "level": "首板"
+    },
+    {
+      "code": "600444",
+      "name": "国机通用",
+      "status": "炸",
+      "change_pct": 2.51,
+      "industry": "机械设备",
+      "level": "首板"
+    },
+    {
+      "code": "002678",
+      "name": "珠江钢琴",
+      "status": "炸",
+      "change_pct": 1.73,
+      "industry": "轻工制造",
+      "level": "首板"
+    },
+    {
+      "code": "003042",
+      "name": "中农联合",
+      "status": "炸",
+      "change_pct": 0.72,
+      "industry": "基础化工",
+      "level": "首板"
+    },
+    {
+      "code": "002202",
+      "name": "金风科技",
+      "status": "炸",
+      "change_pct": 0.09,
+      "industry": "电气设备",
+      "level": "首板"
+    }
+  ],
+  "limit_up_pool": [
+    {
+      "code": "002333",
+      "name": "罗普斯金",
+      "change_pct": 10.07,
+      "seal_amount_wan": 8631,
+      "first_seal_time": "09:25:00",
+      "last_seal_time": "09:25:00",
+      "炸板次数": 0,
+      "涨停统计": "1/1",
+      "连板数": 1,
+      "industry": "拟收购盟萤科技+检测业务+铝型材"
+    },
+    {
+      "code": "002953",
+      "name": "日丰股份",
+      "change_pct": 10.04,
+      "seal_amount_wan": 9630,
+      "first_seal_time": "09:25:00",
+      "last_seal_time": "09:30:24",
+      "炸板次数": 1,
+      "涨停统计": "2/2",
+      "连板数": 2,
+      "industry": "光纤预制棒+机器人电缆+通信装备组件"
+    },
+    {
+      "code": "600127",
+      "name": "金健米业",
+      "change_pct": 9.99,
+      "seal_amount_wan": 2770,
+      "first_seal_time": "09:25:02",
+      "last_seal_time": "09:25:02",
+      "炸板次数": 0,
+      "涨停统计": "3/3",
+      "连板数": 3,
+      "industry": "粮食概念+大健康食品+国企改革"
+    },
+    {
+      "code": "600783",
+      "name": "鲁信创投",
+      "change_pct": 10.03,
+      "seal_amount_wan": 522,
+      "first_seal_time": "09:25:02",
+      "last_seal_time": "09:32:20",
+      "炸板次数": 1,
+      "涨停统计": "1/1",
+      "连板数": 1,
+      "industry": "参股蓝箭航天+机器人+创投"
+    },
+    {
+      "code": "603395",
+      "name": "红四方",
+      "change_pct": 10.02,
+      "seal_amount_wan": 806,
+      "first_seal_time": "09:25:02",
+      "last_seal_time": "09:32:08",
+      "炸板次数": 1,
+      "涨停统计": "3/3",
+      "连板数": 3,
+      "industry": "新疆煤化工项目+复合肥+国企改革"
+    },
+    {
+      "code": "000020",
+      "name": "深华发Ａ",
+      "change_pct": 10.01,
+      "seal_amount_wan": 2303,
+      "first_seal_time": "09:30:00",
+      "last_seal_time": "09:34:24",
+      "炸板次数": 1,
+      "涨停统计": "2/2",
+      "连板数": 2,
+      "industry": "光学光电+显示器+深圳旧改"
+    },
+    {
+      "code": "601011",
+      "name": "宝泰隆",
+      "change_pct": 10.14,
+      "seal_amount_wan": 1219,
+      "first_seal_time": "09:30:02",
+      "last_seal_time": "09:30:02",
+      "炸板次数": 0,
+      "涨停统计": "1/1",
+      "连板数": 1,
+      "industry": "石墨烯导热膜+煤化工+石墨矿"
+    },
+    {
+      "code": "603506",
+      "name": "南都物业",
+      "change_pct": 10.0,
+      "seal_amount_wan": 225,
+      "first_seal_time": "09:30:14",
+      "last_seal_time": "09:31:53",
+      "炸板次数": 1,
+      "涨停统计": "1/1",
+      "连板数": 1,
+      "industry": "机器人概念+物业服务+业绩增长"
+    },
+    {
+      "code": "600371",
+      "name": "万向德农",
+      "change_pct": 9.95,
+      "seal_amount_wan": 37,
+      "first_seal_time": "09:31:18",
+      "last_seal_time": "14:46:30",
+      "炸板次数": 5,
+      "涨停统计": "2/2",
+      "连板数": 2,
+      "industry": "种植业+转基因+粮食概念"
+    },
+    {
+      "code": "001301",
+      "name": "尚太科技",
+      "change_pct": 10.01,
+      "seal_amount_wan": 2840,
+      "first_seal_time": "09:31:21",
+      "last_seal_time": "14:51:48",
+      "炸板次数": 10,
+      "涨停统计": "1/1",
+      "连板数": 1,
+      "industry": "负极材料+半年报+产能扩张"
+    },
+    {
+      "code": "002900",
+      "name": "哈三联",
+      "change_pct": 9.99,
+      "seal_amount_wan": 14808,
+      "first_seal_time": "09:31:27",
+      "last_seal_time": "09:32:27",
+      "炸板次数": 1,
+      "涨停统计": "1/1",
+      "连板数": 1,
+      "industry": "创新药+化学制药+中报预计减亏"
+    },
+    {
+      "code": "000505",
+      "name": "京粮控股",
+      "change_pct": 10.01,
+      "seal_amount_wan": 5990,
+      "first_seal_time": "09:31:33",
+      "last_seal_time": "09:31:33",
+      "炸板次数": 0,
+      "涨停统计": "3/3",
+      "连板数": 3,
+      "industry": "粮食概念+油脂加工+国企改革"
+    },
+    {
+      "code": "603102",
+      "name": "百合股份",
+      "change_pct": 10.0,
+      "seal_amount_wan": 500,
+      "first_seal_time": "09:32:33",
+      "last_seal_time": "09:32:33",
+      "炸板次数": 0,
+      "涨停统计": "3/6",
+      "连板数": 1,
+      "industry": "宠物经济+营养保健食品+半年报营收增长"
+    },
+    {
+      "code": "603801",
+      "name": "志邦家居",
+      "change_pct": 10.05,
+      "seal_amount_wan": 172,
+      "first_seal_time": "09:32:38",
+      "last_seal_time": "09:33:49",
+      "炸板次数": 1,
+      "涨停统计": "1/1",
+      "连板数": 1,
+      "industry": "海外业务+整家一体化+老房焕新"
+    },
+    {
+      "code": "000526",
+      "name": "学大教育",
+      "change_pct": 9.99,
+      "seal_amount_wan": 9412,
+      "first_seal_time": "09:33:24",
+      "last_seal_time": "09:34:45",
+      "炸板次数": 1,
+      "涨停统计": "2/2",
+      "连板数": 2,
+      "industry": "教育培训+半年报增长+股份回购"
+    },
+    {
+      "code": "000560",
+      "name": "我爱我家",
+      "change_pct": 10.19,
+      "seal_amount_wan": 3663,
+      "first_seal_time": "09:33:27",
+      "last_seal_time": "10:35:24",
+      "炸板次数": 4,
+      "涨停统计": "1/1",
+      "连板数": 1,
+      "industry": "房产经纪+长租公寓+AI应用"
+    },
+    {
+      "code": "002412",
+      "name": "汉森制药",
+      "change_pct": 10.07,
+      "seal_amount_wan": 8602,
+      "first_seal_time": "09:33:42",
+      "last_seal_time": "09:34:54",
+      "炸板次数": 1,
+      "涨停统计": "1/1",
+      "连板数": 1,
+      "industry": "创新药+中药+中报预增"
+    },
+    {
+      "code": "000736",
+      "name": "中交发展",
+      "change_pct": 10.11,
+      "seal_amount_wan": 2551,
+      "first_seal_time": "09:33:48",
+      "last_seal_time": "09:33:48",
+      "炸板次数": 0,
+      "涨停统计": "1/1",
+      "连板数": 1,
+      "industry": "房地产开发+中交房地产控股+数据中心"
+    },
+    {
+      "code": "301211",
+      "name": "亨迪药业",
+      "change_pct": 19.97,
+      "seal_amount_wan": 1221,
+      "first_seal_time": "09:34:36",
+      "last_seal_time": "14:42:45",
+      "炸板次数": 4,
+      "涨停统计": "1/1",
+      "连板数": 1,
+      "industry": "创新药+布洛芬+原料药"
+    },
+    {
+      "code": "000723",
+      "name": "美锦能源",
+      "change_pct": 9.89,
+      "seal_amount_wan": 4826,
+      "first_seal_time": "09:35:36",
+      "last_seal_time": "09:46:54",
+      "炸板次数": 2,
+      "涨停统计": "1/1",
+      "连板数": 1,
+      "industry": "焦炭+氢能+中报预计减亏"
+    },
+    {
+      "code": "301130",
+      "name": "西点药业",
+      "change_pct": 19.99,
+      "seal_amount_wan": 1998,
+      "first_seal_time": "09:35:42",
+      "last_seal_time": "14:03:45",
+      "炸板次数": 1,
+      "涨停统计": "2/4",
+      "连板数": 1,
+      "industry": "创新药+瑞香素+化学制药"
+    },
+    {
+      "code": "603848",
+      "name": "好太太",
+      "change_pct": 9.98,
+      "seal_amount_wan": 165,
+      "first_seal_time": "09:36:16",
+      "last_seal_time": "10:05:19",
+      "炸板次数": 2,
+      "涨停统计": "1/1",
+      "连板数": 1,
+      "industry": "家居用品+半年报增长+智能家居"
+    },
+    {
+      "code": "001277",
+      "name": "速达股份",
+      "change_pct": 10.01,
+      "seal_amount_wan": 5284,
+      "first_seal_time": "09:42:27",
+      "last_seal_time": "09:42:27",
+      "炸板次数": 0,
+      "涨停统计": "1/1",
+      "连板数": 1,
+      "industry": "高管增持+煤炭设备后市场+农机"
+    },
+    {
+      "code": "001338",
+      "name": "永顺泰",
+      "change_pct": 10.06,
+      "seal_amount_wan": 1080,
+      "first_seal_time": "09:45:15",
+      "last_seal_time": "14:18:57",
+      "炸板次数": 7,
+      "涨停统计": "1/1",
+      "连板数": 1,
+      "industry": "粮食概念+麦芽+啤酒"
+    },
+    {
+      "code": "600403",
+      "name": "大有能源",
+      "change_pct": 10.0,
+      "seal_amount_wan": 763,
+      "first_seal_time": "09:48:29",
+      "last_seal_time": "09:48:29",
+      "炸板次数": 0,
+      "涨停统计": "1/1",
+      "连板数": 1,
+      "industry": "煤炭开采+国企改革"
+    },
+    {
+      "code": "603290",
+      "name": "斯达半导",
+      "change_pct": 10.0,
+      "seal_amount_wan": 2023,
+      "first_seal_time": "09:53:13",
+      "last_seal_time": "10:49:58",
+      "炸板次数": 2,
+      "涨停统计": "1/1",
+      "连板数": 1,
+      "industry": "半导体+IGBT+SiC"
+    },
+    {
+      "code": "001400",
+      "name": "江顺科技",
+      "change_pct": 10.0,
+      "seal_amount_wan": 4025,
+      "first_seal_time": "09:54:45",
+      "last_seal_time": "13:12:15",
+      "炸板次数": 2,
+      "涨停统计": "1/1",
+      "连板数": 1,
+      "industry": "商业航天+3D打印+铝挤压模具"
+    },
+    {
+      "code": "300069",
+      "name": "金利华电",
+      "change_pct": 20.01,
+      "seal_amount_wan": 7771,
+      "first_seal_time": "09:59:27",
+      "last_seal_time": "10:00:06",
+      "炸板次数": 1,
+      "涨停统计": "1/1",
+      "连板数": 1,
+      "industry": "商业航天+特高压绝缘子+并购重组"
+    },
+    {
+      "code": "601015",
+      "name": "陕西黑猫",
+      "change_pct": 10.09,
+      "seal_amount_wan": 314,
+      "first_seal_time": "10:15:31",
+      "last_seal_time": "10:21:46",
+      "炸板次数": 1,
+      "涨停统计": "1/1",
+      "连板数": 1,
+      "industry": "焦炭加工+煤炭+煤矿投产"
+    },
+    {
+      "code": "600610",
+      "name": "中毅达",
+      "change_pct": 10.01,
+      "seal_amount_wan": 299,
+      "first_seal_time": "10:24:35",
+      "last_seal_time": "10:30:26",
+      "炸板次数": 2,
+      "涨停统计": "1/1",
+      "连板数": 1,
+      "industry": "中字头+季戊四醇+业绩增长"
+    },
+    {
+      "code": "603366",
+      "name": "日出东方",
+      "change_pct": 9.94,
+      "seal_amount_wan": 299,
+      "first_seal_time": "11:01:13",
+      "last_seal_time": "11:01:13",
+      "炸板次数": 0,
+      "涨停统计": "1/1",
+      "连板数": 1,
+      "industry": "厨卫电器+中报扣非净利增长+储能"
+    },
+    {
+      "code": "002040",
+      "name": "南 京 港",
+      "change_pct": 9.95,
+      "seal_amount_wan": 1596,
+      "first_seal_time": "11:22:09",
+      "last_seal_time": "13:20:00",
+      "炸板次数": 3,
+      "涨停统计": "1/1",
+      "连板数": 1,
+      "industry": "航运概念+原油中转+国企改革"
+    },
+    {
+      "code": "000059",
+      "name": "华锦股份",
+      "change_pct": 9.98,
+      "seal_amount_wan": 4633,
+      "first_seal_time": "13:05:51",
+      "last_seal_time": "13:30:09",
+      "炸板次数": 1,
+      "涨停统计": "1/1",
+      "连板数": 1,
+      "industry": "石油化工"
+    },
+    {
+      "code": "300911",
+      "name": "亿田智能",
+      "change_pct": 19.98,
+      "seal_amount_wan": 14476,
+      "first_seal_time": "13:07:54",
+      "last_seal_time": "13:07:54",
+      "炸板次数": 0,
+      "涨停统计": "1/1",
+      "连板数": 1,
+      "industry": "厨卫电器"
+    },
+    {
+      "code": "002543",
+      "name": "万和电气",
+      "change_pct": 10.03,
+      "seal_amount_wan": 12187,
+      "first_seal_time": "13:51:57",
+      "last_seal_time": "13:51:57",
+      "炸板次数": 0,
+      "涨停统计": "1/1",
+      "连板数": 1,
+      "industry": "氢能源"
+    },
+    {
+      "code": "603113",
+      "name": "金能科技",
+      "change_pct": 10.04,
+      "seal_amount_wan": 145,
+      "first_seal_time": "14:12:02",
+      "last_seal_time": "14:12:02",
+      "炸板次数": 0,
+      "涨停统计": "1/1",
+      "连板数": 1,
+      "industry": "氢能源"
+    }
+  ],
+  "concepts": [
+    {
+      "concept": "国企改革",
+      "sealed": 3,
+      "total": 16,
+      "stocks": [
+        {
+          "code": "603395",
+          "name": "红四方",
+          "sealed": true
+        },
+        {
+          "code": "000505",
+          "name": "京粮控股",
+          "sealed": true
+        },
+        {
+          "code": "600127",
+          "name": "金健米业",
+          "sealed": true
+        },
+        {
+          "code": "002820",
+          "name": "桂发祥",
+          "sealed": false
+        },
+        {
+          "code": "000735",
+          "name": "罗牛山",
+          "sealed": false
+        },
+        {
+          "code": "600313",
+          "name": "农发种业",
+          "sealed": false
+        },
+        {
+          "code": "600737",
+          "name": "中粮糖业",
+          "sealed": false
+        },
+        {
+          "code": "000019",
+          "name": "深粮控股",
+          "sealed": false
+        },
+        {
+          "code": "600707",
+          "name": "彩虹股份",
+          "sealed": false
+        },
+        {
+          "code": "605577",
+          "name": "龙版传媒",
+          "sealed": false
+        },
+        {
+          "code": "600272",
+          "name": "开开实业",
+          "sealed": false
+        },
+        {
+          "code": "000852",
+          "name": "石化机械",
+          "sealed": false
+        },
+        {
+          "code": "000716",
+          "name": "黑芝麻",
+          "sealed": false
+        },
+        {
+          "code": "000678",
+          "name": "襄阳轴承",
+          "sealed": false
+        },
+        {
+          "code": "600113",
+          "name": "浙江东日",
+          "sealed": false
+        },
+        {
+          "code": "600108",
+          "name": "亚盛集团",
+          "sealed": false
+        }
+      ]
+    },
+    {
+      "concept": "粮食概念",
+      "sealed": 3,
+      "total": 8,
+      "stocks": [
+        {
+          "code": "000505",
+          "name": "京粮控股",
+          "sealed": true
+        },
+        {
+          "code": "600127",
+          "name": "金健米业",
+          "sealed": true
+        },
+        {
+          "code": "600371",
+          "name": "万向德农",
+          "sealed": true
+        },
+        {
+          "code": "600313",
+          "name": "农发种业",
+          "sealed": false
+        },
+        {
+          "code": "600598",
+          "name": "北大荒",
+          "sealed": false
+        },
+        {
+          "code": "300189",
+          "name": "神农种业",
+          "sealed": false
+        },
+        {
+          "code": "000019",
+          "name": "深粮控股",
+          "sealed": false
+        },
+        {
+          "code": "600108",
+          "name": "亚盛集团",
+          "sealed": false
+        }
+      ]
+    },
+    {
+      "concept": "机器人概念",
+      "sealed": 0,
+      "total": 7,
+      "stocks": [
+        {
+          "code": "603089",
+          "name": "正裕工业",
+          "sealed": false
+        },
+        {
+          "code": "600536",
+          "name": "中国软件",
+          "sealed": false
+        },
+        {
+          "code": "603400",
+          "name": "华之杰",
+          "sealed": false
+        },
+        {
+          "code": "603112",
+          "name": "华翔股份",
+          "sealed": false
+        },
+        {
+          "code": "002284",
+          "name": "亚太股份",
+          "sealed": false
+        },
+        {
+          "code": "002124",
+          "name": "天邦食品",
+          "sealed": false
+        },
+        {
+          "code": "002553",
+          "name": "南方精工",
+          "sealed": false
+        }
+      ]
+    },
+    {
+      "concept": "农林牧渔",
+      "sealed": 0,
+      "total": 6,
+      "stocks": [
+        {
+          "code": "000998",
+          "name": "隆平高科",
+          "sealed": false
+        },
+        {
+          "code": "600354",
+          "name": "敦煌种业",
+          "sealed": false
+        },
+        {
+          "code": "002385",
+          "name": "大北农",
+          "sealed": false
+        },
+        {
+          "code": "600359",
+          "name": "新农开发",
+          "sealed": false
+        },
+        {
+          "code": "601952",
+          "name": "苏垦农发",
+          "sealed": false
+        },
+        {
+          "code": "000713",
+          "name": "国投丰乐",
+          "sealed": false
+        }
+      ]
+    },
+    {
+      "concept": "化石能源",
+      "sealed": 5,
+      "total": 6,
+      "stocks": [
+        {
+          "code": "601011",
+          "name": "宝泰隆",
+          "sealed": true
+        },
+        {
+          "code": "601015",
+          "name": "陕西黑猫",
+          "sealed": true
+        },
+        {
+          "code": "600403",
+          "name": "大有能源",
+          "sealed": true
+        },
+        {
+          "code": "000059",
+          "name": "华锦股份",
+          "sealed": true
+        },
+        {
+          "code": "000723",
+          "name": "美锦能源",
+          "sealed": true
+        },
+        {
+          "code": "600121",
+          "name": "郑州煤电",
+          "sealed": false
+        }
+      ]
+    },
+    {
+      "concept": "种植业",
+      "sealed": 1,
+      "total": 5,
+      "stocks": [
+        {
+          "code": "600371",
+          "name": "万向德农",
+          "sealed": true
+        },
+        {
+          "code": "600313",
+          "name": "农发种业",
+          "sealed": false
+        },
+        {
+          "code": "002041",
+          "name": "登海种业",
+          "sealed": false
+        },
+        {
+          "code": "300189",
+          "name": "神农种业",
+          "sealed": false
+        },
+        {
+          "code": "600108",
+          "name": "亚盛集团",
+          "sealed": false
+        }
+      ]
+    },
+    {
+      "concept": "电子设备",
+      "sealed": 2,
+      "total": 5,
+      "stocks": [
+        {
+          "code": "301106",
+          "name": "骏成科技",
+          "sealed": true
+        },
+        {
+          "code": "603290",
+          "name": "斯达半导",
+          "sealed": true
+        },
+        {
+          "code": "002819",
+          "name": "东方中科",
+          "sealed": false
+        },
+        {
+          "code": "002025",
+          "name": "航天电器",
+          "sealed": false
+        },
+        {
+          "code": "300155",
+          "name": "安居宝",
+          "sealed": false
+        }
+      ]
+    },
+    {
+      "concept": "机械设备",
+      "sealed": 3,
+      "total": 5,
+      "stocks": [
+        {
+          "code": "600783",
+          "name": "鲁信创投",
+          "sealed": true
+        },
+        {
+          "code": "001277",
+          "name": "速达股份",
+          "sealed": true
+        },
+        {
+          "code": "001400",
+          "name": "江顺科技",
+          "sealed": true
+        },
+        {
+          "code": "002747",
+          "name": "埃斯顿",
+          "sealed": false
+        },
+        {
+          "code": "600444",
+          "name": "国机通用",
+          "sealed": false
+        }
+      ]
+    },
+    {
+      "concept": "医药生物",
+      "sealed": 3,
+      "total": 5,
+      "stocks": [
+        {
+          "code": "301211",
+          "name": "亨迪药业",
+          "sealed": true
+        },
+        {
+          "code": "002412",
+          "name": "汉森制药",
+          "sealed": true
+        },
+        {
+          "code": "002900",
+          "name": "哈三联",
+          "sealed": true
+        },
+        {
+          "code": "603207",
+          "name": "小方制药",
+          "sealed": false
+        },
+        {
+          "code": "000788",
+          "name": "北大医药",
+          "sealed": false
+        }
+      ]
+    },
+    {
+      "concept": "半年报增长",
+      "sealed": 1,
+      "total": 4,
+      "stocks": [
+        {
+          "code": "000526",
+          "name": "学大教育",
+          "sealed": true
+        },
+        {
+          "code": "688112",
+          "name": "鼎阳科技",
+          "sealed": false
+        },
+        {
+          "code": "002284",
+          "name": "亚太股份",
+          "sealed": false
+        },
+        {
+          "code": "603071",
+          "name": "物产环能",
+          "sealed": false
+        }
+      ]
+    },
+    {
+      "concept": "轻工制造",
+      "sealed": 2,
+      "total": 4,
+      "stocks": [
+        {
+          "code": "603801",
+          "name": "志邦家居",
+          "sealed": true
+        },
+        {
+          "code": "603848",
+          "name": "好太太",
+          "sealed": true
+        },
+        {
+          "code": "000025",
+          "name": "特力A",
+          "sealed": false
+        },
+        {
+          "code": "002678",
+          "name": "珠江钢琴",
+          "sealed": false
+        }
+      ]
+    },
+    {
+      "concept": "基础化工",
+      "sealed": 2,
+      "total": 4,
+      "stocks": [
+        {
+          "code": "603113",
+          "name": "金能科技",
+          "sealed": true
+        },
+        {
+          "code": "600610",
+          "name": "中毅达",
+          "sealed": true
+        },
+        {
+          "code": "000703",
+          "name": "恒逸石化",
+          "sealed": false
+        },
+        {
+          "code": "003042",
+          "name": "中农联合",
+          "sealed": false
+        }
+      ]
+    },
+    {
+      "concept": "创新药",
+      "sealed": 1,
+      "total": 3,
+      "stocks": [
+        {
+          "code": "301130",
+          "name": "西点药业",
+          "sealed": true
+        },
+        {
+          "code": "600613",
+          "name": "神奇制药",
+          "sealed": false
+        },
+        {
+          "code": "000597",
+          "name": "东北制药",
+          "sealed": false
+        }
+      ]
+    },
+    {
+      "concept": "新零售",
+      "sealed": 0,
+      "total": 3,
+      "stocks": [
+        {
+          "code": "002820",
+          "name": "桂发祥",
+          "sealed": false
+        },
+        {
+          "code": "603708",
+          "name": "家家悦",
+          "sealed": false
+        },
+        {
+          "code": "601116",
+          "name": "三江购物",
+          "sealed": false
+        }
+      ]
+    },
+    {
+      "concept": "液冷服务器",
+      "sealed": 0,
+      "total": 3,
+      "stocks": [
+        {
+          "code": "300684",
+          "name": "中石科技",
+          "sealed": false
+        },
+        {
+          "code": "603400",
+          "name": "华之杰",
+          "sealed": false
+        },
+        {
+          "code": "601609",
+          "name": "金田股份",
+          "sealed": false
+        }
+      ]
+    },
+    {
+      "concept": "AI智能体",
+      "sealed": 0,
+      "total": 3,
+      "stocks": [
+        {
+          "code": "300598",
+          "name": "诚迈科技",
+          "sealed": false
+        },
+        {
+          "code": "603280",
+          "name": "南方路机",
+          "sealed": false
+        },
+        {
+          "code": "301129",
+          "name": "瑞纳智能",
+          "sealed": false
+        }
+      ]
+    },
+    {
+      "concept": "光学光电",
+      "sealed": 1,
+      "total": 3,
+      "stocks": [
+        {
+          "code": "000020",
+          "name": "深华发A",
+          "sealed": true
+        },
+        {
+          "code": "600707",
+          "name": "彩虹股份",
+          "sealed": false
+        },
+        {
+          "code": "002638",
+          "name": "勤上股份",
+          "sealed": false
+        }
+      ]
+    },
+    {
+      "concept": "化学制药",
+      "sealed": 1,
+      "total": 3,
+      "stocks": [
+        {
+          "code": "301130",
+          "name": "西点药业",
+          "sealed": true
+        },
+        {
+          "code": "002365",
+          "name": "永安药业",
+          "sealed": false
+        },
+        {
+          "code": "000153",
+          "name": "丰原药业",
+          "sealed": false
+        }
+      ]
+    },
+    {
+      "concept": "CPO概念",
+      "sealed": 0,
+      "total": 2,
+      "stocks": [
+        {
+          "code": "600353",
+          "name": "旭光电子",
+          "sealed": false
+        },
+        {
+          "code": "002515",
+          "name": "金字火腿",
+          "sealed": false
+        }
+      ]
+    },
+    {
+      "concept": "精密金属结构件",
+      "sealed": 0,
+      "total": 2,
+      "stocks": [
+        {
+          "code": "603580",
+          "name": "艾艾精工",
+          "sealed": false
+        },
+        {
+          "code": "003043",
+          "name": "华亚智能",
+          "sealed": false
+        }
+      ]
+    }
+  ]
+}

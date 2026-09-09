@@ -1,0 +1,2403 @@
+{
+  "meta": {
+    "date": "2026-09-07",
+    "generated_at": "2026-09-07T22:33:33",
+    "note": "本 JSON 仅包含数据与确定性聚合，不含交易判断；请由 LLM 基于数据独立完成四步分析并撰写报告。注意：leaders_candidates 的 industry 为东财涨停池行业标签，可能只反映次要属性，板块归属需结合个股主营判断；涨停池个股尾盘行为统一标注为『涨停封板』。",
+    "data_sources": [
+      "涨停情绪源：hithink-finance fuyao API（fetch_market_snapshot.py，替代大班客）：涨停 92 / 炸板 19 / 昨日池 38 只。今日各板家数 {'6': 1, '3': 3, '2': 9}（fuyao up 池口径）。缺口：首板尝试数（炸板池无连板属性）、概念聚焦 total 缺失，题材浓度由涨停原因标签（limit_up_reason 拆 +）近似。",
+      "数据源：同花顺日线（指数/板块成交额）+ 东方财富涨停/跌停池 + 腾讯个股K线 + 新浪个股资金流；板块主力净流入：东财行业板块主力净流入命中 86/90 个板块；中军尾盘行为取自东财分钟线（近 3 个交易日内可得）",
+      "北向资金日频净买入未披露；涨停池口径为东财（93 家），跌停 2 家"
+    ],
+    "data_gaps": [
+      "北向资金日频净买入自 2024-08-19 起未披露，不得编造北向数据"
+    ],
+    "anomalies": [
+      {
+        "type": "board_flow_implausible",
+        "item": "电子化学品",
+        "detail": "主力净流入 306.9 亿占板块成交 373 亿的 82.4%，超出常识阈值（> 30%），疑似口径异常，不宜直接采信"
+      },
+      {
+        "type": "board_flow_implausible",
+        "item": "其他电子",
+        "detail": "主力净流入 306.9 亿占板块成交 187 亿的 164.3%，超出常识阈值（> 30%），疑似口径异常，不宜直接采信"
+      },
+      {
+        "type": "board_flow_implausible",
+        "item": "军工电子",
+        "detail": "主力净流入 306.9 亿占板块成交 128 亿的 240.2%，超出常识阈值（> 30%），疑似口径异常，不宜直接采信"
+      },
+      {
+        "type": "board_flow_implausible",
+        "item": "汽车服务及其他",
+        "detail": "主力净流入 10.8 亿占板块成交 26 亿的 41.9%，超出常识阈值（> 30%），疑似口径异常，不宜直接采信"
+      },
+      {
+        "type": "board_flow_implausible",
+        "item": "贸易",
+        "detail": "主力净流入 -4.3 亿占板块成交 13 亿的 33.8%，超出常识阈值（> 30%），疑似口径异常，不宜直接采信"
+      }
+    ]
+  },
+  "market": {
+    "total_turnover_yi": 19460.19,
+    "prev_total_turnover_yi": 20306.68,
+    "turnover_change_pct": -4.17,
+    "indices": [
+      {
+        "name": "上证指数",
+        "close": 3932.7,
+        "change_pct": 0.07,
+        "turnover_yi": 8979.04,
+        "ma5": 3945.24,
+        "ma5_dist_pct": -0.32
+      },
+      {
+        "name": "创业板指",
+        "close": 3398.68,
+        "change_pct": 3.41,
+        "turnover_yi": 5085.13,
+        "ma5": 3340.69,
+        "ma5_dist_pct": 1.74
+      },
+      {
+        "name": "沪深300",
+        "close": 4575.02,
+        "change_pct": null,
+        "turnover_yi": 5358.12,
+        "ma5": null,
+        "ma5_dist_pct": null
+      },
+      {
+        "name": "深证成指",
+        "close": 13774.91,
+        "change_pct": 1.91,
+        "turnover_yi": 10481.15,
+        "ma5": 13680.19,
+        "ma5_dist_pct": 0.69
+      },
+      {
+        "name": "科创50",
+        "close": 1615.53,
+        "change_pct": null,
+        "turnover_yi": 883.32,
+        "ma5": null,
+        "ma5_dist_pct": null
+      }
+    ],
+    "top_boards": [
+      {
+        "name": "半导体",
+        "turnover_yi": 2365.16,
+        "ratio_pct": 12.15,
+        "change_pct": 2.54,
+        "main_flow_yi": 97.98,
+        "main_flow_turnover_pct": 4.14,
+        "limit_ups": null
+      },
+      {
+        "name": "通信设备",
+        "turnover_yi": 1703.06,
+        "ratio_pct": 8.75,
+        "change_pct": 3.77,
+        "main_flow_yi": 201.35,
+        "main_flow_turnover_pct": 11.82,
+        "limit_ups": null
+      },
+      {
+        "name": "元件",
+        "turnover_yi": 1200.44,
+        "ratio_pct": 6.17,
+        "change_pct": 6.83,
+        "main_flow_yi": 156.9,
+        "main_flow_turnover_pct": 13.07,
+        "limit_ups": null
+      },
+      {
+        "name": "通用设备",
+        "turnover_yi": 615.62,
+        "ratio_pct": 3.16,
+        "change_pct": 1.25,
+        "main_flow_yi": 1.22,
+        "main_flow_turnover_pct": 0.2,
+        "limit_ups": null
+      },
+      {
+        "name": "消费电子",
+        "turnover_yi": 546.7,
+        "ratio_pct": 2.81,
+        "change_pct": 1.61,
+        "main_flow_yi": 27.74,
+        "main_flow_turnover_pct": 5.07,
+        "limit_ups": null
+      },
+      {
+        "name": "汽车零部件",
+        "turnover_yi": 545.2,
+        "ratio_pct": 2.8,
+        "change_pct": 1.0,
+        "main_flow_yi": 14.85,
+        "main_flow_turnover_pct": 2.72,
+        "limit_ups": null
+      },
+      {
+        "name": "自动化设备",
+        "turnover_yi": 490.17,
+        "ratio_pct": 2.52,
+        "change_pct": 3.04,
+        "main_flow_yi": 21.61,
+        "main_flow_turnover_pct": 4.41,
+        "limit_ups": null
+      },
+      {
+        "name": "电池",
+        "turnover_yi": 462.65,
+        "ratio_pct": 2.38,
+        "change_pct": 0.61,
+        "main_flow_yi": -9.96,
+        "main_flow_turnover_pct": 2.15,
+        "limit_ups": null
+      }
+    ],
+    "zt_pool_count": 93,
+    "dt_pool_count": 2,
+    "yesterday_zt_premium": {
+      "count": 39,
+      "avg_pct": 3.97
+    },
+    "top_fallers": [
+      {
+        "code": "600076",
+        "name": "康欣新材",
+        "change_pct": -10.09,
+        "note": "跌停（包装印刷，连续跌停 1 天）"
+      },
+      {
+        "code": "002674",
+        "name": "兴业科技",
+        "change_pct": -10.02,
+        "note": "跌停（纺织制造，连续跌停 1 天）"
+      }
+    ]
+  },
+  "dragon_top": {
+    "count": 68,
+    "trade_date": "2026-09-07",
+    "source": "hithink-finance fuyao（fetch_market_snapshot.py raw/dragon.json）：异动上榜股资金聚合（净买入/游资净买/热度），非交易所买卖前五席位明细；席位级资金属性由 LLM 判断，不得虚构营业部/机构席位名",
+    "note": "上榜股为当日触发交易所异动披露者（涨停/涨跌幅偏离/换手超阈），非全市场资金画像",
+    "top_net_buy": [
+      {
+        "rank": 41,
+        "code": "002463",
+        "name": "沪电股份",
+        "change_pct": 10.0,
+        "net_buy_yi": 17.43,
+        "net_rate_pct": 18.13,
+        "hot_money_net_yi": -0.57,
+        "hot_days": 1,
+        "concepts": [
+          "芯片概念",
+          "PCB概念",
+          "汽车电子"
+        ],
+        "zt": true,
+        "ladder": 1,
+        "seal_amount_wan": 17904.08,
+        "reason": "AI算力PCB+业绩增长+海外扩产"
+      },
+      {
+        "rank": 467,
+        "code": "688498",
+        "name": "源杰科技",
+        "change_pct": 16.1,
+        "net_buy_yi": 13.17,
+        "net_rate_pct": 14.63,
+        "hot_money_net_yi": 1.6,
+        "hot_days": 1,
+        "concepts": [
+          "共封装光学(CPO)",
+          "汽车芯片",
+          "光纤概念"
+        ],
+        "zt": false,
+        "ladder": null,
+        "seal_amount_wan": null,
+        "reason": ""
+      },
+      {
+        "rank": 89,
+        "code": "002281",
+        "name": "光迅科技",
+        "change_pct": 10.0,
+        "net_buy_yi": 10.97,
+        "net_rate_pct": 14.26,
+        "hot_money_net_yi": -0.52,
+        "hot_days": 1,
+        "concepts": [
+          "F5G概念",
+          "共封装光学(CPO)",
+          "先进封装"
+        ],
+        "zt": true,
+        "ladder": 1,
+        "seal_amount_wan": 24617.52,
+        "reason": "拟发H股+高速光模块+NPO模块"
+      },
+      {
+        "rank": 25,
+        "code": "603228",
+        "name": "景旺电子",
+        "change_pct": 10.0,
+        "net_buy_yi": 10.36,
+        "net_rate_pct": 8.16,
+        "hot_money_net_yi": -2.46,
+        "hot_days": 3,
+        "concepts": [
+          "PCB概念",
+          "共封装光学(CPO)",
+          "华为手机"
+        ],
+        "zt": true,
+        "ladder": 1,
+        "seal_amount_wan": 17651.47,
+        "reason": "AI算力PCB+光模块PCB+高端产能"
+      },
+      {
+        "rank": 23,
+        "code": "002436",
+        "name": "兴森科技",
+        "change_pct": 10.0,
+        "net_buy_yi": 5.93,
+        "net_rate_pct": 14.99,
+        "hot_money_net_yi": null,
+        "hot_days": 1,
+        "concepts": [
+          "PCB概念",
+          "共封装光学(CPO)",
+          "玻璃基板"
+        ],
+        "zt": true,
+        "ladder": 1,
+        "seal_amount_wan": 25895.54,
+        "reason": "PCB+光模块+存储芯片+ABF载板"
+      },
+      {
+        "rank": 145,
+        "code": "002916",
+        "name": "深南电路",
+        "change_pct": 10.0,
+        "net_buy_yi": 5.5,
+        "net_rate_pct": 16.59,
+        "hot_money_net_yi": null,
+        "hot_days": 1,
+        "concepts": [
+          "PCB概念",
+          "存储芯片",
+          "先进封装"
+        ],
+        "zt": true,
+        "ladder": 1,
+        "seal_amount_wan": 20361.14,
+        "reason": "AI算力PCB+封装基板+半年报增长"
+      },
+      {
+        "rank": 207,
+        "code": "002484",
+        "name": "江海股份",
+        "change_pct": 10.0,
+        "net_buy_yi": 4.61,
+        "net_rate_pct": 12.58,
+        "hot_money_net_yi": null,
+        "hot_days": 1,
+        "concepts": [
+          "超级电容",
+          "5G",
+          "东数西算(算力)"
+        ],
+        "zt": true,
+        "ladder": 1,
+        "seal_amount_wan": 7059.2,
+        "reason": "AI服务器电源+超级电容+元件+浙江国资"
+      },
+      {
+        "rank": 139,
+        "code": "002980",
+        "name": "华盛昌",
+        "change_pct": 10.0,
+        "net_buy_yi": 2.58,
+        "net_rate_pct": 5.34,
+        "hot_money_net_yi": 0.03,
+        "hot_days": 3,
+        "concepts": [
+          "智能穿戴",
+          "AI眼镜",
+          "共封装光学(CPO)"
+        ],
+        "zt": true,
+        "ladder": 1,
+        "seal_amount_wan": 12561.59,
+        "reason": "光通信测试+CPO+伽蓝特并表+中报增长"
+      },
+      {
+        "rank": 21,
+        "code": "600103",
+        "name": "青山纸业",
+        "change_pct": 10.14,
+        "net_buy_yi": 1.99,
+        "net_rate_pct": 10.63,
+        "hot_money_net_yi": 0.25,
+        "hot_days": 1,
+        "concepts": [
+          "海峡两岸",
+          "数据中心(AIDC)",
+          "碳中和"
+        ],
+        "zt": true,
+        "ladder": 1,
+        "seal_amount_wan": 11398.68,
+        "reason": "光模块+竹浆纸+电子通讯"
+      },
+      {
+        "rank": 1194,
+        "code": "688678",
+        "name": "福立旺",
+        "change_pct": 15.37,
+        "net_buy_yi": 1.88,
+        "net_rate_pct": 19.85,
+        "hot_money_net_yi": 0.83,
+        "hot_days": 1,
+        "concepts": [
+          "苹果概念",
+          "富士康概念",
+          "智能穿戴"
+        ],
+        "zt": false,
+        "ladder": null,
+        "seal_amount_wan": null,
+        "reason": ""
+      }
+    ],
+    "high_ladder_on_board": [
+      {
+        "rank": 10,
+        "code": "605577",
+        "name": "龙版传媒",
+        "change_pct": 10.03,
+        "net_buy_yi": 0.12,
+        "net_rate_pct": 1.6,
+        "hot_money_net_yi": 0.11,
+        "hot_days": 3,
+        "concepts": [
+          "文化传媒概念",
+          "黑龙江自贸区",
+          "IP经济(谷子经济)"
+        ],
+        "zt": true,
+        "ladder": 6,
+        "seal_amount_wan": 11177.28,
+        "reason": "AI漫剧+出版发行+黑龙江国资"
+      },
+      {
+        "rank": 27,
+        "code": "600108",
+        "name": "亚盛集团",
+        "change_pct": 10.09,
+        "net_buy_yi": 0.27,
+        "net_rate_pct": 26.95,
+        "hot_money_net_yi": 0.09,
+        "hot_days": 1,
+        "concepts": [
+          "粮食概念",
+          "玉米",
+          "土地流转"
+        ],
+        "zt": true,
+        "ladder": 3,
+        "seal_amount_wan": 45458.75,
+        "reason": "玉米制种+现代农业+甘肃国资"
+      },
+      {
+        "rank": 45,
+        "code": "600865",
+        "name": "百大集团",
+        "change_pct": 10.04,
+        "net_buy_yi": 0.59,
+        "net_rate_pct": 26.68,
+        "hot_money_net_yi": 0.3,
+        "hot_days": 1,
+        "concepts": [
+          "信托概念",
+          "物业管理",
+          "创投"
+        ],
+        "zt": true,
+        "ladder": 3,
+        "seal_amount_wan": 36856.3,
+        "reason": "商业零售+物业租赁+恒隆租约"
+      }
+    ],
+    "boarded_zt_codes": [
+      "601086",
+      "605577",
+      "600371",
+      "600103",
+      "002436",
+      "603228",
+      "600108",
+      "600354",
+      "600354",
+      "002463",
+      "600865",
+      "000735",
+      "000428",
+      "002281",
+      "600540",
+      "000798",
+      "603395",
+      "002980",
+      "603696",
+      "002916",
+      "002702",
+      "301550",
+      "002484",
+      "601949",
+      "002564",
+      "688655",
+      "001366",
+      "600400",
+      "300112",
+      "688001",
+      "002988",
+      "688813",
+      "301516"
+    ]
+  },
+  "emotion": {
+    "sealed_total": 92,
+    "blast_total": 19,
+    "seal_rate_pct": 82.9,
+    "blast_avg_change_pct": 8.53,
+    "first_board": {
+      "sealed": 79,
+      "attempted": null,
+      "rate_pct": null
+    },
+    "promote_rates": {
+      "1进2": {
+        "rate_pct": 29.0,
+        "sealed": 9,
+        "attempted": 31
+      },
+      "2进3": {
+        "rate_pct": 50.0,
+        "sealed": 3,
+        "attempted": 6
+      },
+      "5进6": {
+        "rate_pct": 100.0,
+        "sealed": 1,
+        "attempted": 1
+      }
+    },
+    "max_ladder": 6,
+    "ladder": {
+      "6": 1,
+      "3": 3,
+      "2": 9
+    },
+    "industry_concentration": [
+      {
+        "industry": "人形机器人",
+        "count": 8
+      },
+      {
+        "industry": "半年报增长",
+        "count": 5
+      },
+      {
+        "industry": "光模块",
+        "count": 5
+      },
+      {
+        "industry": "中报增长",
+        "count": 4
+      },
+      {
+        "industry": "CPO",
+        "count": 4
+      },
+      {
+        "industry": "商业零售",
+        "count": 3
+      },
+      {
+        "industry": "AI算力PCB",
+        "count": 3
+      },
+      {
+        "industry": "业绩增长",
+        "count": 3
+      },
+      {
+        "industry": "光模块PCB",
+        "count": 3
+      },
+      {
+        "industry": "全产业链",
+        "count": 2
+      }
+    ],
+    "concept_focus": [],
+    "industry_zt_groups": {
+      "人形机器人": [
+        "爱仕达",
+        "光洋股份",
+        "科瑞技术",
+        "北特科技",
+        "浙江荣泰",
+        "日盈电子",
+        "福莱新材",
+        "华兴源创"
+      ],
+      "半年报增长": [
+        "中水渔业",
+        "广合科技",
+        "深南电路",
+        "科瑞技术",
+        "国芳集团"
+      ],
+      "光模块": [
+        "汇绿生态",
+        "顺络电子",
+        "兴森科技",
+        "青山纸业",
+        "泰金新能"
+      ],
+      "中报增长": [
+        "敦煌种业",
+        "博杰股份",
+        "华盛昌",
+        "天创时尚"
+      ],
+      "CPO": [
+        "汇绿生态",
+        "金字火腿",
+        "华盛昌",
+        "天通股份"
+      ]
+    }
+  },
+  "leaders_candidates": [
+    {
+      "code": "002463",
+      "name": "沪电股份",
+      "ladder": 1,
+      "industry": "元件",
+      "market_cap_yi": 2360.23,
+      "turnover_yi": 96.14,
+      "change_pct": 10.0,
+      "first_seal_time": "13:31:57",
+      "blast_count": 7,
+      "close": 122.65,
+      "ma5": 117.94,
+      "ma10": 119.18,
+      "ma5_dist_pct": 3.99,
+      "ma10_dist_pct": 2.91,
+      "main_flow_yi": 32.16,
+      "tail_behavior": "涨停封板"
+    },
+    {
+      "code": "002281",
+      "name": "光迅科技",
+      "ladder": 1,
+      "industry": "通信设备",
+      "market_cap_yi": 1527.13,
+      "turnover_yi": 76.91,
+      "change_pct": 10.0,
+      "first_seal_time": "13:18:39",
+      "blast_count": 1,
+      "close": 184.47,
+      "ma5": 175.96,
+      "ma10": 174.49,
+      "ma5_dist_pct": 4.84,
+      "ma10_dist_pct": 5.72,
+      "main_flow_yi": 30.18,
+      "tail_behavior": "涨停封板"
+    },
+    {
+      "code": "603228",
+      "name": "景旺电子",
+      "ladder": 1,
+      "industry": "元件",
+      "market_cap_yi": 1061.07,
+      "turnover_yi": 52.69,
+      "change_pct": 10.0,
+      "first_seal_time": "09:58:13",
+      "blast_count": 6,
+      "close": 105.97,
+      "ma5": 93.77,
+      "ma10": 93.72,
+      "ma5_dist_pct": 13.01,
+      "ma10_dist_pct": 13.07,
+      "main_flow_yi": 15.98,
+      "tail_behavior": "涨停封板"
+    },
+    {
+      "code": "002436",
+      "name": "兴森科技",
+      "ladder": 1,
+      "industry": "元件",
+      "market_cap_yi": 624.63,
+      "turnover_yi": 39.54,
+      "change_pct": 10.0,
+      "first_seal_time": "09:53:24",
+      "blast_count": 0,
+      "close": 36.75,
+      "ma5": 34.77,
+      "ma10": 34.8,
+      "ma5_dist_pct": 5.69,
+      "ma10_dist_pct": 5.6,
+      "main_flow_yi": 20.36,
+      "tail_behavior": "涨停封板"
+    },
+    {
+      "code": "603186",
+      "name": "华正新材",
+      "ladder": 1,
+      "industry": "元件",
+      "market_cap_yi": 291.77,
+      "turnover_yi": 37.17,
+      "change_pct": 10.0,
+      "first_seal_time": "10:15:34",
+      "blast_count": 4,
+      "close": 186.09,
+      "ma5": 177.6,
+      "ma10": 178.75,
+      "ma5_dist_pct": 4.78,
+      "ma10_dist_pct": 4.11,
+      "main_flow_yi": 17.73,
+      "tail_behavior": "涨停封板"
+    },
+    {
+      "code": "002484",
+      "name": "江海股份",
+      "ladder": 1,
+      "industry": "元件",
+      "market_cap_yi": 526.9,
+      "turnover_yi": 36.63,
+      "change_pct": 10.0,
+      "first_seal_time": "13:00:09",
+      "blast_count": 3,
+      "close": 61.95,
+      "ma5": 58.31,
+      "ma10": 59.75,
+      "ma5_dist_pct": 6.24,
+      "ma10_dist_pct": 3.68,
+      "main_flow_yi": 13.44,
+      "tail_behavior": "涨停封板"
+    },
+    {
+      "code": "603083",
+      "name": "剑桥科技",
+      "ladder": 1,
+      "industry": "通信设备",
+      "market_cap_yi": 763.05,
+      "turnover_yi": 35.45,
+      "change_pct": 10.0,
+      "first_seal_time": "09:30:01",
+      "blast_count": 1,
+      "close": null,
+      "ma5": null,
+      "ma10": null,
+      "ma5_dist_pct": null,
+      "ma10_dist_pct": null,
+      "main_flow_yi": null,
+      "tail_behavior": "涨停封板"
+    },
+    {
+      "code": "002916",
+      "name": "深南电路",
+      "ladder": 1,
+      "industry": "元件",
+      "market_cap_yi": 2486.12,
+      "turnover_yi": 33.14,
+      "change_pct": 10.0,
+      "first_seal_time": "10:14:36",
+      "blast_count": 3,
+      "close": null,
+      "ma5": null,
+      "ma10": null,
+      "ma5_dist_pct": null,
+      "ma10_dist_pct": null,
+      "main_flow_yi": null,
+      "tail_behavior": "涨停封板"
+    },
+    {
+      "code": "600330",
+      "name": "天通股份",
+      "ladder": 1,
+      "industry": "电子化学",
+      "market_cap_yi": 356.34,
+      "turnover_yi": 22.39,
+      "change_pct": 10.02,
+      "first_seal_time": "09:37:06",
+      "blast_count": 2,
+      "close": null,
+      "ma5": null,
+      "ma10": null,
+      "ma5_dist_pct": null,
+      "ma10_dist_pct": null,
+      "main_flow_yi": null,
+      "tail_behavior": "涨停封板"
+    },
+    {
+      "code": "002138",
+      "name": "顺络电子",
+      "ladder": 1,
+      "industry": "元件",
+      "market_cap_yi": 394.61,
+      "turnover_yi": 20.09,
+      "change_pct": 10.0,
+      "first_seal_time": "13:18:45",
+      "blast_count": 9,
+      "close": null,
+      "ma5": null,
+      "ma10": null,
+      "ma5_dist_pct": null,
+      "ma10_dist_pct": null,
+      "main_flow_yi": null,
+      "tail_behavior": "涨停封板"
+    }
+  ],
+  "high_ladder_stocks": [
+    {
+      "code": "605577",
+      "name": "龙版传媒",
+      "ladder": 6,
+      "first_seal_time": "09:30:47",
+      "industry": "出版"
+    },
+    {
+      "code": "600108",
+      "name": "亚盛集团",
+      "ladder": 3,
+      "first_seal_time": "09:25:02",
+      "industry": "种植业"
+    },
+    {
+      "code": "600865",
+      "name": "百大集团",
+      "ladder": 3,
+      "first_seal_time": "09:30:01",
+      "industry": "一般零售"
+    },
+    {
+      "code": "002403",
+      "name": "爱仕达",
+      "ladder": 3,
+      "first_seal_time": "10:07:54",
+      "industry": "小家电"
+    }
+  ],
+  "first_sealer": {
+    "code": "002702",
+    "name": "海欣食品",
+    "first_seal_time": "09:25:00",
+    "ladder": 2,
+    "industry": "食品加工"
+  },
+  "capital": {
+    "institutional_proxy": {
+      "large_cap_zt": [
+        {
+          "name": "沪电股份",
+          "market_cap_yi": 2360.23,
+          "turnover_yi": 96.14,
+          "ladder": 1,
+          "industry": "元件"
+        },
+        {
+          "name": "光迅科技",
+          "market_cap_yi": 1527.13,
+          "turnover_yi": 76.91,
+          "ladder": 1,
+          "industry": "通信设备"
+        },
+        {
+          "name": "景旺电子",
+          "market_cap_yi": 1061.07,
+          "turnover_yi": 52.69,
+          "ladder": 1,
+          "industry": "元件"
+        },
+        {
+          "name": "兴森科技",
+          "market_cap_yi": 624.63,
+          "turnover_yi": 39.54,
+          "ladder": 1,
+          "industry": "元件"
+        },
+        {
+          "name": "江海股份",
+          "market_cap_yi": 526.9,
+          "turnover_yi": 36.63,
+          "ladder": 1,
+          "industry": "元件"
+        },
+        {
+          "name": "剑桥科技",
+          "market_cap_yi": 763.05,
+          "turnover_yi": 35.45,
+          "ladder": 1,
+          "industry": "通信设备"
+        }
+      ]
+    },
+    "hot_money_proxy": {
+      "max_ladder": 6,
+      "high_ladder_count": 4,
+      "first_board_rate_pct": null
+    },
+    "quant_proxy": {
+      "zt_industry_spread": 240,
+      "sealed_total": 92,
+      "first_board_ratio_pct": 85.9,
+      "blast_ratio_pct": 17.1
+    },
+    "northbound_proxy": {
+      "note": "北向日频净买入未披露，以大市值涨停方向（institutional_proxy）替代"
+    },
+    "event_capital_proxy": {
+      "event_tags": {
+        "扭亏": 3,
+        "回购": 3,
+        "重组": 1
+      }
+    },
+    "note": "以上为确定性数据代理；机构/游资/量化/北向/产业资本的资金属性定性由 LLM 完成"
+  },
+  "market_leaders": {
+    "market_height": {
+      "code": "605577",
+      "name": "龙版传媒",
+      "ladder": 6,
+      "first_seal_time": "09:30:47",
+      "industry": "出版"
+    },
+    "capacity_core": {
+      "code": "002463",
+      "name": "沪电股份",
+      "ladder": 1,
+      "industry": "元件",
+      "market_cap_yi": 2360.23,
+      "turnover_yi": 96.14,
+      "change_pct": 10.0,
+      "first_seal_time": "13:31:57",
+      "blast_count": 7,
+      "close": 122.65,
+      "ma5": 117.94,
+      "ma10": 119.18,
+      "ma5_dist_pct": 3.99,
+      "ma10_dist_pct": 2.91,
+      "main_flow_yi": 32.16,
+      "tail_behavior": "涨停封板"
+    },
+    "sentiment_barometer": {
+      "code": "605577",
+      "name": "龙版传媒",
+      "ladder": 6,
+      "first_seal_time": "09:30:47",
+      "industry": "出版"
+    },
+    "index_anchor": {
+      "index": "创业板指",
+      "index_change_pct": 3.41,
+      "board": "半导体"
+    }
+  },
+  "risk_matrix": {
+    "rows": [
+      {
+        "risk": "指数风险",
+        "trigger": "沪指收盘跌破 5 日线",
+        "triggered": true,
+        "anchor": {
+          "close": 3932.7,
+          "ma5": 3945.24
+        }
+      },
+      {
+        "risk": "情绪风险",
+        "trigger": "最高板个股跌停",
+        "triggered": false,
+        "anchor": {
+          "top_stock": "龙版传媒"
+        }
+      },
+      {
+        "risk": "主线风险",
+        "trigger": "成交额最大板块收跌或主力净流出",
+        "triggered": false,
+        "anchor": {
+          "board": "半导体",
+          "change_pct": 2.54,
+          "main_flow_yi": 97.98
+        }
+      },
+      {
+        "risk": "资金风险",
+        "trigger": "两市成交跌破 20000 亿",
+        "triggered": true,
+        "anchor": {
+          "total_turnover_yi": 19460.19
+        }
+      }
+    ],
+    "note": "triggered 为当日可计算值（None=数据不足）；动作（降仓/清仓/切换/防守）由 LLM 按触发状态给出"
+  },
+  "diagnostics": [
+    {
+      "type": "index_up_lonely_top",
+      "detail": "指数普涨（均值 +1.80%）但最高 6 板仅 1 家：趋势资金做多、连板高度孤立，接力断层风险"
+    }
+  ],
+  "quantified": {
+    "leader_ma_distances": {
+      "002463": {
+        "name": "沪电股份",
+        "close": 122.65,
+        "ma5": 117.94,
+        "ma10": 119.18,
+        "ma5_dist_pct": 3.99,
+        "ma10_dist_pct": 2.91
+      },
+      "002281": {
+        "name": "光迅科技",
+        "close": 184.47,
+        "ma5": 175.96,
+        "ma10": 174.49,
+        "ma5_dist_pct": 4.84,
+        "ma10_dist_pct": 5.72
+      },
+      "603228": {
+        "name": "景旺电子",
+        "close": 105.97,
+        "ma5": 93.77,
+        "ma10": 93.72,
+        "ma5_dist_pct": 13.01,
+        "ma10_dist_pct": 13.07
+      },
+      "002436": {
+        "name": "兴森科技",
+        "close": 36.75,
+        "ma5": 34.77,
+        "ma10": 34.8,
+        "ma5_dist_pct": 5.69,
+        "ma10_dist_pct": 5.6
+      },
+      "603186": {
+        "name": "华正新材",
+        "close": 186.09,
+        "ma5": 177.6,
+        "ma10": 178.75,
+        "ma5_dist_pct": 4.78,
+        "ma10_dist_pct": 4.11
+      },
+      "002484": {
+        "name": "江海股份",
+        "close": 61.95,
+        "ma5": 58.31,
+        "ma10": 59.75,
+        "ma5_dist_pct": 6.24,
+        "ma10_dist_pct": 3.68
+      }
+    },
+    "board_flow_intensity": {
+      "半导体": 4.14,
+      "通信设备": 11.82,
+      "元件": 13.07,
+      "通用设备": 0.2,
+      "消费电子": 5.07,
+      "汽车零部件": 2.72,
+      "自动化设备": 4.41,
+      "电池": -2.15,
+      "文化传媒": -1.83,
+      "专用设备": 1.32,
+      "光学光电子": 1.51,
+      "软件开发": -4.12,
+      "IT服务": -2.88,
+      "电子化学品": 82.38,
+      "计算机设备": -2.31,
+      "电网设备": -3.07,
+      "化学制品": -0.81,
+      "银行": -5.18,
+      "化学制药": 0.51,
+      "证券": -7.93,
+      "电力": -4.61,
+      "工业金属": -3.19,
+      "建筑装饰": 0.33,
+      "小金属": 3.55,
+      "建筑材料": 1.41,
+      "贵金属": -7.27,
+      "零售": 4.55,
+      "光伏设备": 2.51,
+      "种植业与林业": -0.45,
+      "塑料制品": 0.2,
+      "其他电子": 164.32,
+      "其他电源设备": 6.97,
+      "医疗服务": -0.94,
+      "化学原料": -3.62,
+      "游戏": -1.34,
+      "医疗器械": -0.5,
+      "房地产": -3.2,
+      "农化制品": -2.19,
+      "煤炭开采加工": -2.07,
+      "农产品加工": 3.65,
+      "港口航运": 1.41,
+      "军工电子": 240.2,
+      "白色家电": -0.25,
+      "保险": -10.76,
+      "环境治理": -1.26,
+      "食品加工制造": 2.51,
+      "养殖业": -1.84,
+      "通信服务": -0.98,
+      "家居用品": -0.13,
+      "服装家纺": -0.23,
+      "影视院线": 3.61,
+      "白酒": -4.09,
+      "中药": 0.07,
+      "金属新材料": 3.56,
+      "旅游及酒店": 1.47,
+      "生物制品": -2.7,
+      "多元金融": -5.39,
+      "非金属材料": 5.02,
+      "汽车整车": 13.88,
+      "能源金属": -5.0,
+      "钢铁": -1.75,
+      "包装印刷": 0.2,
+      "工程机械": -1.74,
+      "化学纤维": -2.84,
+      "互联网电商": -1.28,
+      "物流": -2.06,
+      "风电设备": -1.12,
+      "公路铁路运输": -1.94,
+      "医药商业": -2.39,
+      "其他社会服务": 6.81,
+      "造纸": 15.97,
+      "电机": 1.82,
+      "环保设备": -9.3,
+      "美容护理": 1.21,
+      "燃气": -5.61,
+      "综合": 8.3,
+      "汽车服务及其他": 41.93,
+      "教育": -1.57,
+      "小家电": 3.33,
+      "纺织制造": -3.89,
+      "机场航运": 7.59,
+      "橡胶制品": 4.82,
+      "轨交设备": 4.91,
+      "黑色家电": -4.92,
+      "厨卫电器": -8.87,
+      "贸易": -33.81
+    }
+  },
+  "cycle_context": {
+    "days": [
+      {
+        "date": "2026-09-02",
+        "sealed": 52,
+        "max_ladder": 4,
+        "ladder": {
+          "4": 2,
+          "3": 4,
+          "2": 7,
+          "1": 39
+        },
+        "top_industries": [
+          [
+            "汽车零部",
+            5
+          ],
+          [
+            "电网设备",
+            4
+          ],
+          [
+            "服装家纺",
+            3
+          ],
+          [
+            "化学原料",
+            2
+          ],
+          [
+            "IT服务Ⅱ",
+            2
+          ]
+        ]
+      },
+      {
+        "date": "2026-09-03",
+        "sealed": 44,
+        "max_ladder": 5,
+        "ladder": {
+          "5": 1,
+          "4": 2,
+          "2": 6,
+          "1": 35
+        },
+        "top_industries": [
+          [
+            "汽车零部",
+            4
+          ],
+          [
+            "一般零售",
+            3
+          ],
+          [
+            "通用设备",
+            3
+          ],
+          [
+            "包装印刷",
+            3
+          ],
+          [
+            "IT服务Ⅱ",
+            2
+          ]
+        ]
+      },
+      {
+        "date": "2026-09-04",
+        "sealed": 39,
+        "max_ladder": 5,
+        "ladder": {
+          "5": 1,
+          "2": 6,
+          "1": 32
+        },
+        "top_industries": [
+          [
+            "饲料",
+            4
+          ],
+          [
+            "养殖业",
+            3
+          ],
+          [
+            "出版",
+            2
+          ],
+          [
+            "非白酒",
+            2
+          ],
+          [
+            "种植业",
+            2
+          ]
+        ]
+      },
+      {
+        "date": "2026-09-07",
+        "sealed": 93,
+        "max_ladder": 6,
+        "ladder": {
+          "6": 1,
+          "3": 3,
+          "2": 9,
+          "1": 80
+        },
+        "top_industries": [
+          [
+            "元件",
+            14
+          ],
+          [
+            "通信设备",
+            8
+          ],
+          [
+            "汽车零部",
+            7
+          ],
+          [
+            "一般零售",
+            6
+          ],
+          [
+            "种植业",
+            4
+          ]
+        ]
+      }
+    ],
+    "promote_chain": [
+      {
+        "from": "2026-09-02",
+        "to": "2026-09-03",
+        "rates": {
+          "1进2": {
+            "attempted": 39,
+            "sealed": 6,
+            "rate_pct": 15.4
+          },
+          "2进3": {
+            "attempted": 7,
+            "sealed": 0,
+            "rate_pct": 0.0
+          },
+          "3进4": {
+            "attempted": 4,
+            "sealed": 2,
+            "rate_pct": 50.0
+          }
+        }
+      },
+      {
+        "from": "2026-09-03",
+        "to": "2026-09-04",
+        "rates": {
+          "1进2": {
+            "attempted": 35,
+            "sealed": 6,
+            "rate_pct": 17.1
+          },
+          "2进3": {
+            "attempted": 6,
+            "sealed": 0,
+            "rate_pct": 0.0
+          },
+          "3进4": {
+            "attempted": 0,
+            "sealed": 0,
+            "rate_pct": null
+          }
+        }
+      },
+      {
+        "from": "2026-09-04",
+        "to": "2026-09-07",
+        "rates": {
+          "1进2": {
+            "attempted": 32,
+            "sealed": 9,
+            "rate_pct": 28.1
+          },
+          "2进3": {
+            "attempted": 6,
+            "sealed": 3,
+            "rate_pct": 50.0
+          },
+          "3进4": {
+            "attempted": 0,
+            "sealed": 0,
+            "rate_pct": null
+          }
+        }
+      }
+    ],
+    "leader_history": [
+      {
+        "date": "2026-09-02",
+        "max_ladder": 4,
+        "leaders": [
+          {
+            "code": "003005",
+            "name": "竞业达",
+            "first_seal": "09:25:00",
+            "industry": "IT服务Ⅱ"
+          },
+          {
+            "code": "601086",
+            "name": "国芳集团",
+            "first_seal": "09:25:00",
+            "industry": "一般零售"
+          }
+        ]
+      },
+      {
+        "date": "2026-09-03",
+        "max_ladder": 5,
+        "leaders": [
+          {
+            "code": "601086",
+            "name": "国芳集团",
+            "first_seal": "09:30:37",
+            "industry": "一般零售"
+          }
+        ]
+      },
+      {
+        "date": "2026-09-04",
+        "max_ladder": 5,
+        "leaders": [
+          {
+            "code": "605577",
+            "name": "龙版传媒",
+            "first_seal": "09:31:09",
+            "industry": "出版"
+          }
+        ]
+      },
+      {
+        "date": "2026-09-07",
+        "max_ladder": 6,
+        "leaders": [
+          {
+            "code": "605577",
+            "name": "龙版传媒",
+            "first_seal": "09:30:47",
+            "industry": "出版"
+          }
+        ]
+      }
+    ]
+  },
+  "capital_migration": {
+    "boards": [
+      {
+        "board": "半导体",
+        "today_main_flow_yi": 97.98,
+        "today_ratio_pct": 12.153838169103178,
+        "today_turnover_yi": 2365.16,
+        "momentum": "增强",
+        "flow_alignment": "合力",
+        "turnover_trend": "放量",
+        "trend": [
+          {
+            "date": "2026-09-02",
+            "change_pct": null,
+            "turnover_yi": 1818.94
+          },
+          {
+            "date": "2026-09-03",
+            "change_pct": -0.27,
+            "turnover_yi": 1710.05
+          },
+          {
+            "date": "2026-09-04",
+            "change_pct": -2.82,
+            "turnover_yi": 2156.11
+          },
+          {
+            "date": "2026-09-07",
+            "change_pct": 2.54,
+            "turnover_yi": 2365.16
+          }
+        ]
+      },
+      {
+        "board": "通信设备",
+        "today_main_flow_yi": 201.35,
+        "today_ratio_pct": 8.751507564931279,
+        "today_turnover_yi": 1703.06,
+        "momentum": "增强",
+        "flow_alignment": "合力",
+        "turnover_trend": "放量",
+        "trend": [
+          {
+            "date": "2026-09-02",
+            "change_pct": null,
+            "turnover_yi": 1300.43
+          },
+          {
+            "date": "2026-09-03",
+            "change_pct": -0.59,
+            "turnover_yi": 1177.45
+          },
+          {
+            "date": "2026-09-04",
+            "change_pct": -1.64,
+            "turnover_yi": 1312.14
+          },
+          {
+            "date": "2026-09-07",
+            "change_pct": 3.77,
+            "turnover_yi": 1703.06
+          }
+        ]
+      },
+      {
+        "board": "元件",
+        "today_main_flow_yi": 156.9,
+        "today_ratio_pct": 6.168696194641472,
+        "today_turnover_yi": 1200.44,
+        "momentum": "增强",
+        "flow_alignment": "合力",
+        "turnover_trend": "放量",
+        "trend": [
+          {
+            "date": "2026-09-02",
+            "change_pct": null,
+            "turnover_yi": 771.96
+          },
+          {
+            "date": "2026-09-03",
+            "change_pct": 0.89,
+            "turnover_yi": 797.82
+          },
+          {
+            "date": "2026-09-04",
+            "change_pct": -2.73,
+            "turnover_yi": 946.43
+          },
+          {
+            "date": "2026-09-07",
+            "change_pct": 6.83,
+            "turnover_yi": 1200.44
+          }
+        ]
+      },
+      {
+        "board": "通用设备",
+        "today_main_flow_yi": 1.22,
+        "today_ratio_pct": 3.1634840153153694,
+        "today_turnover_yi": 615.62,
+        "momentum": "增强",
+        "flow_alignment": "合力",
+        "turnover_trend": "缩量",
+        "trend": [
+          {
+            "date": "2026-09-02",
+            "change_pct": null,
+            "turnover_yi": 594.63
+          },
+          {
+            "date": "2026-09-03",
+            "change_pct": 0.44,
+            "turnover_yi": 677.51
+          },
+          {
+            "date": "2026-09-04",
+            "change_pct": -1.36,
+            "turnover_yi": 711.41
+          },
+          {
+            "date": "2026-09-07",
+            "change_pct": 1.25,
+            "turnover_yi": 615.62
+          }
+        ]
+      },
+      {
+        "board": "消费电子",
+        "today_main_flow_yi": 27.74,
+        "today_ratio_pct": 2.8093250888095134,
+        "today_turnover_yi": 546.7,
+        "momentum": "增强",
+        "flow_alignment": "合力",
+        "turnover_trend": "平量",
+        "trend": [
+          {
+            "date": "2026-09-02",
+            "change_pct": null,
+            "turnover_yi": 468.12
+          },
+          {
+            "date": "2026-09-03",
+            "change_pct": -0.14,
+            "turnover_yi": 525.74
+          },
+          {
+            "date": "2026-09-04",
+            "change_pct": -2.06,
+            "turnover_yi": 555.55
+          },
+          {
+            "date": "2026-09-07",
+            "change_pct": 1.61,
+            "turnover_yi": 546.7
+          }
+        ]
+      },
+      {
+        "board": "汽车零部件",
+        "today_main_flow_yi": 14.85,
+        "today_ratio_pct": 2.8016170448489977,
+        "today_turnover_yi": 545.2,
+        "momentum": "增强",
+        "flow_alignment": "合力",
+        "turnover_trend": "缩量",
+        "trend": [
+          {
+            "date": "2026-09-02",
+            "change_pct": null,
+            "turnover_yi": 456.38
+          },
+          {
+            "date": "2026-09-03",
+            "change_pct": -0.1,
+            "turnover_yi": 501.15
+          },
+          {
+            "date": "2026-09-04",
+            "change_pct": -1.01,
+            "turnover_yi": 591.42
+          },
+          {
+            "date": "2026-09-07",
+            "change_pct": 1.0,
+            "turnover_yi": 545.2
+          }
+        ]
+      },
+      {
+        "board": "自动化设备",
+        "today_main_flow_yi": 21.61,
+        "today_ratio_pct": 2.518834605417522,
+        "today_turnover_yi": 490.17,
+        "momentum": "增强",
+        "flow_alignment": "合力",
+        "turnover_trend": "放量",
+        "trend": [
+          {
+            "date": "2026-09-02",
+            "change_pct": null,
+            "turnover_yi": 350.04
+          },
+          {
+            "date": "2026-09-03",
+            "change_pct": 0.75,
+            "turnover_yi": 350.04
+          },
+          {
+            "date": "2026-09-04",
+            "change_pct": -1.84,
+            "turnover_yi": 408.79
+          },
+          {
+            "date": "2026-09-07",
+            "change_pct": 3.04,
+            "turnover_yi": 490.17
+          }
+        ]
+      },
+      {
+        "board": "电池",
+        "today_main_flow_yi": -9.96,
+        "today_ratio_pct": 2.3774176922219157,
+        "today_turnover_yi": 462.65,
+        "momentum": "增强",
+        "flow_alignment": "兑现背离",
+        "turnover_trend": "平量",
+        "trend": [
+          {
+            "date": "2026-09-02",
+            "change_pct": null,
+            "turnover_yi": 456.03
+          },
+          {
+            "date": "2026-09-03",
+            "change_pct": -0.11,
+            "turnover_yi": 400.65
+          },
+          {
+            "date": "2026-09-04",
+            "change_pct": -1.32,
+            "turnover_yi": 447.11
+          },
+          {
+            "date": "2026-09-07",
+            "change_pct": 0.61,
+            "turnover_yi": 462.65
+          }
+        ]
+      }
+    ],
+    "industry_trend": [
+      {
+        "date": "2026-09-02",
+        "top_industries": [
+          [
+            "汽车零部",
+            5
+          ],
+          [
+            "电网设备",
+            4
+          ],
+          [
+            "服装家纺",
+            3
+          ],
+          [
+            "化学原料",
+            2
+          ],
+          [
+            "IT服务Ⅱ",
+            2
+          ]
+        ]
+      },
+      {
+        "date": "2026-09-03",
+        "top_industries": [
+          [
+            "汽车零部",
+            4
+          ],
+          [
+            "一般零售",
+            3
+          ],
+          [
+            "通用设备",
+            3
+          ],
+          [
+            "包装印刷",
+            3
+          ],
+          [
+            "IT服务Ⅱ",
+            2
+          ]
+        ]
+      },
+      {
+        "date": "2026-09-04",
+        "top_industries": [
+          [
+            "饲料",
+            4
+          ],
+          [
+            "养殖业",
+            3
+          ],
+          [
+            "出版",
+            2
+          ],
+          [
+            "非白酒",
+            2
+          ],
+          [
+            "种植业",
+            2
+          ]
+        ]
+      },
+      {
+        "date": "2026-09-07",
+        "top_industries": [
+          [
+            "元件",
+            14
+          ],
+          [
+            "通信设备",
+            8
+          ],
+          [
+            "汽车零部",
+            7
+          ],
+          [
+            "一般零售",
+            6
+          ],
+          [
+            "种植业",
+            4
+          ]
+        ]
+      }
+    ],
+    "migration_events": [
+      {
+        "type": "持续承接",
+        "board": "半导体",
+        "detail": "半导体 动能增强且主力净流入 98.0 亿：趋势资金持续加仓方向"
+      },
+      {
+        "type": "持续承接",
+        "board": "通信设备",
+        "detail": "通信设备 动能增强且主力净流入 201.3 亿：趋势资金持续加仓方向"
+      },
+      {
+        "type": "持续承接",
+        "board": "元件",
+        "detail": "元件 动能增强且主力净流入 156.9 亿：趋势资金持续加仓方向"
+      },
+      {
+        "type": "持续承接",
+        "board": "通用设备",
+        "detail": "通用设备 动能增强且主力净流入 1.2 亿：趋势资金持续加仓方向"
+      },
+      {
+        "type": "持续承接",
+        "board": "消费电子",
+        "detail": "消费电子 动能增强且主力净流入 27.7 亿：趋势资金持续加仓方向"
+      },
+      {
+        "type": "持续承接",
+        "board": "汽车零部件",
+        "detail": "汽车零部件 动能增强且主力净流入 14.8 亿：趋势资金持续加仓方向"
+      },
+      {
+        "type": "持续承接",
+        "board": "自动化设备",
+        "detail": "自动化设备 动能增强且主力净流入 21.6 亿：趋势资金持续加仓方向"
+      },
+      {
+        "type": "兑现背离",
+        "board": "电池",
+        "detail": "电池 涨 0.61% 但主力净流出 10.0 亿：价涨资金撤，属高位兑现而非增量做多"
+      },
+      {
+        "type": "高低切",
+        "from": "半导体",
+        "to": "通信设备",
+        "detail": "前一日领涨的 半导体 动能转向，资金流向 通信设备（主力 201.3 亿）：同一大方向内部的高低切"
+      },
+      {
+        "type": "行业集中度迁移",
+        "from": "汽车零部",
+        "to": "饲料",
+        "detail": "涨停集中行业由 汽车零部（09-03）迁移至 饲料（09-04）"
+      },
+      {
+        "type": "行业集中度迁移",
+        "from": "饲料",
+        "to": "元件",
+        "detail": "涨停集中行业由 饲料（09-04）迁移至 元件（09-07）"
+      }
+    ]
+  },
+  "capital_forecast": {
+    "boards": [
+      {
+        "board": "元件",
+        "score": 75.0,
+        "direction": "大概率流入",
+        "signals": [
+          {
+            "factor": "主力强流入",
+            "impact": 20,
+            "detail": "主力净流入 156.9 亿（>50 亿）"
+          },
+          {
+            "factor": "动能增强",
+            "impact": 10,
+            "detail": "3 日涨跌幅趋势增强"
+          },
+          {
+            "factor": "一致性：合力",
+            "impact": 15,
+            "detail": "合力"
+          },
+          {
+            "factor": "放量",
+            "impact": 5,
+            "detail": "放量上涨"
+          },
+          {
+            "factor": "集中度迁移",
+            "impact": 10,
+            "detail": "涨停集中行业今日包含该板块"
+          },
+          {
+            "factor": "相对强度",
+            "impact": 15,
+            "detail": "涨幅 6.83% vs 板块均值 2.58%"
+          }
+        ]
+      },
+      {
+        "board": "通信设备",
+        "score": 66.0,
+        "direction": "大概率流入",
+        "signals": [
+          {
+            "factor": "主力强流入",
+            "impact": 20,
+            "detail": "主力净流入 201.3 亿（>50 亿）"
+          },
+          {
+            "factor": "动能增强",
+            "impact": 10,
+            "detail": "3 日涨跌幅趋势增强"
+          },
+          {
+            "factor": "一致性：合力",
+            "impact": 15,
+            "detail": "合力"
+          },
+          {
+            "factor": "放量",
+            "impact": 5,
+            "detail": "放量上涨"
+          },
+          {
+            "factor": "集中度迁移",
+            "impact": 10,
+            "detail": "涨停集中行业今日包含该板块"
+          },
+          {
+            "factor": "相对强度",
+            "impact": 6,
+            "detail": "涨幅 3.77% vs 板块均值 2.58%"
+          }
+        ]
+      },
+      {
+        "board": "半导体",
+        "score": 50.0,
+        "direction": "大概率流入",
+        "signals": [
+          {
+            "factor": "主力强流入",
+            "impact": 20,
+            "detail": "主力净流入 98.0 亿（>50 亿）"
+          },
+          {
+            "factor": "动能增强",
+            "impact": 10,
+            "detail": "3 日涨跌幅趋势增强"
+          },
+          {
+            "factor": "一致性：合力",
+            "impact": 15,
+            "detail": "合力"
+          },
+          {
+            "factor": "放量",
+            "impact": 5,
+            "detail": "放量上涨"
+          }
+        ]
+      },
+      {
+        "board": "自动化设备",
+        "score": 42.0,
+        "direction": "大概率流入",
+        "signals": [
+          {
+            "factor": "主力流入",
+            "impact": 10,
+            "detail": "主力净流入 21.6 亿"
+          },
+          {
+            "factor": "动能增强",
+            "impact": 10,
+            "detail": "3 日涨跌幅趋势增强"
+          },
+          {
+            "factor": "一致性：合力",
+            "impact": 15,
+            "detail": "合力"
+          },
+          {
+            "factor": "放量",
+            "impact": 5,
+            "detail": "放量上涨"
+          }
+        ]
+      },
+      {
+        "board": "汽车零部件",
+        "score": 32.0,
+        "direction": "大概率流入",
+        "signals": [
+          {
+            "factor": "主力流入",
+            "impact": 10,
+            "detail": "主力净流入 14.8 亿"
+          },
+          {
+            "factor": "动能增强",
+            "impact": 10,
+            "detail": "3 日涨跌幅趋势增强"
+          },
+          {
+            "factor": "一致性：合力",
+            "impact": 15,
+            "detail": "合力"
+          },
+          {
+            "factor": "缩量",
+            "impact": -5,
+            "detail": "缩量"
+          },
+          {
+            "factor": "集中度迁移",
+            "impact": 10,
+            "detail": "涨停集中行业今日包含该板块"
+          },
+          {
+            "factor": "相对强度",
+            "impact": -8,
+            "detail": "涨幅 1.00% vs 板块均值 2.58%"
+          }
+        ]
+      },
+      {
+        "board": "消费电子",
+        "score": 30.0,
+        "direction": "大概率流入",
+        "signals": [
+          {
+            "factor": "主力流入",
+            "impact": 10,
+            "detail": "主力净流入 27.7 亿"
+          },
+          {
+            "factor": "动能增强",
+            "impact": 10,
+            "detail": "3 日涨跌幅趋势增强"
+          },
+          {
+            "factor": "一致性：合力",
+            "impact": 15,
+            "detail": "合力"
+          },
+          {
+            "factor": "相对强度",
+            "impact": -5,
+            "detail": "涨幅 1.61% vs 板块均值 2.58%"
+          }
+        ]
+      },
+      {
+        "board": "通用设备",
+        "score": 23.0,
+        "direction": "倾向流入",
+        "signals": [
+          {
+            "factor": "主力流入",
+            "impact": 10,
+            "detail": "主力净流入 1.2 亿"
+          },
+          {
+            "factor": "动能增强",
+            "impact": 10,
+            "detail": "3 日涨跌幅趋势增强"
+          },
+          {
+            "factor": "一致性：合力",
+            "impact": 15,
+            "detail": "合力"
+          },
+          {
+            "factor": "缩量",
+            "impact": -5,
+            "detail": "缩量"
+          },
+          {
+            "factor": "相对强度",
+            "impact": -7,
+            "detail": "涨幅 1.25% vs 板块均值 2.58%"
+          }
+        ]
+      },
+      {
+        "board": "电池",
+        "score": -30.0,
+        "direction": "倾向流出",
+        "signals": [
+          {
+            "factor": "主力流出",
+            "impact": -10,
+            "detail": "主力净流出 10.0 亿"
+          },
+          {
+            "factor": "动能增强",
+            "impact": 10,
+            "detail": "3 日涨跌幅趋势增强"
+          },
+          {
+            "factor": "一致性：兑现背离",
+            "impact": -20,
+            "detail": "兑现背离"
+          },
+          {
+            "factor": "相对强度",
+            "impact": -10,
+            "detail": "涨幅 0.61% vs 板块均值 2.58%"
+          }
+        ]
+      }
+    ],
+    "inflow_leaders": [
+      {
+        "board": "元件",
+        "score": 75.0,
+        "direction": "大概率流入",
+        "signals": [
+          {
+            "factor": "主力强流入",
+            "impact": 20,
+            "detail": "主力净流入 156.9 亿（>50 亿）"
+          },
+          {
+            "factor": "动能增强",
+            "impact": 10,
+            "detail": "3 日涨跌幅趋势增强"
+          },
+          {
+            "factor": "一致性：合力",
+            "impact": 15,
+            "detail": "合力"
+          },
+          {
+            "factor": "放量",
+            "impact": 5,
+            "detail": "放量上涨"
+          },
+          {
+            "factor": "集中度迁移",
+            "impact": 10,
+            "detail": "涨停集中行业今日包含该板块"
+          },
+          {
+            "factor": "相对强度",
+            "impact": 15,
+            "detail": "涨幅 6.83% vs 板块均值 2.58%"
+          }
+        ]
+      },
+      {
+        "board": "通信设备",
+        "score": 66.0,
+        "direction": "大概率流入",
+        "signals": [
+          {
+            "factor": "主力强流入",
+            "impact": 20,
+            "detail": "主力净流入 201.3 亿（>50 亿）"
+          },
+          {
+            "factor": "动能增强",
+            "impact": 10,
+            "detail": "3 日涨跌幅趋势增强"
+          },
+          {
+            "factor": "一致性：合力",
+            "impact": 15,
+            "detail": "合力"
+          },
+          {
+            "factor": "放量",
+            "impact": 5,
+            "detail": "放量上涨"
+          },
+          {
+            "factor": "集中度迁移",
+            "impact": 10,
+            "detail": "涨停集中行业今日包含该板块"
+          },
+          {
+            "factor": "相对强度",
+            "impact": 6,
+            "detail": "涨幅 3.77% vs 板块均值 2.58%"
+          }
+        ]
+      },
+      {
+        "board": "半导体",
+        "score": 50.0,
+        "direction": "大概率流入",
+        "signals": [
+          {
+            "factor": "主力强流入",
+            "impact": 20,
+            "detail": "主力净流入 98.0 亿（>50 亿）"
+          },
+          {
+            "factor": "动能增强",
+            "impact": 10,
+            "detail": "3 日涨跌幅趋势增强"
+          },
+          {
+            "factor": "一致性：合力",
+            "impact": 15,
+            "detail": "合力"
+          },
+          {
+            "factor": "放量",
+            "impact": 5,
+            "detail": "放量上涨"
+          }
+        ]
+      }
+    ],
+    "outflow_leaders": [
+      {
+        "board": "电池",
+        "score": -30.0,
+        "direction": "倾向流出",
+        "signals": [
+          {
+            "factor": "主力流出",
+            "impact": -10,
+            "detail": "主力净流出 10.0 亿"
+          },
+          {
+            "factor": "动能增强",
+            "impact": 10,
+            "detail": "3 日涨跌幅趋势增强"
+          },
+          {
+            "factor": "一致性：兑现背离",
+            "impact": -20,
+            "detail": "兑现背离"
+          },
+          {
+            "factor": "相对强度",
+            "impact": -10,
+            "detail": "涨幅 0.61% vs 板块均值 2.58%"
+          }
+        ]
+      }
+    ],
+    "note": "规则打分模型（权重见 config.FORECAST_WEIGHTS），信号链即预测依据；次日可用实际主力净流入回测（预测流入且次日流入为正=命中）。主力占成交 >30% 的异常板块已排除，不参与预测。"
+  },
+  "leader_rivalry": {
+    "height_rivals": {
+      "6": [
+        {
+          "code": "605577",
+          "name": "龙版传媒",
+          "first_seal": "09:30:47",
+          "blast_count": 0,
+          "industry": "出版"
+        }
+      ],
+      "3": [
+        {
+          "code": "600108",
+          "name": "亚盛集团",
+          "first_seal": "09:25:02",
+          "blast_count": 0,
+          "industry": "种植业"
+        },
+        {
+          "code": "600865",
+          "name": "百大集团",
+          "first_seal": "09:30:01",
+          "blast_count": 0,
+          "industry": "一般零售"
+        },
+        {
+          "code": "002403",
+          "name": "爱仕达",
+          "first_seal": "10:07:54",
+          "blast_count": 0,
+          "industry": "小家电"
+        }
+      ]
+    },
+    "yesterday_leaders_fate": [
+      {
+        "date": "2026-09-04",
+        "name": "龙版传媒",
+        "yesterday_ladder": 5,
+        "today_ladder": 6,
+        "status": "晋级"
+      },
+      {
+        "date": "2026-09-03",
+        "name": "国芳集团",
+        "yesterday_ladder": 5,
+        "today_ladder": 1,
+        "status": "维持"
+      },
+      {
+        "date": "2026-09-03",
+        "name": "龙版传媒",
+        "yesterday_ladder": 4,
+        "today_ladder": 6,
+        "status": "维持"
+      },
+      {
+        "date": "2026-09-03",
+        "name": "集泰股份",
+        "yesterday_ladder": 4,
+        "today_ladder": 1,
+        "status": "维持"
+      },
+      {
+        "date": "2026-09-02",
+        "name": "竞业达",
+        "yesterday_ladder": 4,
+        "today_ladder": 0,
+        "status": "断板"
+      },
+      {
+        "date": "2026-09-02",
+        "name": "国芳集团",
+        "yesterday_ladder": 4,
+        "today_ladder": 1,
+        "status": "维持"
+      },
+      {
+        "date": "2026-09-02",
+        "name": "龙版传媒",
+        "yesterday_ladder": 3,
+        "today_ladder": 6,
+        "status": "维持"
+      },
+      {
+        "date": "2026-09-02",
+        "name": "集泰股份",
+        "yesterday_ladder": 3,
+        "today_ladder": 1,
+        "status": "维持"
+      },
+      {
+        "date": "2026-09-02",
+        "name": "欢瑞世纪",
+        "yesterday_ladder": 3,
+        "today_ladder": 0,
+        "status": "断板"
+      },
+      {
+        "date": "2026-09-02",
+        "name": "大晟文化",
+        "yesterday_ladder": 3,
+        "today_ladder": 0,
+        "status": "断板"
+      },
+      {
+        "date": "2026-09-02",
+        "name": "香溢融通",
+        "yesterday_ladder": 2,
+        "today_ladder": 0,
+        "status": "断板"
+      },
+      {
+        "date": "2026-09-03",
+        "name": "金帝股份",
+        "yesterday_ladder": 2,
+        "today_ladder": 0,
+        "status": "断板"
+      },
+      {
+        "date": "2026-09-02",
+        "name": "茂业商业",
+        "yesterday_ladder": 2,
+        "today_ladder": 0,
+        "status": "断板"
+      },
+      {
+        "date": "2026-09-02",
+        "name": "英 力 特",
+        "yesterday_ladder": 2,
+        "today_ladder": 0,
+        "status": "断板"
+      },
+      {
+        "date": "2026-09-04",
+        "name": "百大集团",
+        "yesterday_ladder": 2,
+        "today_ladder": 3,
+        "status": "晋级"
+      },
+      {
+        "date": "2026-09-04",
+        "name": "爱仕达",
+        "yesterday_ladder": 2,
+        "today_ladder": 3,
+        "status": "晋级"
+      },
+      {
+        "date": "2026-09-04",
+        "name": "海通发展",
+        "yesterday_ladder": 2,
+        "today_ladder": 0,
+        "status": "断板"
+      },
+      {
+        "date": "2026-09-04",
+        "name": "新炬网络",
+        "yesterday_ladder": 2,
+        "today_ladder": 0,
+        "status": "断板"
+      },
+      {
+        "date": "2026-09-04",
+        "name": "恒盛能源",
+        "yesterday_ladder": 2,
+        "today_ladder": 0,
+        "status": "断板"
+      },
+      {
+        "date": "2026-09-02",
+        "name": "恒宝股份",
+        "yesterday_ladder": 2,
+        "today_ladder": 0,
+        "status": "断板"
+      },
+      {
+        "date": "2026-09-02",
+        "name": "小方制药",
+        "yesterday_ladder": 2,
+        "today_ladder": 0,
+        "status": "断板"
+      },
+      {
+        "date": "2026-09-03",
+        "name": "太阳电缆",
+        "yesterday_ladder": 2,
+        "today_ladder": 0,
+        "status": "断板"
+      },
+      {
+        "date": "2026-09-03",
+        "name": "博云新材",
+        "yesterday_ladder": 2,
+        "today_ladder": 0,
+        "status": "断板"
+      },
+      {
+        "date": "2026-09-02",
+        "name": "内蒙一机",
+        "yesterday_ladder": 2,
+        "today_ladder": 0,
+        "status": "断板"
+      },
+      {
+        "date": "2026-09-03",
+        "name": "光洋股份",
+        "yesterday_ladder": 2,
+        "today_ladder": 1,
+        "status": "维持"
+      },
+      {
+        "date": "2026-09-03",
+        "name": "信达地产",
+        "yesterday_ladder": 2,
+        "today_ladder": 0,
+        "status": "断板"
+      },
+      {
+        "date": "2026-09-04",
+        "name": "亚盛集团",
+        "yesterday_ladder": 2,
+        "today_ladder": 3,
+        "status": "晋级"
+      },
+      {
+        "date": "2026-09-03",
+        "name": "云南旅游",
+        "yesterday_ladder": 2,
+        "today_ladder": 0,
+        "status": "断板"
+      },
+      {
+        "date": "2026-09-02",
+        "name": "九牧王",
+        "yesterday_ladder": 2,
+        "today_ladder": 0,
+        "status": "断板"
+      }
+    ]
+  }
+}

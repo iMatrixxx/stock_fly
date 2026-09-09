@@ -1,0 +1,37 @@
+{
+  "trade_date": "2026-09-08",
+  "source": "复盘报告_2026-09-08.md 的 ## 次日预测卡 区块",
+  "generated_at": "2026-09-08T23:12:39",
+  "parse_ok": true,
+  "warnings": [],
+  "cards": [
+    {
+      "id": "fc1",
+      "hypothesis": "农业防御主线延续：若种植/粮食承接有效，4板旗手亚盛集团次日晋级 5 板",
+      "subject": "stock:600108:ladder",
+      "op": "ge",
+      "target": 5
+    },
+    {
+      "id": "fc2",
+      "hypothesis": "高度淘汰赛：小家电 4 板无集群支撑且盘中炸板，爱仕达次日晋级失败（断板或低于 5 板）",
+      "subject": "stock:002403:ladder",
+      "op": "le",
+      "target": 4
+    },
+    {
+      "id": "fc3",
+      "hypothesis": "退潮延续：1进2 晋级率 15.2% 低迷、炸板占比 33.9%，次日涨停家数由 72 家继续收缩",
+      "subject": "emotion.sealed_total",
+      "op": "le",
+      "target": 64
+    },
+    {
+      "id": "fc4",
+      "hypothesis": "科技残温：若 PCB/存储链隔夜情绪修复，龙虎榜净买居首的中京电子（2 板）次日晋级 3 板",
+      "subject": "stock:002579:ladder",
+      "op": "ge",
+      "target": 3
+    }
+  ]
+}
