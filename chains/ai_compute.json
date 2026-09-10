@@ -1,0 +1,81 @@
+{
+  "chain_id": "ai_compute",
+  "name": "AI 算力",
+  "version": "0.1",
+  "updated": "2026-09-10",
+  "note": "P0 静态产业链图谱（人工维护）：nodes 定义上下游关系，供 L2 事件沿链传导；stocks 为 A股映射（必须含 code 与 purity，否则无法与盘面做程序化验证）；signal_aliases 把涨停原因标签/事件文本归位到节点。图谱只描述结构与映射，不含任何买卖判断。",
+  "nodes": [
+    {
+      "id": "gpu_chip",
+      "name": "算力芯片",
+      "stage": "upstream",
+      "upstream": [],
+      "downstream": ["storage", "packaging"],
+      "note": "GPU/ASIC，国产算力卡位，事件敏感度最高"
+    },
+    {
+      "id": "storage",
+      "name": "存储/HBM",
+      "stage": "upstream",
+      "upstream": ["gpu_chip"],
+      "downstream": ["packaging"],
+      "note": "HBM/DRAM/内存接口与存储材料，涨价信号直接受益"
+    },
+    {
+      "id": "packaging",
+      "name": "先进封装",
+      "stage": "midstream",
+      "upstream": ["storage"],
+      "downstream": ["pcb", "optical"],
+      "note": "CoWoS/Chiplet 封测产能，算力供给瓶颈环节"
+    },
+    {
+      "id": "pcb",
+      "name": "载板/PCB/CCL",
+      "stage": "midstream",
+      "upstream": ["packaging"],
+      "downstream": [],
+      "note": "高多层板/HDI/覆铜板，算力板主力"
+    },
+    {
+      "id": "optical",
+      "name": "光互连",
+      "stage": "midstream",
+      "upstream": ["packaging"],
+      "downstream": [],
+      "note": "光模块/光芯片/CPO，受算力总量驱动"
+    }
+  ],
+  "stocks": [
+    {"node": "gpu_chip", "code": "688256", "name": "寒武纪", "purity": "core", "note": "国产 AI 芯片龙头"},
+    {"node": "gpu_chip", "code": "688041", "name": "海光信息", "purity": "core", "note": "国产 CPU/DCU"},
+    {"node": "storage", "code": "300475", "name": "香农芯创", "purity": "swing", "note": "HBM/存储分销"},
+    {"node": "storage", "code": "603986", "name": "兆易创新", "purity": "core", "note": "NOR/DRAM 存储设计"},
+    {"node": "storage", "code": "002409", "name": "雅克科技", "purity": "edge", "note": "存储前驱体材料"},
+    {"node": "storage", "code": "000620", "name": "盈新发展", "purity": "swing", "note": "存储芯片/封测；09-08 涨停，回放补充，code 以当日 evidence 为准"},
+    {"node": "packaging", "code": "002156", "name": "通富微电", "purity": "core", "note": "先进封装/Chiplet"},
+    {"node": "packaging", "code": "600584", "name": "长电科技", "purity": "core", "note": "封测龙头"},
+    {"node": "pcb", "code": "002463", "name": "沪电股份", "purity": "core", "note": "高多层板/算力板"},
+    {"node": "pcb", "code": "002916", "name": "深南电路", "purity": "core", "note": "PCB + 封装基板"},
+    {"node": "pcb", "code": "603228", "name": "景旺电子", "purity": "core", "note": "PCB"},
+    {"node": "pcb", "code": "600183", "name": "生益科技", "purity": "core", "note": "覆铜板 CCL"},
+    {"node": "pcb", "code": "002579", "name": "中京电子", "purity": "swing", "note": "PCB/HDI；09-08 龙虎榜净买 3.54 亿，回放补充"},
+    {"node": "optical", "code": "300308", "name": "中际旭创", "purity": "core", "note": "光模块龙头"},
+    {"node": "optical", "code": "300502", "name": "新易盛", "purity": "core", "note": "光模块"},
+    {"node": "optical", "code": "300394", "name": "天孚通信", "purity": "core", "note": "光器件"},
+    {"node": "optical", "code": "688498", "name": "源杰科技", "purity": "swing", "note": "光芯片"},
+    {"node": "optical", "code": "603083", "name": "剑桥科技", "purity": "swing", "note": "光模块"}
+  ],
+  "signal_aliases": [
+    {"node": "pcb", "keywords": ["PCB", "覆铜板", "CCL", "线路板", "HDI", "高多层", "载板"]},
+    {"node": "optical", "keywords": ["光模块", "CPO", "光通信", "光芯片", "硅光", "光器件", "800G", "1.6T", "NPO", "光互连"]},
+    {"node": "storage", "keywords": ["存储", "HBM", "DRAM", "闪存", "内存接口", "存储芯片", "固态硬盘"]},
+    {"node": "packaging", "keywords": ["先进封装", "Chiplet", "封测", "CoWoS", "封装基板"]},
+    {"node": "gpu_chip", "keywords": ["算力芯片", "GPU", "ASIC", "国产芯片", "AI芯片", "DCU"]}
+  ],
+  "pending_nodes": [
+    {"id": "cooling_power", "name": "液冷/服务器电源", "note": "09-07 涨停池出现多只液冷/电源标的（盾安环境/集泰股份/江南新材/中远通等），当日为资金战场之一；节点未建前不纳入映射，相关标签也不参与反例判定"},
+    {"id": "copper_connect", "name": "铜连接/高速铜缆", "note": "待 L1 事件出现后按同一 schema 增量建链"}
+  ],
+  "alias_note": "别名刻意不含『算力/服务器/液冷』等泛词：实测这些词会把蹭概念股（算力租赁、液冷硅油、家电复材等）大量误判为链内标的。别名只收硬件环节专有词；泛概念与待补链环节留给人工判断。"
+}
