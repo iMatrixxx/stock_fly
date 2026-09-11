@@ -315,3 +315,87 @@ def check_coverage(report_md: str, evidence: dict) -> dict:
             "notes": notes,
         },
     }
+
+
+# ---------------------------------------------------------------------------
+# 校验门禁（gate）—— 全链 ⑧ 用：两路校验跑完给出"能否放行"的确定性结论。
+# 数字核对查"编造"，覆盖检查查"漏写"；任一有待处理项 → 不放行（除非人工 --skip-verify）。
+# ---------------------------------------------------------------------------
+
+
+def verify_bundle(report_md: str, evidence: dict, coverage: bool = True) -> dict:
+    """一次跑完两路校验，返回结构化结果 + 放行判定。
+
+    {
+      "numbers": verify_report_numbers(...),
+      "coverage": check_coverage(...) 或 None,
+      "total": 报告数字总数,
+      "ok": bool,                  # True = 两路均无待处理项，可进 PDF/邮件
+      "blocking": [人类可读的阻断原因...],
+    }
+    """
+    numbers = verify_report_numbers(report_md, evidence)
+    out: dict = {
+        "numbers": numbers,
+        "coverage": None,
+        "total": numbers.get("total", 0),
+        "ok": True,
+        "blocking": [],
+    }
+    suspects = numbers.get("suspects") or []
+    if suspects:
+        head = "、".join(suspects[:10]) + ("…" if len(suspects) > 10 else "")
+        out["blocking"].append(
+            f"证据链外可疑数字 {len(suspects)} 个（{head}）"
+            "——核对后改正，或在数字后就近标注（计划参数）"
+        )
+
+    if coverage:
+        cov = check_coverage(report_md, evidence)
+        out["coverage"] = cov
+        s = cov["summary"]
+        if not s["ok"]:
+            parts: list[str] = []
+            if s["missing_names"]:
+                parts.append(f"缺失必答名字 {len(s['missing_names'])} 个"
+                             f"（{'、'.join(s['missing_names'][:6])}）")
+            if s["unreplied_diagnostics"]:
+                parts.append(f"未回应诊断 {len(s['unreplied_diagnostics'])} 条"
+                             f"（{'、'.join(s['unreplied_diagnostics'][:4])}）")
+            if s["unmapped_risks"]:
+                parts.append(f"触发风险未给防守动作 {len(s['unmapped_risks'])} 条"
+                             f"（{'、'.join(s['unmapped_risks'][:4])}）")
+            if s["gap_violations"]:
+                parts.append(f"缺口主题提及但未标缺失 {len(s['gap_violations'])} 个"
+                             f"（{'、'.join(s['gap_violations'][:4])}）")
+            out["blocking"].append("覆盖检查未通过 —— " + "；".join(parts))
+
+    out["ok"] = not out["blocking"]
+    return out
+
+
+def format_gate_report(bundle: dict) -> str:
+    """把 verify_bundle 结果渲染成给人看的校验小结（⑧ 门禁打印用）。"""
+    lines = [f"校验：报告数字 {bundle['total']} 个"]
+    suspects = (bundle.get("numbers") or {}).get("suspects") or []
+    lines.append(
+        f"  数字核对：{'未发现证据链外数字 ✅' if not suspects else f'可疑 {len(suspects)} 个 ⚠️'}"
+    )
+    for s in suspects:
+        lines.append(f"    - {s}")
+    cov = bundle.get("coverage")
+    if cov is not None:
+        cs = cov["summary"]
+        lines.append(f"  覆盖检查：{'通过 ✅' if cs['ok'] else '未通过 ⚠️'}")
+        for key, label in (
+            ("missing_names", "缺失必答名字"),
+            ("unreplied_diagnostics", "未回应诊断"),
+            ("unmapped_risks", "触发风险未给防守动作"),
+            ("gap_violations", "缺口未标缺失"),
+        ):
+            if cs[key]:
+                lines.append(f"    - {label}: {'、'.join(cs[key])}")
+        for n in cs["notes"]:
+            lines.append(f"    · {n}")
+    return "\n".join(lines)
+

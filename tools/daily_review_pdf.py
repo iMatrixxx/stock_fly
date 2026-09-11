@@ -1,23 +1,28 @@
 #!/usr/bin/env python3
 """生成前一交易日 A 股复盘报告并发送 PDF 邮件。
 
-流程（2026-09-04 起，大班客已退役）：
+流程（2026-09-04 起大班客退役；2026-09-11 起接入日历校正与 ⑧ 门禁）：
+  0. 交易日历：缓存过期则联网刷新；默认复盘日走统一交易日历（非"只跳周末"）
   1. 确定复盘日期（默认前一交易日；--date 可覆盖）
   2. fetch_market_snapshot.py（fuyao API）抓指定交易日大盘快照 → pools
+     非交易日（rc=3）自动按日历逐日回退重试，长假后不会跑错日子
   3. build_dabanke_from_fuyao.py 桥接 pools → 涨停池 JSON（失败则东财池回退）
   4. harness 联网补行情 → 证据链 + prompt（先清当日同花顺年线缓存防旧行）
   5. 同花顺缺行时用腾讯行情补两市成交/沪深300
-  5.5 M2 预测卡判卷：判上一交易日冻结的预测卡（hit/miss/na → scorecard.jsonl）
-  5.6 M2 预测卡冻结：报告末尾如含 `## 次日预测卡` fenced json → forecast_<date>.json
-  6. 报告正文：优先复用已生成的 复盘报告_<date>.md；否则需配置
+  5.5 M2 判卷：**补判**所有未计分预测卡（含历史断链的），带 gap 标记 → scorecard.jsonl
+  5.6 M2 预测卡冻结：报告末尾如含 `## 次日预测卡` fenced json → forecast.json
+  6. 报告正文：优先复用已生成的 复盘报告.md；否则需配置
      LLM_API_URL / LLM_MODEL / LLM_API_KEY 自动生成
-  7. Markdown → HTML → Chrome headless → PDF
-  8. SMTP 发送 PDF（附 Markdown 原文）至 MAIL_TO（默认 imatrixxxlee@gmail.com）
+  8. **⑧ 校验门禁**：双通道校验（数字比对 + 覆盖检查）未通过则中止，不渲染 PDF、
+     不发邮件（--skip-verify 可放行）
+  9. Markdown → HTML → Chrome headless → PDF
+  10. SMTP 发送 PDF（附 Markdown 原文）至 MAIL_TO（默认 imatrixxxlee@gmail.com）
 
 用法：
   python3 tools/daily_review_pdf.py                 # 前一交易日
   python3 tools/daily_review_pdf.py --date 2026-08-12
   python3 tools/daily_review_pdf.py --date 2026-08-12 --no-email   # 只出 PDF
+  python3 tools/daily_review_pdf.py --date 2026-08-12 --no-email --skip-verify
 """
 
 from __future__ import annotations
@@ -44,6 +49,7 @@ if str(ROOT) not in sys.path:
 from tools.daily_review import (  # noqa: E402
     DEFAULT_MAIL_TO,
     DEFAULT_SKILL_DIR,
+    SNAPSHOT_PY,
     _load_env_file,
     append_news_brief_to_prompt,
     fetch_news_incremental,
@@ -57,19 +63,55 @@ from stock_review_harness.artifact_paths import (  # noqa: E402
     report_md_path,
     report_pdf_path,
 )
+from stock_review_harness.report.checklist import (  # noqa: E402
+    format_gate_report,
+    verify_bundle,
+)
+from stock_review_harness.trading_calendar import (  # noqa: E402
+    calendar_freshness,
+    load_calendar,
+)
 from tools.md2html import md_to_html  # noqa: E402
 
 CHROME = "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
 DEFAULT_SMTP_HOST = "smtp.gmail.com"
 DEFAULT_SMTP_PORT = "465"
 DEFAULT_SMTP_USER = "imatrixxxlee@gmail.com"
+# 日历缓存超过该天数就尝试联网刷新（失败不阻断；见 _maybe_refresh_calendar）
+CALENDAR_MAX_AGE_DAYS = 7
 
 
-def prev_trading_day(today: _date) -> _date:
-    d = today - timedelta(days=1)
-    while d.weekday() >= 5:
-        d -= timedelta(days=1)
-    return d
+def prev_trading_day(today: _date, root: Path | None = None) -> _date:
+    """`today` 之前最近一个交易日（走统一交易日历，非"只跳周末"）。"""
+    iso = load_calendar(root or ROOT).prev(today)
+    if iso is None:
+        # 理论上不会发生（回退上限约一年）；兜底退回纯工作日语义
+        d = today - timedelta(days=1)
+        while d.weekday() >= 5:
+            d -= timedelta(days=1)
+        return d
+    return _date.fromisoformat(iso)
+
+
+def _maybe_refresh_calendar(max_age_days: int = CALENDAR_MAX_AGE_DAYS) -> None:
+    """交易日历缓存过期时联网刷新（best-effort，失败只告警）。
+
+    日历越新，长假后的缺省复盘日越准；即便刷新失败，`fetch_snapshot_limit_pool` 仍会
+    以快照侧的官方日历为准逐日回退，主链不会因此中断。
+    """
+    fresh = calendar_freshness(ROOT)
+    if fresh["exists"] and fresh["age_days"] is not None and fresh["age_days"] <= max_age_days:
+        return
+    script = ROOT / "tools" / "refresh_trading_calendar.py"
+    if not script.exists() or not Path(SNAPSHOT_PY).exists():
+        return
+    try:
+        proc = subprocess.run([SNAPSHOT_PY, str(script)], capture_output=True,
+                              text=True, timeout=180, cwd=str(ROOT))
+        line = (proc.stdout or "").strip().splitlines()
+        print(f"[calendar] {line[-1] if line else '刷新无输出'}", flush=True)
+    except Exception as e:  # noqa: BLE001 - 刷新失败不影响主链
+        print(f"[WARN] 交易日历刷新失败（沿用本地缓存）: {str(e)[:120]}", flush=True)
 
 
 def clear_ths_year_cache(year: int, bulk_limit: int = 20) -> int:
@@ -248,6 +290,45 @@ def md_to_pdf(report_md: Path, pdf_path: Path, html_path: Path) -> bool:
     return ok
 
 
+def run_verify_gate(
+    date_str: str,
+    report_md: Path,
+    evidence_file: Path,
+    skip: bool = False,
+) -> bool:
+    """⑧ 校验门禁（2026-09-11 起）：报告进 PDF 前的确定性把关。
+
+    两路校验（数字核对防编造 + 覆盖检查防漏写）任一有待处理项即**阻断**——不渲染 PDF、
+    不发邮件，把清单打出来让人去改 md，改完重跑（⑨ 只读 md，不会覆盖）。用
+    `--skip-verify` 显式放行（例如已人工确认过可疑数字）。
+
+    返回 True = 放行。
+    """
+    try:
+        report_text = report_md.read_text(encoding="utf-8")
+        evidence = json.loads(evidence_file.read_text(encoding="utf-8"))
+    except Exception as e:  # noqa: BLE001 - 读不到就当校验无法执行，不静默放行
+        print(f"[verify] ⚠️ 校验无法执行（{str(e)[:120]}），中止以避免未校验产出", flush=True)
+        return False
+
+    bundle = verify_bundle(report_text, evidence)
+    print("[verify] " + format_gate_report(bundle).replace("\n", "\n[verify] "), flush=True)
+
+    if bundle["ok"]:
+        print(f"[verify] {date_str} 报告通过双通道校验 ✅", flush=True)
+        return True
+    if skip:
+        print("[verify] ⚠️ --skip-verify：跳过阻断，按人工确认继续（未消解项见上）",
+              flush=True)
+        return True
+    print(f"[verify] ⛔ {date_str} 报告未通过校验，已中止（不渲染 PDF / 不发邮件）：",
+          flush=True)
+    for b in bundle["blocking"]:
+        print(f"[verify]   · {b}", flush=True)
+    print("[verify] 修正 复盘报告.md 后重跑即可；确需放行加 --skip-verify", flush=True)
+    return False
+
+
 def send_pdf_email(date_str: str, pdf_path: Path, report_md: Path) -> bool:
     host = os.environ.get("SMTP_HOST", DEFAULT_SMTP_HOST)
     user = os.environ.get("SMTP_USER", DEFAULT_SMTP_USER)
@@ -293,8 +374,11 @@ def main(argv=None) -> None:
                     help="保留参数（已由 fetch_market_snapshot 替代大班客）")
     ap.add_argument("--no-email", action="store_true", help="只生成 PDF，不发送")
     ap.add_argument("--keep-temp", action="store_true", help="保留中间 JSON（调试）")
+    ap.add_argument("--skip-verify", action="store_true",
+                    help="⑧ 校验未通过时仍然渲染 PDF/发邮件（默认阻断）")
     args = ap.parse_args(argv)
 
+    _maybe_refresh_calendar()
     today = _date.today()
     d = _date.fromisoformat(args.date) if args.date else prev_trading_day(today)
     date_str = d.isoformat()
@@ -307,7 +391,8 @@ def main(argv=None) -> None:
         # 数据源 ②（2026-09-04 起）：fetch_market_snapshot（fuyao）替代大班客
         fuyao_pools: Path | None = None
         try:
-            limit_pool = fetch_snapshot_limit_pool(date_str, outdir=ROOT / "hithink_out")
+            date_str, limit_pool = fetch_snapshot_limit_pool(
+                date_str, outdir=ROOT / "hithink_out")
             # 快照成功 → raw/pools.json 含 premiums 溢价节（fetch_market_snapshot 步骤 3.5）
             fp = ROOT / "hithink_out" / "raw" / "pools.json"
             if fp.exists():
@@ -343,12 +428,13 @@ def main(argv=None) -> None:
         # 资讯增量采集（消息面/催化归因素材，供报告撰写参考；失败不阻断复盘）
         fetch_news_incremental()
 
-        # 5.5) M2 预测卡判卷：判上一交易日的冻结预测卡（hit/miss/na → scorecard.jsonl）
+        # 5.5) M2 预测卡判卷（补判全部未计分卡片；hit/miss/na → scorecard.jsonl）
+        #      断过链的日子也能补回来，不再只认"上一交易日"
         try:
-            from tools.score_predictions import run as score_prev
-            score_prev(date_str)
+            from tools.score_predictions import run_all as score_all
+            score_all(ROOT)
         except Exception as e:  # noqa: BLE001 - 判卷失败不阻断复盘
-            print(f"[WARN] 昨日预测卡判卷失败（不影响复盘）: {str(e)[:120]}", flush=True)
+            print(f"[WARN] 预测卡判卷失败（不影响复盘）: {str(e)[:120]}", flush=True)
 
         report_md = report_md_path(ROOT, date_str)
         if not (report_md.exists() and report_md.stat().st_size > 500):
@@ -374,6 +460,11 @@ def main(argv=None) -> None:
             export_forecast_cards(date_str, report_md)
         except Exception as e:  # noqa: BLE001 - 冻结失败不阻断复盘
             print(f"[WARN] 预测卡冻结失败（不影响复盘）: {str(e)[:120]}", flush=True)
+
+        # ⑧ 校验门禁（2026-09-11 起）：双通道校验未过 → 不渲染 PDF、不发邮件
+        if not run_verify_gate(date_str, report_md, arts["evidence"],
+                               skip=args.skip_verify):
+            return
 
         pdf = report_pdf_path(ROOT, date_str)
         html = report_html_path(ROOT, date_str)

@@ -47,6 +47,7 @@ build_dabanke_from_  │       models.py（统一数据模型）       outputs/<
 | 入口 | `stock_review_harness/cli.py` | 日期解析、参数路由、组装证据链 + prompt |
 | 入口 | `stock_review_harness/config.py` | 缓存 TTL / 并发 / 重试等参数集中管理 |
 | 入口 | `stock_review_harness/models.py` | 统一数据契约（`MarketData` 等，扩展指南入口） |
+| 入口 | `stock_review_harness/trading_calendar.py` | 交易日历（离线优先分层解析；默认复盘日/判卷日的唯一定义点，见 §6.4） |
 | 数据访问 | `data/loaders.py` | 各源适配器，原始响应 → 统一模型（规范化） |
 | 数据访问 | `data/fetch_market.py` | 多源抓取 / 缓存 / 失败降级（不中断） |
 | 数据访问 | `data/{ths,eastmoney,tencent,sina,northbound,dragon_seats,macro_snapshot}.py` | 各数据源实现（northbound=沪深股通十大活跃股；dragon_seats=龙虎榜买卖前五席位，机构/北向/游资结构；macro_snapshot=国内商品期货主连日K宏观快照） |
@@ -59,7 +60,7 @@ build_dabanke_from_  │       models.py（统一数据模型）       outputs/<
 | 确定性分析 | `logic/diagnostics.py` | 矛盾诊断（数据张力清单，LLM 须调和） |
 | 输出组装 | `report/evidence.py` | 证据链 JSON 组装（含 data_gaps/anomalies/diagnostics/quantified；`board_pools` 板块内领涨标的池——涨停股按行业归组落到个股，供报告写板块必落标的；题材浓度 ratio_pct+mainline(≥20%)；`dragon_seats` 龙虎榜席位结构；`macro` 当日宏观快照——国内商品期货主连涨跌，供"当日宏观催化"小节对照板块切换有无期货端印证） |
 | 输出组装 | `report/prompt.py` | LLM prompt 模板（数字纪律 / 独立判断要求） |
-| 输出组装 | `report/checklist.py` | 报告核对：`verify_report_numbers` 数字比对（防编造）+ `check_coverage` 覆盖检查（防漏写） |
+| 输出组装 | `report/checklist.py` | 报告核对：`verify_report_numbers` 数字比对（防编造）+ `check_coverage` 覆盖检查（防漏写）；`verify_bundle` 把两路合成放行判定（⑧ 门禁用） |
 | 输出组装 | `report/forecast_cards.py` | M2 次日预测卡：subject 白名单解析、judge 纯代码判卷、报告内预测卡区块提取、候选清单 |
 
 `tools/` 下的流水线脚本（全链编排 + 取数 + 校验）：
@@ -73,9 +74,10 @@ build_dabanke_from_  │       models.py（统一数据模型）       outputs/<
 | `build_dabanke_from_eastmoney.py` | 快照失败时的东财涨停池回退构建器 |
 | `fetch_news.py` | ⑥ 资讯/公告增量采集（cls/em/notice/cctv/csrc/miit/ndrc，幂等断点） |
 | `md2html.py` | Markdown → 自包含 HTML（⑨ PDF 前置） |
-| `verify_report.py` | ⑧ 报告核对：数字比对（证据外可疑数字）+ 覆盖检查（该覆盖未覆盖清单），`--no-coverage` 只跑数字 |
+| `verify_report.py` | ⑧ 报告核对：数字比对（证据外可疑数字）+ 覆盖检查（该覆盖未覆盖清单），`--no-coverage` 只跑数字。**已接入 `daily_review_pdf` 门禁——不通过不渲染 PDF** |
 | `forecast_card.py` | M2 生成侧：把报告末尾 `## 次日预测卡` fenced json 冻结为 `outputs/<date>/forecast.json`；`hint` 子命令打印当日候选 |
-| `score_predictions.py` | M2 判卷侧：判上一交易日预测卡（hit/miss/na），追加 `outputs/scorecard.jsonl`（幂等） |
+| `score_predictions.py` | M2 判卷侧：**补判**所有未计分预测卡（hit/miss/na，带 gap 标记），追加 `outputs/scorecard.jsonl`（幂等）；`summary` 子命令出命中率汇总 |
+| `refresh_trading_calendar.py` | 交易日历：从 fuyao 官方日历拉全量交易日 → `data_cache/trading_calendar.json`（需 hithink venv；供默认复盘日与判卷判定） |
 | `build_llm_prompt.py` | 底层：由 evidence JSON 单独组装 prompt |
 | `fetch_m5_leaders.py` / `fetch_quotes_tx.py` / `build_market_json*.py` 等 | 专项补数/调试脚本（离线回放用） |
 
@@ -89,9 +91,9 @@ build_dabanke_from_  │       models.py（统一数据模型）       outputs/<
                                                                                   两市成交/沪深300）
         ┌──────────────────────────────────────────────┘
         ▼
-⑤ evidence + prompt ──▶ ⑥ fetch_news 增量采集 ──▶ ⑦ 报告撰写 ──▶ ⑧ verify_report
-   （确定性聚合出证据链；       当日题材关键词摘要注入         （LLM 独立判断；      （数字与证据链全文
-    quality 护栏四件套）        prompt「外部资讯参考」节，      优先复用已有 md）     比对，可疑数字清单）
+⑤ evidence + prompt ──▶ ⑥ fetch_news 增量采集 ──▶ ⑦ 报告撰写 ──▶ ⑧ verify_report 门禁
+   （确定性聚合出证据链；       当日题材关键词摘要注入         （LLM 独立判断；      （双通道校验：数字比对 +
+    quality 护栏四件套）        prompt「外部资讯参考」节，      优先复用已有 md）     覆盖检查；**不过即中止**）
                                外部来源独立标注）
         ▼
 ⑨ md2html + Chrome headless ──▶ ⑩ SMTP 邮件
@@ -107,8 +109,8 @@ build_dabanke_from_  │       models.py（统一数据模型）       outputs/<
 | ⑤ | 证据链 + prompt | harness（确定性） | `outputs/<date>/evidence.json`（纯数据：情绪/资金/周期 + **`board_pools` 板块内领涨标的池**——涨停股按行业归组列个股，写板块资金必落标的；无该行业=当日无涨停，子板块资金不编造）+ `outputs/<date>/prompt.md` |
 | ⑥ | 资讯增量采集 | `fetch_news.py`（幂等去重） | `hithink_out/raw/news/*.jsonl`；关键词取当日 evidence 题材，摘要注入 prompt 时**按发布时间分 A/B 两桶**——A（≤15:00 盘前/盘中）可作当日归因，B（盘后）仅限次日条件预期 |
 | ⑦ | 报告撰写 | LLM / 人 | `outputs/<date>/复盘报告.md`；无既有 md 时需配置 `LLM_API_URL/MODEL/KEY` 自动生成 |
-| ⑦.5 | M2 预测卡冻结 + 判卷 | 全链自动 | 判上一交易日卡片 → `outputs/scorecard.jsonl`；报告末尾含 `## 次日预测卡` fenced json 则冻结 `outputs/<date>/forecast.json`（均失败不阻断，见 §2 M2 小节） |
-| ⑧ | 报告校验 | `verify_report.py` | 双重检查：① 报告每个数字与证据链比对（防编造，输出"证据外可疑数字"）；② 覆盖检查——证据链点名的高标/锚点/首封名字、diagnostics 调和、risk_matrix 触发→动作、data_gaps 免责措辞是否被报告覆盖（防漏写，输出"该覆盖未覆盖"清单） |
+| ⑦.5 | M2 预测卡冻结 + 判卷 | 全链自动 | **补判**所有未计分卡片 → `outputs/scorecard.jsonl`（隔日补判的行带 `gap_trading_days`/`clean` 标记，不混入校准样本）；报告末尾含 `## 次日预测卡` fenced json 则冻结 `outputs/<date>/forecast.json`（均失败不阻断，见 §2.1） |
+| ⑧ | 报告校验**门禁** | `verify_report.py` 双通道 | ① 报告每个数字与证据链比对（防编造）；② 覆盖检查——证据链点名的高标/锚点/首封名字、diagnostics 调和、risk_matrix 触发→动作、data_gaps 免责措辞是否被覆盖（防漏写）。**任一有待处理项即中止：不渲染 PDF、不发邮件**，打印清单待改 md 后重跑；`--skip-verify` 显式放行 |
 | ⑨ | PDF 渲染 | md2html + Chrome headless | `outputs/<date>/复盘报告.pdf`（本机需装 Google Chrome） |
 | ⑩ | 邮件 | SMTP（gmail 465 SSL） | 发送 PDF + Markdown 至 `MAIL_TO`（默认 imatrixxxlee@gmail.com） |
 
@@ -123,7 +125,15 @@ python3 tools/daily_review_pdf.py --date 2026-09-04
 
 # 只跑证据链 + prompt（②-⑥），不写报告
 python3 tools/daily_review.py --date 2026-09-04
+
+# 报告已人工确认、要强行出 PDF（跳过 ⑧ 门禁）
+python3 tools/daily_review_pdf.py --date 2026-09-04 --no-email --skip-verify
 ```
+
+> **⑧ 门禁行为（2026-09-11 起）**：`daily_review_pdf.py` 在渲染 PDF 前自动跑双通道校验，
+> 可疑数字或"该覆盖未覆盖"非空即**中止**（不打 PDF、不发邮件），并打印清单。修正
+> `outputs/<date>/复盘报告.md` 后**重跑即可**（⑨ 只读 md，不会覆盖你的修改）；
+> 确需放行加 `--skip-verify`（会在日志里留痕）。
 
 分步执行等价于逐条跑：`fetch_market_snapshot.py --date` → `build_dabanke_from_fuyao.py`
 （失败回退 `build_dabanke_from_eastmoney.py`）→ `python3 -m stock_review_harness.cli <date>
@@ -145,19 +155,27 @@ Chrome headless（详见 §5 离线/底层用法）。
   `## 次日预测卡` + fenced json（≤5 条：`hypothesis` 定性 + `subject` 白名单 +
   `op`∈{ge,le,gt,lt,eq} + `target` 数值）。全链跑完后 `export_forecast_cards()` 提取冻结为
   `outputs/<date>/forecast.json`（解析失败/无区块仅提示，不阻断）。
-- **判卷（T+1 开盘前，全链自动）**：证据链就绪后 `score_predictions.py run` 判上一交易日
-  卡片——`subject` 从次日 evidence 复算：点路径（`emotion.seal_rate_pct` 等）、
-  查询式（`stock:<代码>:ladder|in_zt`、`board:<板块名>:limit_ups`、
-  `index:<指数名>:close|change_pct`、`industry:<行业名>:count`）。次日取不到值（板块消失/
-  接口缺字段/仅上榜但板数不可复算）判 **na 不计分**；个股不在涨停名单视为未涨停
-  （ladder=0，客观可判）。结果追加 `outputs/scorecard.jsonl`（幂等，同卡不重计）。
+- **判卷（补判制，2026-09-11 起）**：证据链就绪后 `score_predictions.py`（全链自动）扫描
+  `outputs/*/forecast.json`，对每张**尚未计分**的卡片，用交易日历找它**之后首个存在
+  evidence 的交易日**判卷——错过多久都能补回来（旧实现只认"上一交易日且 T-1 目录存在"，
+  中间断一天该卡就永久漏判，09-08 的卡即因此从未被判）。`subject` 从次日 evidence 复算：
+  点路径（`emotion.seal_rate_pct` 等）、查询式（`stock:<代码>:ladder|in_zt`、
+  `board:<板块名>:limit_ups`、`index:<指数名>:close|change_pct`、`industry:<行业名>:count`）。
+  次日取不到值（板块消失/接口缺字段/仅上榜但板数不可复算）判 **na 不计分**；个股不在
+  涨停名单视为未涨停（ladder=0，客观可判）。
+- **gap 标记（校准纪律）**：判卷行带 `gap_trading_days` 与 `clean`。`gap=1` 才是严格次日
+  判卷（干净样本）；`gap>1` 说明中间缺盘面，结果只作参考，**不混入命中率校准**——
+  `summary` 把两者分开报。
+- **幂等键** = `forecast_date:id`（一卡终身只计一次），`--force` 可强制重判。
 - **产物**：`outputs/<date>/forecast.json`（冻结卡片 + warnings）、`outputs/scorecard.jsonl`
   （逐条判卷流水，累计命中率校准）。
 - 手工命令：
   ```bash
   python3 tools/forecast_card.py extract outputs/2026-09-08/复盘报告.md   # 冻结
   python3 tools/forecast_card.py hint outputs/2026-09-08/evidence.json     # 当日候选清单
-  python3 tools/score_predictions.py --date 2026-09-08                     # 判昨日卡
+  python3 tools/score_predictions.py                    # 补判所有未计分卡片（推荐）
+  python3 tools/score_predictions.py --date 2026-09-08  # 严格模式：只判该日 T-1 的卡
+  python3 tools/score_predictions.py summary            # 命中率汇总（按预测日/op/是否干净）
   ```
 - 预测卡 fenced json 里的数字（阈值 target 等）在 verify 数字核对中**整块剥离**，不会误报
   可疑数字（见 §4）。
@@ -260,9 +278,15 @@ python3 -m stock_review_harness.cli 2026-09-04 \
 # 联网模式（自动抓指数/板块/涨跌停池/中军/溢价/跌幅榜，不提供 --market-json 时）
 python3 -m stock_review_harness.cli 2026-09-04 --limit-pool-json hithink_out/limit_pool_2026-09-04.json
 
-# 冒烟测试
-python3 -m unittest discover -s tests -v
+# 冒烟测试（**必须用带 pytest 的解释器**，见下）
+/Users/imatrix/.workbuddy/binaries/python/envs/default/bin/python -m pytest tests -q
 ```
+
+> **测试运行器（2026-09-11 修正）**：项目代码零第三方依赖，但 `tests/test_events.py`
+> 是 pytest 风格（模块级函数 + fixture）。用 `python3 -m unittest discover -s tests`
+> 跑会踩两种坑：解释器里没有 pytest 时**直接报 import 错误**；有 pytest 时那 30+ 个
+> 用例被 unittest **静默跳过**（只跑到 153/185）。统一用上面那行 pytest 命令，
+> 185 项全跑。
 
 参数：`--limit-pool-json`（涨停池 JSON：fuyao 桥接 / 东财回退 / 历史样本，与 `--html`
 二选一必填；旧名 `--dabanke-json` 兼容可用）、`--market-json`（可选）、
@@ -326,6 +350,39 @@ down_open}`，market JSON `notes` 标注实际来源。
 **口径提示**：fuyao 昨日池与东财 `zt_prev` 计数存在 ±1~2 只的供应商口径差（如 09-08：
 fuyao 92 只 avg +3.22% vs 东财 93 只 avg +3.14%），属正常源差异，报告对比历史时应
 同源比较。
+
+### 6.4 交易日历（2026-09-11 起）
+
+"某天是不是交易日"的判定收敛到 `stock_review_harness/trading_calendar.py` 一处。此前
+`daily_review_pdf` 与 `score_predictions` 各写了一份"回退一天 + 跳过周末"，**长假后缺省
+复盘日会落到休市日**（如 2026-05-06 会被算成 05-05 而非 04-30）。
+
+分层解析（`sources` 记录实际生效层）：
+
+1. 显式文件：环境变量 `REVIEW_TRADING_CALENDAR` 指向的 JSON（人工指定/回测用）；
+2. 本地缓存：`data_cache/trading_calendar.json`（**权威层**，fuyao 官方日历快照）；
+3. 仓库交易痕迹：`outputs/<date>/evidence.json`、`samples|data_cache/market_<date>.json`、
+   `hithink_out/limit_pool_<date>.json` —— 产出过复盘数据的日子必然是交易日，自举补全；
+4. 周末兜底。
+
+缓存覆盖面内，落在窗口里却不在交易日列表的**工作日**判为休市（长假由此识别）；窗口之外
+无证据的普通工作日按交易日接受。
+
+```bash
+PY=/Users/imatrix/.workbuddy/binaries/python/envs/hithink/bin/python
+$PY tools/refresh_trading_calendar.py     # 刷新 data_cache/trading_calendar.json
+```
+
+`daily_review_pdf` 在缓存超过 7 天时自动尝试刷新（失败只告警）。**双保险**：
+`fetch_snapshot_limit_pool` 以快照侧的官方日历为准，非交易日（rc=3）自动按日历逐日向
+过去回退重试（≤12 次）——即便本地缓存过期，长假后也不会跑错日子，且会把校正结果写进日志。
+
+### 6.5 报告校验门禁（2026-09-11 起）
+
+`daily_review_pdf` 在 ⑨ 渲染前强制执行 ⑧ 双通道校验（`verify_bundle`）：可疑数字或
+"该覆盖未覆盖"任一非空 → 打印清单并**中止**（不打 PDF、不发邮件）。修正报告 md 后重跑
+即可（⑨ 只读 md 不覆盖）；`--skip-verify` 可显式放行（日志留痕）。校验读不到文件时同样
+中止——不允许"未校验产出"静默流出。
 
 ---
 

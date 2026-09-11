@@ -47,6 +47,7 @@ from stock_review_harness.artifact_paths import (  # noqa: E402
 )
 from stock_review_harness.data.net import post_json  # noqa: E402
 from stock_review_harness.report.prompt import build_prompt  # noqa: E402
+from stock_review_harness.trading_calendar import load_calendar  # noqa: E402
 
 DEFAULT_SKILL_DIR = Path("/Users/imatrix/.codex/skills/review-a-share-market")
 DEFAULT_TEMPLATE = ROOT / "assets" / "llm_report_prompt.md"
@@ -61,40 +62,66 @@ NEWS_PY = "/Users/imatrix/.workbuddy/binaries/python/envs/hithink/bin/python"
 SNAPSHOT_PY = NEWS_PY
 
 
-def fetch_snapshot_limit_pool(date_str: str, outdir: Path | None = None) -> Path:
+def fetch_snapshot_limit_pool(
+    date_str: str,
+    outdir: Path | None = None,
+    max_step_back: int = 12,
+) -> tuple[str, Path]:
     """【2026-09-04 起替代大班客】跑 fetch_market_snapshot.py 抓指定交易日大盘快照，
     再用 build_dabanke_from_fuyao.py 把 fuyao 涨跌停池桥接为统一涨停池 JSON。
 
-    返回涨停池 JSON 路径（hithink_out/limit_pool_<date>.json）；失败抛 RuntimeError。
+    **交易日回退（2026-09-11 起）**：快照侧对 fuyao 官方交易日历做校验，非交易日返回
+    rc=3。长假（春节/国庆）后只靠"回退一天 + 跳过周末"算出的日期会落到休市日，这里
+    不再直接失败，而是按交易日历逐日向过去回退重试（最多 max_step_back 次）——
+    快照是权威源，本地日历只用来决定"下一跳去哪一天"。
+
+    返回 `(实际交易日, 涨停池 JSON 路径)`；失败抛 RuntimeError。
     """
     outdir = outdir or ROOT / "hithink_out"
     script = ROOT / "tools" / "fetch_market_snapshot.py"
     bridge = ROOT / "tools" / "build_dabanke_from_fuyao.py"
     if not (script.exists() and bridge.exists()):
         raise RuntimeError(f"快照/桥接脚本缺失: {script.exists()=} {bridge.exists()=}")
-    # 1) fuyao 快照（指定交易日；含前一交易日涨停池 up_prev，供晋级率）
-    proc = subprocess.run(
-        [SNAPSHOT_PY, str(script), "--date", date_str,
-         "--outdir", str(outdir), "--pool-size", "200"],
-        capture_output=True, text=True, timeout=900,
-    )
-    if proc.returncode != 0:
-        raise RuntimeError(f"fetch_market_snapshot 失败(rc={proc.returncode}): "
-                           f"{(proc.stderr or proc.stdout or '')[-300:]}")
+
+    cal = load_calendar(ROOT)
     pools = outdir / "raw" / "pools.json"
-    if not pools.exists():
-        raise RuntimeError(f"快照未产出 pools.json: {pools}")
+    cur = date_str
+    last_err = ""
+    for attempt in range(max_step_back + 1):
+        pools.unlink(missing_ok=True)  # 防上次残留被误判为本次产物
+        proc = subprocess.run(
+            [SNAPSHOT_PY, str(script), "--date", cur,
+             "--outdir", str(outdir), "--pool-size", "200"],
+            capture_output=True, text=True, timeout=900,
+        )
+        if proc.returncode == 0 and pools.exists():
+            break
+        last_err = (proc.stderr or proc.stdout or "")[-300:]
+        if proc.returncode != 3:  # 只有 rc=3（非交易日）才值得回退
+            raise RuntimeError(f"fetch_market_snapshot 失败(rc={proc.returncode}): {last_err}")
+        nxt = cal.prev(cur)
+        if nxt is None or nxt == cur:
+            raise RuntimeError(f"{cur} 非交易日且无法继续回退：{last_err}")
+        print(f"[snapshot] {cur} 非交易日，回退至 {nxt} 重试", flush=True)
+        cur = nxt
+    else:
+        raise RuntimeError(f"连续回退 {max_step_back} 次仍未找到交易日：{last_err}")
+
+    if cur != date_str:
+        print(f"[snapshot] 复盘日已由日历校正：{date_str} → {cur}（交易日历源 {cal.sources}）",
+              flush=True)
+
     # 2) 桥接 pools → 涨停池 JSON
-    lp = outdir / f"limit_pool_{date_str}.json"
+    lp = outdir / f"limit_pool_{cur}.json"
     proc2 = subprocess.run(
-        [sys.executable, str(bridge), date_str, str(pools), str(lp)],
+        [sys.executable, str(bridge), cur, str(pools), str(lp)],
         capture_output=True, text=True, timeout=120,
     )
     if proc2.returncode != 0 or not lp.exists():
         raise RuntimeError(f"pools→涨停池 JSON 桥接失败: {(proc2.stderr or proc2.stdout or '')[-300:]}")
-    print(f"[snapshot] {proc.stdout.strip().splitlines()[-1] if proc.stdout.strip() else ''}", flush=True)
+    print(f"[snapshot] fuyao 快照 {cur} 完成", flush=True)
     print(f"[bridge] {proc2.stdout.strip()}", flush=True)
-    return lp
+    return cur, lp
 
 
 def _load_env_file() -> None:
@@ -400,7 +427,8 @@ def main(argv=None) -> None:
     # 1) 大盘快照（fetch_market_snapshot.py，fuyao API；替代原大班客）
     with tempfile.TemporaryDirectory(prefix="daily_review_") as td:
         try:
-            limit_pool = fetch_snapshot_limit_pool(date_str, outdir=workdir / "hithink_out")
+            date_str, limit_pool = fetch_snapshot_limit_pool(
+                date_str, outdir=workdir / "hithink_out")
         except Exception as e:  # noqa: BLE001
             print(f"[FAIL] fetch_market_snapshot 抓取/桥接失败: {str(e)[:200]}", flush=True)
             return
