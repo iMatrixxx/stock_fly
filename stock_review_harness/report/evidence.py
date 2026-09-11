@@ -124,6 +124,25 @@ def _macro_section(bundle: DataBundle) -> dict | None:
     }
 
 
+def _industry_intel_section(bundle: DataBundle) -> dict | None:
+    """产业情报事件聚合（P1 第⑥环）——"产业观察"数据维度。
+
+    数据源：market.industry_intel（fetch_market 步骤 10 读 events/<date>.jsonl 聚合）。
+    用途分层（与事件粒度一一对应，禁止越界）：
+    - node_signals：环节信号分（score=Σ权重×置信度折扣），供报告"产业观察"按分排序描述
+      "某环节近期正在发生什么"；score 仅排序用，禁止写成分数式的买卖依据；
+    - chain_level：链级事件（政策等），进报告"宏观催化"作方向解释，不作单环节归因；
+    - stock_watchlist：个股观察池（code 去重），可与涨停池/龙虎榜/北向对照资金验证；
+    - industry_counts：未归链行业计数，仅作方向解释。
+    纪律：confidence=low 的事件只能作背景提及，禁止写成个股事实；事件文本引用须与
+    evidence 原文一致；节为 null 时写"当日无已确认产业事件流"。
+    """
+    ii = bundle.market.industry_intel
+    if not ii:
+        return None
+    return ii
+
+
 def _market_section(bundle: DataBundle) -> dict:
     m = bundle.market
     top_boards = sorted(
@@ -618,6 +637,7 @@ def to_evidence_dict(bundle: DataBundle) -> dict:
         },
         "market": _market_section(bundle),
         "macro": _macro_section(bundle),
+        "industry_intel": _industry_intel_section(bundle),
         "dragon_top": _dragon_section(bundle),
         "dragon_seats": _dragon_seats_section(bundle),
         "emotion": _emotion_section(bundle),

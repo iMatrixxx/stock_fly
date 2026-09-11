@@ -130,6 +130,7 @@ class MarketData:
     northbound_top10: Optional[dict] = None  # 沪深股通十大活跃股 {date, sh[], sz[], note}（可选）
     dragon_seats: Optional[dict] = None  # 龙虎榜买卖前五席位 {date, stocks[], note}，机构/北向/游资结构（可选）
     macro: Optional[dict] = None  # 当日宏观行情快照 {date, items[], note}，国内商品期货主连日K（可选）
+    industry_intel: Optional[dict] = None  # 产业事件聚合 {summary, node_signals[], chain_level[], stock_watchlist[], industry_counts[]}，源 events/<date>.jsonl（可选）
     notes: list[str] = field(default_factory=list)
 
 

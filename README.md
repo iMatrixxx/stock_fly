@@ -208,7 +208,8 @@ $PY tools/fetch_news.py --notice-days 5                # 首次运行建议回�
 - 仅含现象数据与确定性聚合：`market`（指数/成交/板块资金流/跌幅榜）、`emotion`
   （封板率/晋级率/溢价/梯队/行业集中度）、`dragon_top`（龙虎榜异动股资金聚合，可选）、
   `leaders_candidates`（中军候选原始数据）、
-  `high_ladder_stocks`（高标个股）——**不含 phase/仓位/信号等任何判定**；
+  `high_ladder_stocks`（高标个股）、`industry_intel`（产业事件聚合，可选，源
+  `events/<date>.jsonl`）——**不含 phase/仓位/信号等任何判定**；
 - `leaders_candidates.industry` 为东财涨停池行业标签，可能只反映次要属性，板块归属
   需结合主营判断；涨停池个股尾盘统一标注"涨停封板"；
 - `meta.data_gaps`：显式列出数据缺口（如北向未披露），LLM 不得编造；
@@ -495,3 +496,113 @@ python3 tools/replay_chain_coverage.py --date 2026-09-07 --date 2026-09-08 \
 （补 entity/confidence/verify_ts）；图谱与事件资产入库，每日复盘产物仍走 `outputs/`（不入库）。
 
 **测试**：`tests/test_chains.py`（契约、枚举、引用完整性，7 项）。
+
+### 12.1 事件预筛（P1，2026-09-10 起）
+
+把多源资讯流收敛为候选产业事件。**核心设计：粒度由『信息主体』决定，不是由信源决定**——
+政策与电报源天然没有个股信息（政策作用于行业、电报是线索），硬映射个股等于把
+`confidence:low` 的行业推断伪装成个股事实。四条落地路径互不越界：
+
+| granularity | 主体 | 落地 | 产出 |
+|---|---|---|---|
+| `stock` | 上市公司（公告自带 code，或电报点名链内标的） | code 反查映射表 | 观察池个股 |
+| `node` | 产业链环节（含链级 `node=unknown`） | 行业词典 / signal_aliases 归位 | 节点信号分 |
+| `industry` | 行业但未归入已建链 | 行业标签 | 报告"宏观催化" |
+| `macro` | 海外宏观/地缘 | 噪声词典剔除 | 不入链 |
+
+```bash
+# 预筛（缺省取资讯库最新日期）
+python3 tools/filter_news_signals.py --date 2026-09-08
+python3 tools/filter_news_signals.py --date 2026-09-08 --dump-noise   # 校准噪声词典
+# 二次确认后提升为正式事件流（人工把候选池里对应行的 _review.confirm 改为 true）
+python3 tools/filter_news_signals.py --promote --date 2026-09-08
+```
+
+**词典资产**（`events/`，入库）
+- `noise_filter.json`：负向词典，剔除**海外宏观数据 + 地缘政治 + 海外非中国业务**。
+  刻意**不收外国公司名**——美光/SK海力士/三星/英伟达的产能与价格事件是产业链最左侧的
+  领先信号（如"三星泰勒厂产能预定完毕"归 gpu_chip），必须保留。`ahook` 为 A股钩子白名单
+  （公司名+冒号 / 6 位代码，`deny_prefixes` 排除"加拿大总理："类误判），命中则强制保留；
+  东财公告（extra 自带 code）一律不参与噪声剔除。
+- `industry_lexicon.json`：行业词 → `(chain_id, node)` 或行业标签。`node: null` 表示**链级
+  政策**（如"信息通信业十五五规划"），写事件时 node=unknown，不得强行塞给某一节点。
+  它与 chains 的 `signal_aliases` 分工不同：别名面向"涨停原因标签"（短标签），本词典面向
+  "新闻/政策正文"（长句）。
+
+**产物边界**：`events/candidates/<date>.jsonl`（候选池）与 `events/<date>.jsonl`（正式流）
+均为每日产物，**不入库**（`.gitignore`）；契约与词典资产 `events/*.json` 入库。
+
+**实测（全量 8687 条，09-01~09-08）**：日均真实交易日候选 22–40 条；09-08 扫描 2074 条 →
+噪声剔除 36 条（全为伊朗/霍尔木兹地缘、特朗普、加拿大关税、海外央行，**零误杀**）→ 跨源
+去重 1 条 → 候选 30 条（stock 7 / node 6 / industry 17）。被剔除的海外宏观记录里含
+"美国耐用品订单""OPEC 会议"等命中信号词但非产业事件的误报，噪声词典的首要作用即在此。
+
+**测试**：`tests/test_events.py`（15 项，含噪声词典零依赖契约校验 `validate_event`）。
+
+### 12.2 L1 链路：从 7 源资讯到证据链（2026-09-10 起）
+
+资讯库（7 源）到证据链的完整数据流。**①–⑥ 全部已跑通**（2026-09-10 接入 evidence）；
+industry_scorecard.jsonl（产业判卷账）为下一步。
+
+```text
+  7 源资讯库  hithink_out/raw/news/*.jsonl
+    notice(公告·自带code) · em/cls(电报·无code) · csrc/miit/ndrc/cctv(政策·无个股)
+            │
+            ▼  ① 采集    tools/fetch_news.py（增量·幂等去重）
+            │
+            ▼  ② 剔除    events/noise_filter.json
+            │            ├─► macro 级（海外宏观/地缘）→ 丢弃（审核文档留痕）
+            │            └─ A股钩子白名单（公司名+冒号 / 6 位代码）强制保留
+            │
+            ▼  ③ 预筛    events/signals.json（订单5/涨价4/缺货4/扩产3/政策2/传闻1）
+            │            命中即候选，不判语义
+            │
+            ▼  ④ 归位    events/industry_lexicon.json + chains/<chain_id>.json
+            │            ├─ stock     code 反查映射表（零猜测）     → 观察池个股    conf=high
+            │            ├─ node      行业词典 / signal_aliases 归位 → 节点信号分    conf=mid
+            │            └─ industry  行业标签（未归链）            → 报告"宏观催化" conf=low
+            │
+            ▼  ⑤ 落盘    events/candidates/<date>.jsonl（候选池）
+            │            └─ 人工二次确认（_review.confirm=true）→ events/<date>.jsonl（正式流）
+            │
+            ▼  ⑥ 聚合    evidence.industry_intel（已接入）→ 每日复盘报告 · industry_scorecard.jsonl
+```
+
+**环节与落脚文件（09-08 实测）**
+
+| 环节 | 命令 | 落脚文件 | 实测 |
+|---|---|---|---|
+| ① 采集 | `python3 tools/fetch_news.py` | `hithink_out/raw/news/*.jsonl`（7 源） | 全量 8687 条 |
+| ② 剔除 | 预筛内自动执行 | `events/noise_filter.json` | 扫 2074 → 剔 36（零误杀） |
+| ③ 预筛 | `python3 tools/filter_news_signals.py --date 2026-09-08` | `events/signals.json` | 命中即候选 |
+| ④ 归位 | 同上 | `events/industry_lexicon.json` + `chains/ai_compute.json` | 去重 1 → 候选 30 |
+| ⑤ 落盘 | 同上加 `--promote` | `events/candidates/<date>.jsonl` → `events/<date>.jsonl` | 确认 4 条入正式流 |
+| ⑥ 聚合 | `fetch_market.py` 步骤 10 自动执行 | `evidence.json` 的 `industry_intel` 节 | 已接入：09-08 实得 gpu_chip 信号分 4.9 / pcb 2.1 |
+
+**⑥ 聚合的消费结构**（`stock_review_harness/data/industry_intel.py`，确定性聚合不含判断）：
+
+| 子节 | 内容 | 报告落点 |
+|---|---|---|
+| `node_signals` | 环节信号分 score=Σ(类型权重×置信度折扣 high=1.0/mid=0.7/low=0.0)，仅排序 | 第二层"产业观察"按分排序描述 |
+| `chain_level` | 链级事件（node=unknown，政策等） | 并入"当日宏观催化"作方向解释 |
+| `stock_watchlist` | 个股观察池（code 去重，保留最高置信度） | 与涨停池/龙虎榜/北向对照资金验证 |
+| `industry_counts` | 未归链行业计数 | 仅方向解释，禁止升格个股信号 |
+
+纪律：confidence=low 事件只能作背景提及；score 禁止写成分数式结论；节为 null 时写
+"当日无已确认产业事件流"。事件流缺失时 fetch_market 降级标注，不阻断主链。
+
+**三条真实记录走位（09-08，同一批资讯进三条不同路径）**
+
+| 原始记录（源文件） | `via` | 粒度 | 落脚 | conf |
+|---|---|---|---|---|
+| 长电科技：未来三年股东回报规划（`notice`，extra.code=600584） | `extra_code` | stock | `ai_compute/packaging` + target 600584 | high |
+| 本川智能：拟投资 20 亿建 AI 算力高多层/高阶 HDI 电路板项目（`em`） | `lexicon_node` | node | `ai_compute/pcb`，target=null | mid |
+| 3.8 万亿投资·信息通信业"十五五"规划释放哪些信号（`em`） | `lexicon_chain` | node | `ai_compute/unknown`（链级），industry=算力基础设施 | mid |
+
+> 读法：**路径可信 ≠ 类型可信**——code 直连能零猜测定 chain/node，但"股东回报规划"命中"规划"
+> 被判成 `policy` 仍是误报，故候选一律 `confirm:false`，须人工二次确认。链级政策的正确落点是
+> `node=unknown`（整条链），不硬塞给单一环节。注意第三条源是 `em` 而非部委源——**粒度由信息
+> 主体决定，不由信源决定**。
+
+链路细节与踩坑（7 条教训：6 位代码钩子、公司名冒号钩子过宽、运营商归链级、公告漏扫行业词典、
+跨源去重、promote 契约校验、tmp 目录）见 `assets/design_decisions.md` R6/R7。

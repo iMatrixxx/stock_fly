@@ -1,9 +1,12 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "title": "IndustryEvent",
+  "version": "0.2",
+  "updated": "2026-09-10",
   "description": "产业事件最小单元（events/<date>.jsonl 每行一条）。所有信源收敛到本结构后才谈得上 L2 推演。纪律：text 保留原文摘录、url 可回源；未经二次确认的候选不得写入正式事件流。",
+  "granularity_note": "事件粒度决定落地路径，四者不可混用。stock=公告源自带 code，可直接映射个股（观察池）；node=电报源/新闻通过行业词典或别名归位到链节点（节点信号分）；industry=政策源只有行业语义，进行业标签与报告『宏观催化』小节，严禁伪造个股映射；macro=海外宏观/地缘，被 noise_filter.json 剔除，不写入正式流。",
   "type": "object",
-  "required": ["event_id", "ts", "type", "chain_id", "node", "text", "source", "source_tier", "confidence"],
+  "required": ["event_id", "ts", "type", "granularity", "text", "source", "source_tier", "confidence"],
   "additionalProperties": false,
   "properties": {
     "event_id": {
@@ -16,14 +19,36 @@
       "enum": ["order_win", "price_increase", "shortage", "capacity_expansion", "policy", "rumor"],
       "description": "必须与 events/signals.json 的 event_types[].id 一致"
     },
+    "granularity": {
+      "enum": ["stock", "node", "industry", "macro"],
+      "description": "事件粒度；决定 chain_id/node/target/industry 的必填组合（见 allOf 条件必填）"
+    },
     "chain_id": {"type": "string", "description": "对应 chains/<chain_id>.json；未归链用 other"},
-    "node": {"type": "string", "description": "链内节点 id；未定节点用 unknown"},
+    "node": {"type": "string", "description": "链内节点 id；链级事件或未定节点用 unknown"},
+    "industry": {
+      "type": "array",
+      "items": {"type": "string"},
+      "description": "granularity=industry 时的行业标签（取自 events/industry_lexicon.json 的 label）"
+    },
+    "target": {
+      "type": ["object", "null"],
+      "description": "granularity=stock 时的个股主体",
+      "properties": {
+        "code": {"type": "string"},
+        "name": {"type": "string"}
+      },
+      "required": ["code", "name"],
+      "additionalProperties": true
+    },
     "text": {"type": "string", "minLength": 5, "description": "原文摘录，不改写、不合并数字"},
     "url": {"type": ["string", "null"], "description": "回源链接；无则 null"},
-    "source": {"enum": ["eastmoney_ann", "sse_szse", "sina_fut", "clsing", "eastmoney_news", "other"]},
+    "source": {
+      "enum": ["notice", "cls", "em", "csrc", "miit", "ndrc", "cctv", "sina_fut", "sse_szse", "other"],
+      "description": "信源 id，与实际抓取源一致（notice=东财公告；cls=财联社电报；em=东财快讯；csrc/miit/ndrc/cctv=部委与官媒政策源）"
+    },
     "source_tier": {
       "enum": ["fact", "event", "price", "rumor"],
-      "description": "fact=公告/交易所；price=价格序列；event=电报流；rumor=传闻"
+      "description": "fact=公告/交易所/部委文件；price=价格序列；event=电报流；rumor=传闻"
     },
     "entity": {
       "type": "object",
@@ -33,5 +58,19 @@
     "confidence": {"enum": ["high", "mid", "low"]},
     "verify_ts": {"type": ["string", "null"], "description": "人工/LLM 二次确认时间；未确认为 null"},
     "tags": {"type": "array", "items": {"type": "string"}}
-  }
+  },
+  "allOf": [
+    {
+      "if": {"properties": {"granularity": {"const": "stock"}}},
+      "then": {"required": ["chain_id", "node", "target"]}
+    },
+    {
+      "if": {"properties": {"granularity": {"const": "node"}}},
+      "then": {"required": ["chain_id", "node"]}
+    },
+    {
+      "if": {"properties": {"granularity": {"const": "industry"}}},
+      "then": {"required": ["industry"]}
+    }
+  ]
 }

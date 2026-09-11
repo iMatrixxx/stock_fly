@@ -120,6 +120,30 @@
       }
     ]
   },
+  "industry_intel": {
+    "date": "2026-09-08",
+    "source": "events/2026-09-08.jsonl（P1 事件流：词典预筛 + 人工二次确认）",
+    "note": "产业事件聚合（现象层，不含判断）。node_signals.score=Σ(类型权重×置信度折扣，high=1.0/mid=0.7/low=0.0)仅用于排序；链级事件 node=unknown 不作单环节归因；海外宏观/地缘已在预筛剔除",
+    "summary": { "total": 4, "by_granularity": { "node": 4 }, "by_type": { "policy": 2, "capacity_expansion": 1, "order_win": 1 } },
+    "node_signals": [
+      {
+        "chain_id": "ai_compute",
+        "node": "gpu_chip",
+        "event_count": 2,
+        "score": 4.9,
+        "events": [
+          { "event_id": "E-20260908-0019", "type": "order_win", "granularity": "node", "confidence": "mid", "text": "（事件原文摘要，≤100 字）", "score": 3.5 }
+        ]
+      }
+    ],
+    "chain_level": [
+      { "event_id": "E-20260908-0008", "type": "policy", "granularity": "node", "confidence": "mid", "text": "（链级事件原文摘要）", "chain_id": "ai_compute", "score": 1.4 }
+    ],
+    "stock_watchlist": [
+      { "code": "600584", "name": "长电科技", "chain_id": "ai_compute", "node": "packaging", "types": ["policy"], "max_confidence": "high", "event_ids": ["E-20260904-0003"] }
+    ],
+    "industry_counts": [ { "industry": "房地产", "count": 2 } ]
+  },
   "_example": {
     "说明": "上方字段为示例值，直接替换为真实行情即可；示例板块/个股数据不是 2026-07-30 的真实数据，正式使用时务必用实际行情覆盖。"
   },

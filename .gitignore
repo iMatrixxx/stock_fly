@@ -22,6 +22,12 @@ outputs/
 # 工作区记忆（本地会话上下文，不入库）
 .workbuddy/
 
+# 产业情报每日产物：事件流与候选池（由 tools/filter_news_signals.py 预筛生成，可重跑）
+# 契约与词典资产（events/*.json）仍入库
+events/candidates/
+events/*.jsonl
+
 # 本地临时文件
 *.log
 *.tmp
+tests/_tmp_*

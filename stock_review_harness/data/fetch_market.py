@@ -25,6 +25,8 @@ from ..models import (
 )
 from . import dragon_seats as dragon_seats_mod
 from . import eastmoney, tencent, ths
+from . import industry_intel as industry_intel_mod
+from . import macro_snapshot as macro_mod
 from . import northbound
 from .cache import load_cached_market, save_market_cache
 from .net import fetch_many
@@ -496,6 +498,23 @@ def fetch_market(
     except Exception as e:  # noqa: BLE001
         print(f"  [warn] 宏观快照抓取失败（{str(e)[:100]}），本次不注入", flush=True)
 
+    # ---------- 10. 产业情报事件流（P1 L1 产物 events/<date>.jsonl；可选，缺失不阻断） ----------
+    industry_intel: Optional[dict] = None
+    try:
+        industry_intel = industry_intel_mod.build_industry_intel(date_str)
+        if industry_intel:
+            s = industry_intel["summary"]
+            print(
+                f"  产业情报: 事件 {s['total']} 条"
+                f"（环节信号 {len(industry_intel['node_signals'])} 个 / 链级 {len(industry_intel['chain_level'])} 条 / "
+                f"观察池 {len(industry_intel['stock_watchlist'])} 只）",
+                flush=True,
+            )
+        else:
+            print("  [warn] 无产业事件流（events/<date>.jsonl 不存在或为空），本次不注入", flush=True)
+    except Exception as e:  # noqa: BLE001
+        print(f"  [warn] 产业事件流读取失败（{str(e)[:100]}），本次不注入", flush=True)
+
     market = MarketData(
         date=date_str,
         indices=indices,
@@ -511,6 +530,7 @@ def fetch_market(
         northbound_top10=north_top10,
         dragon_seats=dragon_seats,
         macro=macro_snap,
+        industry_intel=industry_intel,
         notes=[
             "数据源：同花顺日线（指数/板块成交额）+ 东方财富涨停/跌停池 + 腾讯个股K线 + 新浪个股资金流；"
             f"板块主力净流入：{flow_note}；中军尾盘行为取自东财分钟线（近 3 个交易日内可得）",
@@ -523,6 +543,11 @@ def fetch_market(
                 "含前夜盘口径；美元/离岸/外盘未纳入）"
                 if macro_snap
                 else "宏观快照本次缺失（新浪期货接口不可用），报告禁止编造期货涨跌"
+            ),
+            (
+                f"产业事件流源=events/{date_str}.jsonl（词典预筛+人工二次确认，{industry_intel['summary']['total']} 条）"
+                if industry_intel
+                else "产业事件流本次缺失（events/<date>.jsonl 不存在），报告禁止编造产业事件"
             ),
         ],
     )

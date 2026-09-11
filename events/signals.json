@@ -25,7 +25,7 @@
       "id": "capacity_expansion",
       "label": "扩产/投产",
       "weight": 3,
-      "keywords": ["扩产", "扩能", "扩产计划", "新产线", "投产", "达产", "新建产能", "产能扩张", "技改", "产线扩建", "二期项目"]
+      "keywords": ["扩产", "扩能", "扩产计划", "新产线", "新建产线", "新增产能", "投产", "达产", "新建产能", "产能扩张", "技改", "产线扩建", "二期项目"]
     },
     {
       "id": "policy",
@@ -41,12 +41,16 @@
     }
   ],
   "source_priority": {
-    "eastmoney_ann": 3,
+    "notice": 3,
+    "csrc": 3,
+    "miit": 3,
+    "ndrc": 3,
     "sse_szse": 3,
     "sina_fut": 3,
-    "clsing": 2,
-    "eastmoney_news": 2,
+    "cctv": 2,
+    "cls": 2,
+    "em": 2,
     "other": 1
   },
-  "source_priority_note": "3=事实级（公告/交易所/价格序列）；2=事件级（电报/快讯）；1=其他。与 event_types[].weight 相乘得候选强度，仅用于排序，不构成买卖判断。"
+  "source_priority_note": "3=事实级（公告/交易所/部委文件/价格序列）；2=事件级（电报/快讯/官媒转述）；1=其他。与 event_types[].weight 相乘得候选强度，仅用于排序，不构成买卖判断。取值与 hithink_out/raw/news/*.jsonl 的实际 source 字段一致（原 eastmoney_ann/clsing/eastmoney_news 命名已废弃，见 events/schema.json v0.2）。"
 }

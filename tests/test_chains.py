@@ -79,8 +79,11 @@ def test_events_signals_contract():
 
 def test_events_schema_required_fields():
     schema = json.loads((EVENTS / "schema.json").read_text(encoding="utf-8"))
-    for k in ("event_id", "ts", "type", "chain_id", "node", "text", "source", "source_tier", "confidence"):
+    for k in ("event_id", "ts", "type", "granularity", "text", "source", "source_tier", "confidence"):
         assert k in schema["required"], f"schema 缺必填字段 {k}"
+    # v0.2 起 chain_id/node/target/industry 改为按 granularity 条件必填（见 allOf）
+    assert schema["properties"]["granularity"]["enum"] == ["stock", "node", "industry", "macro"]
+    assert len(schema["allOf"]) == 3, "三条条件必填规则：stock/node/industry"
     assert re.fullmatch(schema["properties"]["event_id"]["pattern"], "E-20260910-0001")
     assert not re.fullmatch(schema["properties"]["event_id"]["pattern"], "20260910-1")
 
