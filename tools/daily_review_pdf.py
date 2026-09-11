@@ -1,14 +1,18 @@
 #!/usr/bin/env python3
 """生成前一交易日 A 股复盘报告并发送 PDF 邮件。
 
-流程（2026-09-04 起大班客退役；2026-09-11 起接入日历校正与 ⑧ 门禁）：
+流程（2026-09-04 起大班客退役；2026-09-11 起接入日历校正、⑧ 门禁与证据链复用）：
   0. 交易日历：缓存过期则联网刷新；默认复盘日走统一交易日历（非"只跳周末"）
   1. 确定复盘日期（默认前一交易日；--date 可覆盖）
-  2. fetch_market_snapshot.py（fuyao API）抓指定交易日大盘快照 → pools
-     非交易日（rc=3）自动按日历逐日回退重试，长假后不会跑错日子
-  3. build_dabanke_from_fuyao.py 桥接 pools → 涨停池 JSON（失败则东财池回退）
-  4. harness 联网补行情 → 证据链 + prompt（先清当日同花顺年线缓存防旧行）
-  5. 同花顺缺行时用腾讯行情补两市成交/沪深300
+  2A. 已有 outputs/<date>/evidence.json 且未加 --refresh → **复用证据链，不重抓**
+      （行情链含"只有实时口径"的源：腾讯指数快照 / 东财板块主力净流入，
+       隔天重抓会把当日行情写进历史日）
+  2B. 否则重抓：
+     a. fetch_market_snapshot.py（fuyao API）抓指定交易日大盘快照 → pools
+        非交易日（rc=3）自动按日历逐日回退重试，长假后不会跑错日子
+     b. build_dabanke_from_fuyao.py 桥接 pools → 涨停池 JSON（失败则东财池回退）
+     c. harness 联网补行情 → 证据链 + prompt（先清当日同花顺年线缓存防旧行）
+     d. 同花顺缺行时用腾讯行情补两市成交/沪深300（快照日期不符则跳过）
   5.5 M2 判卷：**补判**所有未计分预测卡（含历史断链的），带 gap 标记 → scorecard.jsonl
   5.6 M2 预测卡冻结：报告末尾如含 `## 次日预测卡` fenced json → forecast.json
   6. 报告正文：优先复用已生成的 复盘报告.md；否则需配置
@@ -22,6 +26,7 @@
   python3 tools/daily_review_pdf.py                 # 前一交易日
   python3 tools/daily_review_pdf.py --date 2026-08-12
   python3 tools/daily_review_pdf.py --date 2026-08-12 --no-email   # 只出 PDF
+  python3 tools/daily_review_pdf.py --date 2026-08-12 --no-email --refresh    # 强制重抓数据
   python3 tools/daily_review_pdf.py --date 2026-08-12 --no-email --skip-verify
 """
 
@@ -176,7 +181,11 @@ def run_harness_market(
 
 
 def fetch_tencent(symbols: str) -> dict[str, dict]:
-    """腾讯行情：{symbol: {name, close, amount_yi}}。"""
+    """腾讯行情：{symbol: {name, close, amount_yi, date}}。
+
+    `date` 取自行情字段 30 的时间戳（YYYYMMDD）；腾讯该接口只返回"当前"快照，
+    没有日期参数，调用方必须用它判断数据是否属于目标复盘日。
+    """
     import urllib.request
 
     url = f"https://qt.gtimg.cn/q={symbols}"
@@ -192,21 +201,35 @@ def fetch_tencent(symbols: str) -> dict[str, dict]:
         key = line.split("=")[0].strip().replace("v_", "")
         f = line.split('"')[1].split("~")
         if len(f) > 37:
+            stamp = (f[30] or "").strip()
             out[key] = {
                 "name": f[1],
                 "close": float(f[3]),
                 "amount_yi": round(float(f[37]) / 1e4, 2),
+                "date": stamp[:8] if len(stamp) >= 8 and stamp[:8].isdigit() else None,
             }
     return out
 
 
 def patch_market_from_tencent(market_paths: list[Path]) -> bool:
-    """同花顺缺行时补两市成交/沪深300/上证指数（data_cache 与 samples 同步）；返回是否修改。"""
+    """同花顺缺行时补两市成交/沪深300/上证指数（data_cache 与 samples 同步）；返回是否修改。
+
+    **仅当腾讯快照日期 == 快照文件的 date 时才补**：这些补数只能取"当前"实时行情，
+    若隔天给历史日补跑，会把次日收盘/成交写进历史日的文件（2026-09-11 实测：
+    给 09-10 补跑会把 09-11 的 4510.16 / 19718.98 亿写进 09-10）。日期不符则跳过，
+    宁可留缺失由 data_gaps 声明。
+    """
     m = json.loads(market_paths[0].read_text(encoding="utf-8"))
+    target_ymd = str(m.get("date") or "").replace("-", "")
     names = {i["name"] for i in m.get("indices") or []}
     changed = False
     notes = list(m.get("notes") or [])
     quotes = fetch_tencent("sh000001,sz399106,sh000300")
+    src_ymd = (quotes.get("sh000001") or {}).get("date")
+    if not target_ymd or src_ymd != target_ymd:
+        print(f"[WARN] 腾讯快照日期 {src_ymd or '未知'} 与快照文件 date {target_ymd or '未知'} 不符，"
+              f"跳过腾讯补数（避免把当日行情写进历史日）", flush=True)
+        return False
 
     # 两市成交额：上证指数 + 深证综指（腾讯口径）
     if not m.get("total_turnover") and quotes.get("sh000001") and quotes.get("sz399106"):
@@ -374,6 +397,8 @@ def main(argv=None) -> None:
                     help="保留参数（已由 fetch_market_snapshot 替代大班客）")
     ap.add_argument("--no-email", action="store_true", help="只生成 PDF，不发送")
     ap.add_argument("--keep-temp", action="store_true", help="保留中间 JSON（调试）")
+    ap.add_argument("--refresh", action="store_true",
+                    help="强制重抓行情数据（默认：已有 evidence.json 即复用，不重抓）")
     ap.add_argument("--skip-verify", action="store_true",
                     help="⑧ 校验未通过时仍然渲染 PDF/发邮件（默认阻断）")
     args = ap.parse_args(argv)
@@ -388,42 +413,50 @@ def main(argv=None) -> None:
 
     with tempfile.TemporaryDirectory(prefix="daily_pdf_") as td:
         tmp = Path(td)
-        # 数据源 ②（2026-09-04 起）：fetch_market_snapshot（fuyao）替代大班客
-        fuyao_pools: Path | None = None
-        try:
-            date_str, limit_pool = fetch_snapshot_limit_pool(
-                date_str, outdir=ROOT / "hithink_out")
-            # 快照成功 → raw/pools.json 含 premiums 溢价节（fetch_market_snapshot 步骤 3.5）
-            fp = ROOT / "hithink_out" / "raw" / "pools.json"
-            if fp.exists():
-                fuyao_pools = fp
-        except Exception as e:  # noqa: BLE001
-            print(f"[WARN] fuyao 快照失败（{str(e)[:120]}），改用东财池回退", flush=True)
-            from tools.build_dabanke_from_eastmoney import build_limit_pool_json
-
-            doc = build_limit_pool_json(date_str)
-            limit_pool = tmp / f"limit_pool_{date_str}.json"
-            limit_pool.write_text(
-                json.dumps(doc, ensure_ascii=False, indent=2), encoding="utf-8"
-            )
-
-        arts = run_harness_market(date_str, limit_pool, ROOT, refresh=True,
-                                  fuyao_pools=fuyao_pools)
-        market_paths = [
-            ROOT / "data_cache" / f"market_{date_str}.json",
-            ROOT / "samples" / f"market_{date_str}.json",
-        ]
-        existing = [p for p in market_paths if p.exists()]
-        if existing:
+        ev_path = evidence_path(ROOT, date_str)
+        # 证据链是"那一天的产物"：行情抓取链里含多个**只有实时口径**的源
+        # （腾讯指数快照 / 东财板块主力净流入），隔天重抓会把当日数据写进历史日。
+        # 因此默认复用已有 evidence.json，只有 --refresh 才重抓。
+        if ev_path.exists() and ev_path.stat().st_size > 0 and not args.refresh:
+            print(f"[INFO] 复用已有证据链（--refresh 可强制重抓）: {ev_path}", flush=True)
+            arts = {"evidence": ev_path, "prompt": prompt_path(ROOT, date_str)}
+        else:
+            # 数据源 ②（2026-09-04 起）：fetch_market_snapshot（fuyao）替代大班客
+            fuyao_pools: Path | None = None
             try:
-                if patch_market_from_tencent(existing):
-                    print("[INFO] 腾讯行情补齐缺失字段，重跑 harness", flush=True)
-                    arts = run_harness_market(
-                        date_str, limit_pool, ROOT,
-                        market_json=ROOT / "samples" / f"market_{date_str}.json",
-                    )
+                date_str, limit_pool = fetch_snapshot_limit_pool(
+                    date_str, outdir=ROOT / "hithink_out")
+                # 快照成功 → raw/pools.json 含 premiums 溢价节（fetch_market_snapshot 步骤 3.5）
+                fp = ROOT / "hithink_out" / "raw" / "pools.json"
+                if fp.exists():
+                    fuyao_pools = fp
             except Exception as e:  # noqa: BLE001
-                print(f"[WARN] 腾讯补数失败（{str(e)[:100]}），按缺失处理", flush=True)
+                print(f"[WARN] fuyao 快照失败（{str(e)[:120]}），改用东财池回退", flush=True)
+                from tools.build_dabanke_from_eastmoney import build_limit_pool_json
+
+                doc = build_limit_pool_json(date_str)
+                limit_pool = tmp / f"limit_pool_{date_str}.json"
+                limit_pool.write_text(
+                    json.dumps(doc, ensure_ascii=False, indent=2), encoding="utf-8"
+                )
+
+            arts = run_harness_market(date_str, limit_pool, ROOT, refresh=True,
+                                      fuyao_pools=fuyao_pools)
+            market_paths = [
+                ROOT / "data_cache" / f"market_{date_str}.json",
+                ROOT / "samples" / f"market_{date_str}.json",
+            ]
+            existing = [p for p in market_paths if p.exists()]
+            if existing:
+                try:
+                    if patch_market_from_tencent(existing):
+                        print("[INFO] 腾讯行情补齐缺失字段，重跑 harness", flush=True)
+                        arts = run_harness_market(
+                            date_str, limit_pool, ROOT,
+                            market_json=ROOT / "samples" / f"market_{date_str}.json",
+                        )
+                except Exception as e:  # noqa: BLE001
+                    print(f"[WARN] 腾讯补数失败（{str(e)[:100]}），按缺失处理", flush=True)
 
         # 资讯增量采集（消息面/催化归因素材，供报告撰写参考；失败不阻断复盘）
         fetch_news_incremental()

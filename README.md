@@ -105,7 +105,7 @@ build_dabanke_from_  │       models.py（统一数据模型）       outputs/<
 | ① | 确定复盘日期 | 脚本/人 | `--date YYYY-MM-DD`；默认前一交易日，周末自动跳过 |
 | ② | 大盘快照 | fuyao SDK（`fetch_market_snapshot.py`） | `hithink_out/raw/pools.json`：指数/板块/涨跌停池/连板天梯/昨日涨停池 + `premiums` 溢价节（步骤 3.5：昨日池 92/93 只逐票算开盘溢价与 A 杀） |
 | ③ | 联网补行情 | harness（东财/同花顺/腾讯/新浪） | 成交额、板块资金流、中军 K 线/溢价/尾盘、跌幅榜、**龙虎榜买卖前五席位（dragon_seats，机构/北向/游资结构，净买前 12 采样）**、北向十大活跃股、**当日宏观快照（macro_snapshot：新浪期货日K主力连续 8 品种，含前夜盘）**；失败降级标注不中断 |
-| ④ | 腾讯补缺 | harness | 同花顺日线缺行时，用腾讯行情补两市成交与沪深 300 |
+| ④ | 腾讯补缺 | harness | 同花顺日线缺行时，用腾讯行情补两市成交与沪深 300（**快照时间戳日期须等于复盘日**，否则跳过，见 §6.6） |
 | ⑤ | 证据链 + prompt | harness（确定性） | `outputs/<date>/evidence.json`（纯数据：情绪/资金/周期 + **`board_pools` 板块内领涨标的池**——涨停股按行业归组列个股，写板块资金必落标的；无该行业=当日无涨停，子板块资金不编造）+ `outputs/<date>/prompt.md` |
 | ⑥ | 资讯增量采集 | `fetch_news.py`（幂等去重） | `hithink_out/raw/news/*.jsonl`；关键词取当日 evidence 题材，摘要注入 prompt 时**按发布时间分 A/B 两桶**——A（≤15:00 盘前/盘中）可作当日归因，B（盘后）仅限次日条件预期 |
 | ⑦ | 报告撰写 | LLM / 人 | `outputs/<date>/复盘报告.md`；无既有 md 时需配置 `LLM_API_URL/MODEL/KEY` 自动生成 |
@@ -128,12 +128,19 @@ python3 tools/daily_review.py --date 2026-09-04
 
 # 报告已人工确认、要强行出 PDF（跳过 ⑧ 门禁）
 python3 tools/daily_review_pdf.py --date 2026-09-04 --no-email --skip-verify
+
+# 强制重抓行情（默认：已有 evidence.json 则复用，见 §6.6）
+python3 tools/daily_review_pdf.py --date 2026-09-04 --no-email --refresh
 ```
 
 > **⑧ 门禁行为（2026-09-11 起）**：`daily_review_pdf.py` 在渲染 PDF 前自动跑双通道校验，
 > 可疑数字或"该覆盖未覆盖"非空即**中止**（不打 PDF、不发邮件），并打印清单。修正
 > `outputs/<date>/复盘报告.md` 后**重跑即可**（⑨ 只读 md，不会覆盖你的修改）；
 > 确需放行加 `--skip-verify`（会在日志里留痕）。
+>
+> **数据复用行为（2026-09-11 起）**：已有 `evidence.json` 时默认**不重抓数据**，只跑
+> ⑦.5 判卷 → ⑧ 门禁 → ⑨ 渲染 → ⑩ 邮件。**给历史日期补跑一律不要加 `--refresh`**——
+> 行情链含只有实时口径的源，重抓会把当天行情写进历史日（详见 §6.6）。
 
 分步执行等价于逐条跑：`fetch_market_snapshot.py --date` → `build_dabanke_from_fuyao.py`
 （失败回退 `build_dabanke_from_eastmoney.py`）→ `python3 -m stock_review_harness.cli <date>
@@ -383,6 +390,29 @@ $PY tools/refresh_trading_calendar.py     # 刷新 data_cache/trading_calendar.j
 "该覆盖未覆盖"任一非空 → 打印清单并**中止**（不打 PDF、不发邮件）。修正报告 md 后重跑
 即可（⑨ 只读 md 不覆盖）；`--skip-verify` 可显式放行（日志留痕）。校验读不到文件时同样
 中止——不允许"未校验产出"静默流出。
+
+### 6.6 实时源日期护栏与证据链复用（2026-09-11 起）
+
+行情链里有几个**只返回"当前"快照、没有日期参数**的源，它们的正确性隐含"今天跑今天"：
+
+| 源 | 位置 | 隔天补跑的后果（2026-09-11 实测） |
+|---|---|---|
+| 腾讯指数行情 `qt.gtimg.cn` | `fetch_market._patch_index_close_from_tencent` | 沪深300 被写成 4510.16（09-11 收盘），真值 4548.39 |
+| 腾讯指数行情（编排层补数） | `daily_review_pdf.patch_market_from_tencent` | 两市成交被写成 19718.98 亿，真值 16471.48 亿 |
+| 东财板块主力净流入 | `eastmoney.board_flows()` | 板块资金流变成"今天"的（半导体 -23.25 → -87.99 亿） |
+
+**两层防护**：
+
+1. **日期校验**：腾讯行情字段 30 是快照时间戳（`YYYYMMDDHHMMSS`）。指数覆盖与编排层补数
+   都必须先确认 `时间戳日期 == 复盘日`，不符则跳过（宁可留缺失，也不把别的日期写进这一天）。
+   取不到时间戳同样按"无法确认"跳过。
+2. **证据链默认复用**：`daily_review_pdf` 发现 `outputs/<date>/evidence.json` 已存在时
+   **不重抓数据**（`--refresh` 才强制重抓）。证据链是"那一天的产物"，隔天重抓必然掺入
+   实时源。这与"报告正文优先复用已有 md"是同一条原则。
+
+> 事故复盘：09-10 的报告在 09-11 补跑时被 ⑧ 门禁拦下 24 个数字。**门禁是对的**——上游
+> 把 09-11 的行情写进了 09-10 的证据链，报告里那些数字反而才是真值。修护栏 + 复用证据链
+> 后重跑，门禁 252 个数字全过。
 
 ---
 

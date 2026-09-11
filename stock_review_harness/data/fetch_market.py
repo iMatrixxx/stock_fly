@@ -158,10 +158,27 @@ _TENCENT_INDEX = {
 }
 
 
+def _tencent_snapshot_date(fields: list[str]) -> str | None:
+    """腾讯行情字段 30 是行情时间戳（`YYYYMMDDHHMMSS`，如 20260911155015）。
+
+    取其中 YYYYMMDD；取不到返回 None（调用方应视为"无法确认"而放弃使用）。
+    """
+    if len(fields) <= 30:
+        return None
+    stamp = (fields[30] or "").strip()
+    return stamp[:8] if len(stamp) >= 8 and stamp[:8].isdigit() else None
+
+
 def _patch_index_close_from_tencent(date_str: str, idx_rows: dict) -> None:
     """当日/近期复盘（距今 ≤5 个自然日）：同花顺指数当日行在收盘结算前
     是盘中快照（如 08-17 上证被报成 3960.19，而腾讯/新浪/东财一致为 3982.65），
     用腾讯收盘行情覆盖/补全当日行，保证指数与两市成交口径正确。历史日期跳过。
+
+    **必须校验腾讯快照自身的日期**：该接口只返回"当前"快照、没有日期参数，
+    仅凭"距今 ≤5 天"不足以判断它属于哪一天。隔天补跑历史日若不校验，就会把
+    **次日收盘写进历史日的槽位**——2026-09-11 实测：`--date 2026-09-10` 补跑时，
+    沪深300 被写成 4510.16（09-11 收盘），正确值是 4548.39（09-10 收盘），
+    两市成交额同步被污染成 19718.98（应为 16471.48）。
     """
     try:
         if (_date.today() - _date.fromisoformat(date_str)).days > 5:
@@ -190,6 +207,10 @@ def _patch_index_close_from_tencent(date_str: str, idx_rows: dict) -> None:
             continue
         f = line.split('"')[1].split("~")
         if len(f) <= 37:
+            continue
+        if _tencent_snapshot_date(f) != ymd:
+            # 快照不是复盘日当天（隔天补跑 / 盘前取到上一交易日）→ 不覆盖，
+            # 宁可保留同花顺原值或缺失，也不能把别的日期写进这一天
             continue
         try:
             close = float(f[3])
