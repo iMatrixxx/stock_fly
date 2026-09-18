@@ -12,7 +12,9 @@ from collections import Counter
 from datetime import datetime
 
 from ..data.validate import validate_bundle
+from ..logic.chain_map import build_chain_map
 from ..logic.conditions import leader_ma_distances, quantify
+from ..logic.concentration import board_taxonomy_guard, build_capital_concentration
 from ..logic.cycle import build_cycle_context
 from ..logic.diagnostics import diagnose
 from ..logic.forecast import forecast_capital_migration
@@ -44,12 +46,54 @@ def _data_gaps(bundle: DataBundle) -> list[str]:
             "成交额口径），禁止编造北向净买入/净流出方向"
         )
     missing_flow = [b.name for b in m.boards[:8] if b.main_flow is None]
-    if missing_flow:
-        gaps.append(f"以下主要板块主力净流入缺失：{'、'.join(missing_flow)}")
+    if len(missing_flow) == 1:
+        # 单板块缺失：保留"缺失：名称"写法。覆盖检查会把这个板块名当主题词，
+        # 逐行核对报告提到它时是否带免责措辞（09-14 的"军工装备"即此例：3 处提及
+        # 全部带"缺失"，检查通过且报告读起来不啰嗦）。
+        gaps.append(f"以下主要板块主力净流入缺失：{missing_flow[0]}")
+    elif missing_flow:
+        # 多板块**整体**缺失：改为"整体未采信 + 禁止引用"的整体式声明。
+        #
+        # 为什么不沿用"缺失：名称"：`checklist._gap_topics` 从该句只抽出**首个**板块名，
+        # 再要求报告**每一行**提到它都带免责词。对"军工装备"这类低频词好用，但对
+        # "半导体"这种当日出现 25 次、且大多落在涨停家数/成交额/方向分语境里的板块名，
+        # 会逼出 16 行重复免责（09-17 实测），且抽到谁只取决于列表顺序（首个缺失板块），
+        # 与"哪个板块真的被误用了资金流数据"无关。
+        #
+        # 整体缺失时真正的防线是**数字核对**而非免责词：板块净流入此时全为 None，
+        # 报告里出现任何板块净流入数字都会直接判"证据链外"——比逐行免责更硬。
+        # 措辞同样刻意不含"缺失："冒号与 2–8 字括号（见 checklist._gap_topics）。
+        gaps.append(
+            f"前 {len(missing_flow)} 大板块主力净流入本次整体未采信"
+            "（源不可用或口径不可回溯），报告禁止引用任何板块主力净流入数字，"
+            "板块资金只能用成交额原值、换手趋势与个股级资金/席位结构表述："
+            + "、".join(missing_flow)
+        )
     if not m.yesterday_premiums:
         gaps.append("昨日涨停股今日开盘溢价缺失，接力意愿只能参考晋级率")
     if not bundle.context:
         gaps.append("多日上下文缺失（资金迁移/情绪周期/龙头竞争数据不足，只能基于当日判断）")
+    # 指数派生字段降级：同花顺当日行缺失/抓取超时，或只有腾讯"当前快照"收盘价时，
+    # 涨跌幅与 MA5 会静默变成 None。显式声明，避免报告把"没算出来"当成"没这项"。
+    degraded = [i.name for i in m.indices if i.change_pct is None or i.ma5 is None]
+    if degraded:
+        gaps.append(
+            "以下指数当日涨跌幅或 MA5 缺失，报告引用指数须注明该数据不可得："
+            + "、".join(degraded)
+        )
+    if m.prev_total_turnover is None:
+        gaps.append(
+            "两市成交额环比缺失（前一交易日成交额不可得），报告禁止编造环比数值"
+        )
+    # 板块集合口径：Σ板块成交 ÷ 两市成交 越界 = 板块集合含多层级嵌套，
+    # 此时板块成交占比既不可加也不可比。措辞刻意不含"缺失："冒号与括号，
+    # 以免被覆盖检查的主题词抽取规则误当成新主题（见 checklist._gap_topics）。
+    guard = board_taxonomy_guard(m)
+    if not guard["ok"]:
+        gaps.append(
+            "板块集合口径不一致，板块成交占比本日整体未采信、行业集中度不可用，"
+            "报告禁止引用该日任何板块占比数字，也禁止与其它交易日的板块占比做比较"
+        )
     return gaps
 
 
@@ -141,6 +185,16 @@ def _industry_intel_section(bundle: DataBundle) -> dict | None:
     if not ii:
         return None
     return ii
+
+
+def _event_verification_section(bundle: DataBundle) -> dict | None:
+    """事件验证层（第 1 段「产业情报」的独立源核对）——**纯透传**。
+
+    数据在 `fetch_market` 第 11 步由 `data/events_db.build_verification` 组装
+    （价格侧=期货序列，公告侧=巨潮账本；两者都是"数据"动作，不放在本格式化层）。
+    节为 None 时报告须写"当日无验证数据"，**禁止**编造核实结论。
+    """
+    return bundle.market.event_verification
 
 
 def _market_section(bundle: DataBundle) -> dict:
@@ -616,6 +670,9 @@ def to_evidence_dict(bundle: DataBundle) -> dict:
     capital_migration = build_capital_migration(
         bundle.date, bundle.market, board_series, zt_history
     )
+    # 事件流聚合只算一次：industry_intel 节与 chain_map 的节点事件分共用同一份数据，
+    # 两次调用虽幂等，但共用变量能保证两者引用的"事件"完全一致（避免将来参数漂移）。
+    industry_intel = _industry_intel_section(bundle)
     return {
         "meta": {
             "date": bundle.date,
@@ -637,7 +694,9 @@ def to_evidence_dict(bundle: DataBundle) -> dict:
         },
         "market": _market_section(bundle),
         "macro": _macro_section(bundle),
-        "industry_intel": _industry_intel_section(bundle),
+        "industry_intel": industry_intel,
+        # 事件验证：给第 1 段的事件配独立源核对（价格侧=期货序列，公告侧=巨潮账本）
+        "event_verification": _event_verification_section(bundle),
         "dragon_top": _dragon_section(bundle),
         "dragon_seats": _dragon_seats_section(bundle),
         "emotion": _emotion_section(bundle),
@@ -657,6 +716,15 @@ def to_evidence_dict(bundle: DataBundle) -> dict:
         "capital_forecast": forecast_capital_migration(capital_migration),
         "leader_rivalry": build_leader_rivalry(
             bundle.date, bundle.market.zt_pool, zt_history
+        ),
+        # 集中度（资金摊开程度）：industry 段受板块口径护栏约束，zt 段口径无关恒可用
+        "capital_concentration": build_capital_concentration(
+            bundle.date, bundle.market, bundle.limit_pool
+        ),
+        # 产业链环节视图：把行业标签换成链条环节，并置涨停/外资活跃/龙虎榜三类来源
+        "chain_map": build_chain_map(
+            bundle.date, bundle.market, bundle.limit_pool,
+            industry_intel=industry_intel,
         ),
     }
 

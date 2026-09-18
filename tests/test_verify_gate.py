@@ -38,7 +38,7 @@ FABRICATED_REPORT = "# 复盘报告\n\n天普股份 三连板，主力净流入 
 
 class VerifyBundleTest(unittest.TestCase):
     def test_clean_report_passes(self):
-        b = verify_bundle(GOOD_REPORT, EVIDENCE)
+        b = verify_bundle(GOOD_REPORT, EVIDENCE, structure=False)
         self.assertTrue(b["ok"], msg=b["blocking"])
         self.assertEqual(b["blocking"], [])
         self.assertIsNotNone(b["coverage"])
@@ -58,12 +58,12 @@ class VerifyBundleTest(unittest.TestCase):
 
     def test_plan_param_marker_is_exempt(self):
         report = "# 复盘\n\n天普股份 三连板。单票上限 3000 万元（计划参数）。\n"
-        b = verify_bundle(report, EVIDENCE)
+        b = verify_bundle(report, EVIDENCE, structure=False)
         self.assertNotIn("3000", b["numbers"]["suspects"])
         self.assertTrue(b["ok"], msg=b["blocking"])
 
     def test_coverage_can_be_disabled(self):
-        b = verify_bundle(NO_NAME_REPORT, EVIDENCE, coverage=False)
+        b = verify_bundle(NO_NAME_REPORT, EVIDENCE, coverage=False, structure=False)
         self.assertIsNone(b["coverage"])
         self.assertTrue(b["ok"])  # 只跑数字核对时该报告是干净的
 
@@ -109,7 +109,11 @@ class RunVerifyGateTest(unittest.TestCase):
 
 
 class RealReportRegressionTest(unittest.TestCase):
-    """真实产物回归：09-10 定稿报告应能通过门禁（产物缺失时跳过）。"""
+    """真实产物回归：09-10 定稿报告应能通过门禁（产物缺失时跳过）。
+
+    09-10 早于结构契约生效日，故结构检查按生效日规则自动跳过——这条同时也回归了
+    "历史日重渲染 PDF 不被新契约误拦"（见 report/outline.STRUCTURE_FROM）。
+    """
 
     def test_real_report_passes_gate(self):
         report = ROOT / "outputs" / "2026-09-10" / "复盘报告.md"
@@ -117,8 +121,10 @@ class RealReportRegressionTest(unittest.TestCase):
         if not (report.exists() and ev.exists()):
             self.skipTest("09-10 产物不在（outputs/ 不入库），跳过")
         b = verify_bundle(report.read_text(encoding="utf-8"),
-                          json.loads(ev.read_text(encoding="utf-8")))
+                          json.loads(ev.read_text(encoding="utf-8")),
+                          date_str="2026-09-10")
         self.assertTrue(b["ok"], msg=b["blocking"])
+        self.assertFalse(b["structure"]["checked"])
 
 
 if __name__ == "__main__":

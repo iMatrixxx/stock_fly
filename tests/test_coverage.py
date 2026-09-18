@@ -136,3 +136,153 @@ class CheckCoveragePipelineSmokeTest(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+# ---------------------------------------------------------------------------
+# 事件验证纪律（check_coverage 第 6 条）——独立源核对的三条硬约束
+# ---------------------------------------------------------------------------
+
+_EV_FIXTURE_BASE = {
+    "meta": {"data_gaps": []},
+    "event_verification": {
+        "counts": {"confirmed": 0, "not_confirmed": 1, "ambiguous": 0, "no_data": 1},
+        "price_checks": [
+            {"event_id": "E-1", "type": "price_increase", "verdict": "not_confirmed"},
+        ],
+        "order_checks": [
+            {"event_id": "E-2", "type": "order_win", "verdict": "no_data",
+             "matched_by": None},
+        ],
+        "no_source_nodes": [
+            {"chain_id": "ai_compute", "node": "storage", "reason": "无商品期货"},
+        ],
+    },
+}
+
+
+def _ev_fixture(**overrides) -> dict:
+    d = json.loads(json.dumps(_EV_FIXTURE_BASE))
+    d["event_verification"].update(overrides)
+    return d
+
+
+class EventVerificationCoverageTest(unittest.TestCase):
+    """第 6 条规则的三种违规必须被拦，合规报告必须通过。"""
+
+    def test_compliant_report_passes(self):
+        rpt = ("碳酸锂事件经期货序列核对，价格侧未同步；公告侧核对对象无法定位、"
+               "无数据；存储环节无验证源，不作涨价结论。")
+        s = check_coverage(rpt, _ev_fixture())["summary"]
+        self.assertNotIn("event_verification_violations", [k for k, v in s.items() if v])
+        self.assertEqual(s["event_verification_violations"], [])
+
+    def test_claim_without_confirmed_is_blocked(self):
+        """无 confirmed 项却写「已证实」→ 越证据断言。"""
+        rpt = "碳酸锂事件已经得到印证，价格侧同步走强，公告侧也已证实。"
+        s = check_coverage(rpt, _ev_fixture())["summary"]
+        self.assertIn("claim_without_confirmed", s["event_verification_violations"])
+
+    def test_claim_allowed_when_confirmed_exists(self):
+        fx = _ev_fixture(price_checks=[
+            {"event_id": "E-1", "type": "price_increase", "verdict": "confirmed"}])
+        rpt = "碳酸锂事件已获验证，价格侧同步走强；存储环节无验证源。"
+        s = check_coverage(rpt, fx)["summary"]
+        self.assertNotIn("claim_without_confirmed", s["event_verification_violations"])
+
+    def test_no_source_undisclosed_is_blocked(self):
+        """存在无验证源环节，报告却完全没有无数据类免责措辞。"""
+        rpt = "核对后碳酸锂价格侧走势与事件一致，公告侧亦有对应主体。"
+        s = check_coverage(rpt, _ev_fixture())["summary"]
+        self.assertIn("no_source_undisclosed", s["event_verification_violations"])
+
+    def test_verification_unused_is_blocked(self):
+        """有可核对项却完全不提核对（该节成了摆设）。"""
+        rpt = "碳酸锂无数据；存储无数据。"  # 有免责词但没有核对动作词
+        s = check_coverage(rpt, _ev_fixture())["summary"]
+        self.assertIn("verification_unused", s["event_verification_violations"])
+
+    def test_absent_section_skips_with_note(self):
+        fx = {"meta": {"data_gaps": []}}
+        r = check_coverage("随便写点。", fx)
+        self.assertTrue(any("event_verification" in n for n in r["summary"]["notes"]))
+        self.assertEqual(r["summary"]["event_verification_violations"], [])
+        self.assertEqual(r["event_verification"], [])
+
+
+# ---------- 板块资金流缺口：单板块 vs 多板块整体 ----------
+#
+# 09-17 复盘实测暴露的口径缺口：`_gap_topics` 只从「…缺失：A、B、C」里抽**首个**
+# 板块名，再要求报告**每一行**提到它都带免责词。单板块（09-14 军工装备，3 处提及）
+# 时这套规则很好用；多板块整体缺失时它会退化成"盯住排第一的那个板块名"——09-17
+# 抽到"半导体"（当日出现 25 次、16 行落地在涨停/成交额/方向语境）→ 逼出 16 行
+# 冗余免责，而且抽到谁纯取决于列表顺序。故多板块整体缺失改为整体式声明
+# （不含"缺失："冒号与 2–8 字括号，主动避开主题词抽取），真正的防线交给数字核对：
+# 板块净流入全为 None 时，报告里任何板块净流入数字都判"证据链外"。
+
+_MULTI_BOARDS = ["半导体", "通信设备", "元件", "通用设备",
+                 "光学光电子", "电子化学品", "电池", "汽车零部件"]
+
+
+def _bundle_with_boards(missing: list[str]):
+    """只带板块行情的 DataBundle：其余字段保持默认，避免别的缺口干扰断言。"""
+    from stock_review_harness.models import (
+        BoardQuote, DataBundle, LimitPoolData, MarketData,
+    )
+    boards = [BoardQuote(name=n, turnover=100.0, main_flow=None) for n in missing]
+    return DataBundle(
+        date="2026-09-17",
+        market=MarketData(date="2026-09-17", boards=boards, total_turnover=18231.34,
+                          prev_total_turnover=19000.0),
+        limit_pool=LimitPoolData(date="2026-09-17", summary={}, pool=[],
+                                 blasted=[], concepts=[]),
+        context={"zt_history": ["2026-09-16"]},
+    )
+
+
+def _flow_gap(gaps: list[str]) -> str:
+    hit = [g for g in gaps if "板块主力净流入" in g or "主力净流入" in g]
+    assert hit, f"未生成资金流缺口：{gaps}"
+    return hit[0]
+
+
+class BoardFlowGapWordingTest(unittest.TestCase):
+    def test_single_board_keeps_precise_wording(self):
+        """单板块缺失：保留「缺失：名称」→ 主题词=该板块名，逐行免责仍生效。"""
+        from stock_review_harness.report.checklist import _gap_topics
+        from stock_review_harness.report.evidence import _data_gaps
+        gap = _flow_gap(_data_gaps(_bundle_with_boards(["军工装备"])))
+        self.assertEqual(gap, "以下主要板块主力净流入缺失：军工装备")
+        self.assertEqual(_gap_topics(gap), ["军工装备"])
+        # 逐行免责规则仍然咬得住：提了却不带免责词 → 违规
+        s = check_coverage("军工装备走强，建议加仓。",
+                           {"meta": {"data_gaps": [gap]}})["summary"]
+        self.assertIn("军工装备", s["gap_violations"])
+
+    def test_multi_board_switches_to_overall_statement(self):
+        """多板块整体缺失：不再产出「缺失：名称」，主题词为空 → 不误伤高频板块名。"""
+        from stock_review_harness.report.checklist import _gap_topics
+        from stock_review_harness.report.evidence import _data_gaps
+        gap = _flow_gap(_data_gaps(_bundle_with_boards(_MULTI_BOARDS)))
+        self.assertNotIn("缺失：", gap)
+        self.assertIn("整体未采信", gap)
+        self.assertIn("禁止引用任何板块主力净流入数字", gap)
+        for name in _MULTI_BOARDS:          # 板块名仍要如实列出，供作者对照
+            self.assertIn(name, gap)
+        self.assertEqual(_gap_topics(gap), [])   # 关键：不再抽板块名当主题词
+
+    def test_multi_board_no_per_line_disclaimer_burden(self):
+        """多板块整体缺失时，报告多次提及「半导体」不再被判违规。"""
+        from stock_review_harness.report.evidence import _data_gaps
+        gap = _flow_gap(_data_gaps(_bundle_with_boards(_MULTI_BOARDS)))
+        rpt = ("半导体方向涨停 2 家、最高 3 板，成交 2294.40 亿；"
+               "通信设备放量衰减；元件跌幅最大。")
+        s = check_coverage(rpt, {"meta": {"data_gaps": [gap]}})["summary"]
+        self.assertEqual(s["gap_violations"], [])
+
+    def test_two_boards_also_uses_overall_statement(self):
+        """阈值是 ≥2：两个板块缺失也走整体式声明（逐行免责只对单板块保留）。"""
+        from stock_review_harness.report.checklist import _gap_topics
+        from stock_review_harness.report.evidence import _data_gaps
+        gap = _flow_gap(_data_gaps(_bundle_with_boards(["半导体", "元件"])))
+        self.assertNotIn("缺失：", gap)
+        self.assertEqual(_gap_topics(gap), [])
