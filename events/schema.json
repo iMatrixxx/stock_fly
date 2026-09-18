@@ -1,8 +1,9 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "title": "IndustryEvent",
-  "version": "0.2",
-  "updated": "2026-09-10",
+  "version": "0.3",
+  "updated": "2026-09-17",
+  "version_note": "v0.3（2026-09-17）新增 `confirmed_by` 与 `confirm_reason`：二次确认的归属与理由此前只存在于候选池的 `_review` 里，而 `_review` 在 promote 时被剥掉——「这条订单事件是谁确认的、凭什么」在正式事件流里**无法回答**，且候选池每天被覆盖重写。v2 把裁定归属定给写报告的 LLM 后，审计信息必须随事件落盘。两字段均为**可选**（历史行无此字段仍合法）。",
   "description": "产业事件最小单元（events/<date>.jsonl 每行一条）。所有信源收敛到本结构后才谈得上 L2 推演。纪律：text 保留原文摘录、url 可回源；未经二次确认的候选不得写入正式事件流。",
   "granularity_note": "事件粒度决定落地路径，四者不可混用。stock=公告源自带 code，可直接映射个股（观察池）；node=电报源/新闻通过行业词典或别名归位到链节点（节点信号分）；industry=政策源只有行业语义，进行业标签与报告『宏观催化』小节，严禁伪造个股映射；macro=海外宏观/地缘，被 noise_filter.json 剔除，不写入正式流。",
   "type": "object",
@@ -57,6 +58,14 @@
     },
     "confidence": {"enum": ["high", "mid", "low"]},
     "verify_ts": {"type": ["string", "null"], "description": "人工/LLM 二次确认时间；未确认为 null"},
+    "confirmed_by": {
+      "enum": ["human", "rule", "llm"],
+      "description": "二次确认的归属（v0.3）：human=人在编辑器里勾选；rule=按 signals.json 的 auto_confirm_via 白名单自动晋级（该白名单默认空）；llm=写报告环节的 LLM 按裁定包裁定。默认由 promote() 填 human（旧候选无标记时的兜底）。"
+    },
+    "confirm_reason": {
+      "type": "string",
+      "description": "二次确认的理由（v0.3）：LLM 裁定必填（校验强制 ≥4 字）；人工确认可省。落盘后可供次日复核「当时的判断依据是否成立」。"
+    },
     "tags": {"type": "array", "items": {"type": "string"}}
   },
   "allOf": [

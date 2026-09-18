@@ -25,13 +25,17 @@ from tools.filter_news_signals import (  # noqa: E402
     VIA_CONFIDENCE,
     build_ctx,
     classify,
+    confirm_by_rule,
     has_ahook,
+    load_announcement_noise,
+    load_auto_confirm_via,
     load_chains,
     load_lexicon,
     load_noise,
     load_signals,
     match_longest,
     noise_rule,
+    promote,
     run,
     validate_event,
 )
@@ -338,3 +342,152 @@ def test_date_filter_excludes_other_days(news_dir, ctx):
     (news / "a.jsonl").write_text(json.dumps(rows[0], ensure_ascii=False) + "\n", encoding="utf-8")
     _, cands, stats, _, _ = run("2026-09-08", ctx, news)
     assert stats["candidates"] == 0
+
+
+# ---------- 4) 规则化确认 + 公告定式过滤（v0.2，2026-09-16） ----------
+#
+# 背景：事件流的"二次确认"原先只有人工一条路，实测 8 个交易日只有 3 天产出，
+# 报告第 1 段（v2 因果链起点）被架空。引入规则化确认后**首版默认错了**——
+# 按 via=extra_code 自动晋级，实测三天 25 条候选里 0 条归链、内容多为治理定式。
+# 以下测试锁死两件事：① 定式词必须能拦住带 code 的公告；② 白名单默认留空。
+
+
+def test_announcement_noise_contract():
+    d = json.loads((EVENTS / "noise_filter.json").read_text(encoding="utf-8"))
+    node = d["announcement_noise"]
+    assert node["phrases"], "announcement_noise.phrases 不得为空"
+    assert node["note"], "announcement_noise 必须写明存在理由（防后人误删）"
+
+
+def test_announcement_formula_beats_code_exemption():
+    """公告定式词在 code 豁免**之前**生效。
+
+    否则治理类公告（自带 code）永远剔不掉：『未来三年股东回报规划』会命中
+    signals.json 的 policy 关键词『规划』，变成一条假的"政策事件"。
+    """
+    phrases, sk, hooks, exempt, deny = _noise_args()
+    ann = load_announcement_noise(EVENTS / "noise_filter.json")
+    assert ann, "announcement_noise 未加载到——测试环境资产缺失"
+
+    text = "杭叉集团: 杭叉集团股份有限公司未来三年(2026-2028年)股东分红回报规划"
+    extra = {"code": "603298", "name": "杭叉集团"}
+    assert noise_rule(text, text, extra, phrases, sk, hooks, exempt, deny,
+                      ann) == "announcement_formula"
+
+    # 同一只票的真实订单公告必须照常放行（证明拦截来自定式词，不是滥杀公告源）
+    real = "杭叉集团: 关于签订20亿元叉车出口订单的公告"
+    assert noise_rule(real, real, extra, phrases, sk, hooks, exempt, deny, ann) is None
+
+
+def test_noise_rule_without_ann_phrases_is_backward_compatible():
+    """不传 ann_phrases 时行为与 v0.1 一致——老调用方与既有测试按位置传 8 个参数。"""
+    phrases, sk, hooks, exempt, deny = _noise_args()
+    text = "杭叉集团: 未来三年股东回报规划"
+    assert noise_rule(text, text, {"code": "603298"},
+                      phrases, sk, hooks, exempt, deny) is None
+
+
+def test_auto_confirm_via_defaults_to_empty():
+    """白名单默认留空＝全人工确认。
+
+    安全默认是"不自动晋级"，不是"悄悄放宽『未经二次确认不得入正式流』的纪律"。
+    首版把它设成 ["extra_code"] 已被实测否掉（见 signals.json 的
+    auto_confirm_rejected_extra_code），本断言防它被改回去。
+    """
+    assert load_auto_confirm_via(EVENTS / "signals.json") == []
+
+
+def test_auto_confirm_via_missing_or_malformed():
+    """词典缺失/形状不对 → 空表（即"全人工"），不兜底成 ['extra_code']。"""
+    assert load_auto_confirm_via(EVENTS / "no_such_file.json") == []
+
+
+@pytest.fixture
+def tmp_cand_dir():
+    """在仓库内建临时候选池目录（沙箱不允许写系统 tmp）。"""
+    d = Path(tempfile.mkdtemp(prefix="_tmp_cand_", dir=str(ROOT / "tests")))
+    try:
+        yield d
+    finally:
+        shutil.rmtree(d, ignore_errors=True)
+
+
+def _cand(seq: int, via: str, code: str = "000001", etype: str = "order_win") -> dict:
+    """一条形状完整的候选（含 _review），可直接过 validate_event。"""
+    return {
+        "event_id": f"E-20260916-{seq:04d}",
+        "ts": "2026-09-16T10:00:00+08:00",
+        "type": etype,
+        "granularity": "stock",
+        "chain_id": "other",
+        "node": "unknown",
+        "industry": ["其他"],
+        "target": {"code": code, "name": f"测试{code}"},
+        "text": "测试事件正文内容",
+        "url": None,
+        "source": "notice",
+        "source_tier": "fact",
+        "confidence": "high",
+        "verify_ts": None,
+        "tags": [],
+        "_review": {"via": via, "confirm": False},
+    }
+
+
+def _write_cands(d: Path, rows) -> Path:
+    p = d / "2026-09-16.jsonl"
+    p.write_text("\n".join(json.dumps(r, ensure_ascii=False) for r in rows) + "\n",
+                 encoding="utf-8")
+    return p
+
+
+def test_confirm_by_rule_only_touches_whitelisted_via(tmp_cand_dir):
+    p = _write_cands(tmp_cand_dir, [_cand(1, "extra_code", "000001"),
+                                    _cand(2, "lexicon_node", "000002")])
+    res = confirm_by_rule(p, ["extra_code"])
+    assert res["auto_confirmed"] == 1
+    assert res["by_via"] == {"extra_code": 1}
+
+    rows = [json.loads(l) for l in p.read_text(encoding="utf-8").splitlines() if l.strip()]
+    assert rows[0]["_review"]["confirm"] is True
+    assert "auto_confirmed" in rows[0]["tags"], "自动晋级必须留痕，否则事后无法归因"
+    assert rows[1]["_review"]["confirm"] is False, "白名单外的 via 必须保持人工"
+    assert rows[1]["tags"] == []
+
+
+def test_confirm_by_rule_empty_whitelist_is_noop(tmp_cand_dir):
+    p = _write_cands(tmp_cand_dir, [_cand(1, "extra_code")])
+    res = confirm_by_rule(p, [])
+    assert res["auto_confirmed"] == 0 and res["allow"] == []
+    rows = [json.loads(l) for l in p.read_text(encoding="utf-8").splitlines() if l.strip()]
+    assert rows[0]["_review"]["confirm"] is False
+
+
+def test_promote_without_any_confirmed_does_not_wipe_existing(tmp_cand_dir):
+    """防呆：主链每天重跑预筛会把候选池整体重置为 confirm=false。
+
+    若 promote 无脑覆盖输出，前几日人工确认攒下的事件会被**静默清空**。
+    """
+    cand = _write_cands(tmp_cand_dir, [_cand(1, "extra_code")])   # 无 confirm
+    out = tmp_cand_dir / "events" / "2026-09-16.jsonl"
+    out.parent.mkdir(parents=True, exist_ok=True)
+    out.write_text('{"keep": "existing"}\n', encoding="utf-8")
+
+    n = promote("2026-09-16", cand, out)
+    assert n == 0
+    assert out.read_text(encoding="utf-8").strip(), "已有事件流不得被空结果清空"
+
+
+def test_promote_writes_only_confirmed_and_strips_review(tmp_cand_dir):
+    rows = [_cand(1, "extra_code", "000001"), _cand(2, "lexicon_node", "000002")]
+    rows[0]["_review"]["confirm"] = True
+    cand = _write_cands(tmp_cand_dir, rows)
+    out = tmp_cand_dir / "events" / "2026-09-16.jsonl"
+
+    assert promote("2026-09-16", cand, out) == 1
+    kept = [json.loads(l) for l in out.read_text(encoding="utf-8").splitlines() if l.strip()]
+    assert len(kept) == 1
+    assert kept[0]["target"]["code"] == "000001"
+    assert "_review" not in kept[0], "_review 是复核信息，不得进正式事件流"
+    assert kept[0]["verify_ts"], "promote 必须写 verify_ts（何时确认的可追溯性）"
+

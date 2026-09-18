@@ -1,7 +1,11 @@
 {
-  "version": "0.1",
-  "updated": "2026-09-10",
+  "version": "0.2",
+  "updated": "2026-09-16",
   "note": "纯规则信号词典（P1 预筛）：命中即候选，不做语义判断；候选须经人工/LLM 二次确认（补 entity/confidence/verify_ts）后才写入 events/<date>.jsonl。weight 供 L2 事件打分使用，与信源等级相乘。关键词匹配采用最长优先，避免『存储芯片』被『芯片』抢先归位。",
+  "auto_confirm_via": [],
+  "auto_confirm_note": "**规则化二次确认白名单**（v0.2 新增，配合 filter_news_signals --auto-confirm）。空表 = 全人工确认，即引入该配置前的行为。默认**刻意留空**——因为首版把它设成 [\"extra_code\"] 后被实测否掉了：",
+  "auto_confirm_rejected_extra_code": "首版依据是『extra_code = 公告来源 + 正文自带 code/name + 该 code 已在 chains 映射表内，三项皆机器可判』。**第三条是错的**——`classify()` 里 `via=extra_code` 只要求『记录带 code 且 code 未在映射表内时也没命中行业词典』，与是否归链无关；真正归链成功与否要另看 `chain_id != \"other\"`。实测 2026-09-14/15/16 三天：extra_code 候选 1/9/15 条，其中落在 chains 映射表内的 **0 条**（chains 目前只有 ai_compute 一条链，覆盖约 30 只），即自动晋级出来的『产业情报』**全部未归链**、无法进入 1.2 产业图谱，且内容多为治理定式（董事会决议/保荐代表人/股东回报规划）与非链公司订单。教训：白名单的准入条件必须**用实测数字验证**，不能靠读代码推断——`via` 的含义在 classify() 的多个分支里被改写（extra_code_lexicon 就是降级后的 extra_code）。",
+  "auto_confirm_candidate_tier": "目前唯一**可能**安全的一层是 `via=lexicon_node`（经行业词典归位到确定环节 ⇒ 天然带 chain_id/node，能进 1.2 图谱）。实测精度：2026-09-16 补齐噪声规则后为 5/5（美光新增供应节奏/力合微涨价/金智科技中标/英特尔缺货/上海十五五规划），2026-09-15 为约 7/10（仍混入『寅成智能 A轮融资』误判为订单、『小米18Pro 发布』误挂算力芯片、带 6 位基金代码的 ETF 文案被 ahook 豁免）。**未默认开启**：报告第 1 段是 v2 因果链的起点，用约 70% 精度的规则去自动填充它，风险大于『如实写无事件流』。要开启就把 \"lexicon_node\" 填进本表并接受该精度。",
   "event_types": [
     {
       "id": "order_win",
