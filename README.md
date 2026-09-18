@@ -5,12 +5,30 @@
 JSON → 由 LLM 完成判断与报告撰写**。harness 只负责"算得准"，不负责"想得深"；
 全程只依赖 Python 标准库，无第三方依赖（取数/资讯脚本除外，见下文 venv 说明）。
 
-> **运行状态（2026-09-04 起）**：原 launchd 定时任务已全部清理，**全流程手动触发**；
-> 涨停情绪源已由网页版大班客切换到 **hithink-finance fuyao 官方 API**（`fetch_market_snapshot.py`
-> 完全替代大班客，经 2026-09-04 全链验收）。一条命令直达 PDF：
-> `python3 tools/daily_review_pdf.py --date YYYY-MM-DD --no-email`。
+> **运行状态（2026-09-04 起；2026-09-18 增补）**：默认全手动；涨停情绪源已由网页版大班客切换到
+> **hithink-finance fuyao 官方 API**（`fetch_market_snapshot.py` 完全替代大班客，经 2026-09-04 全链验收）。
+> 一条命令直达 PDF：`python3 tools/daily_review_pdf.py --date YYYY-MM-DD --no-email`。
+> 可选半自动：`tools/launchd/install.sh install`（工作日 19:30 自动出 PDF、不发邮件，见 §8）。
 
 ---
+
+## 0. 快速导航（2026-09-18 增补）
+
+| 我想… | 去哪里 / 跑什么 |
+|---|---|
+| 跑今天的复盘（出 PDF 不发邮件） | §2 主链 · `python3 tools/daily_review_pdf.py --date <d> --no-email` |
+| 启用/关闭工作日自动出 PDF | §8 运维备注 · `tools/launchd/install.sh {install,status,uninstall}` |
+| 确认这台机器能跑哪些链路 | §5.1 · `python3 tools/check_env.py` |
+| 跑测试（自动挑解释器） | §5 · `tools/run_tests.sh` |
+| 看选股段本周表现 | §13 · `python3 tools/weekly_report.py --days 7` |
+| 看权重能不能动 | §13 · `python3 tools/weights_status.py` |
+| 清理 data_cache（默认 dry-run） | §6.1 · `python3 tools/cache_gc.py [--apply]` |
+| 查产业链映射覆盖 | §12 · `python3 tools/replay_chain_coverage.py --limit-days 8` |
+| 查数据源能力边界与缺口 | §6 · `assets/data_source_gaps.md`、`assets/data_source_decision_d.md` |
+| 找历史一次性脚本 | §9 · `tools/legacy/README.md` |
+
+---
+
 
 ## 1. 架构总览
 
@@ -602,7 +620,12 @@ dragon.json 缺失时产物不加键，证据链输出 count=0 + 显式标注（
 
 ## 8. 运维备注（2026-09-04 实测）
 
-- **触发方式**：全手动。launchd 定时任务已于 2026-09-04 清理，无任何自动调度残留。
+- **触发方式**：默认全手动（`tools/daily_review_pdf.py --date <当日> --no-email`）。
+  2026-09-18 起提供**可选半自动**：`tools/launchd/install.sh install` 安装工作日 19:30 的
+  launchd 任务，自动跑「抓数 → 证据链 → 校验门禁 → PDF」，**不发邮件**（`--no-email`），
+  完成后弹 macOS 通知；人工审阅数字校验输出后再手动去掉 `--no-email` 发送。
+  脚本是 `tools/pipeline_daily.sh`（日志落 `logs/daily_<date>_<ts>.log`，非交易日自动跳过）。
+  **默认不安装**——是否启用由使用者拍板；`tools/launchd/install.sh status` 可查状态。
 - **每日例行**（收盘后）：`python3 tools/daily_review_pdf.py --date <当日> --no-email` 出 PDF，
   人工审阅数字校验输出后决定是否补发邮件（`去掉 --no-email` 即发送）。
 - **报告正文**：脚本优先复用已存在的 `outputs/<date>/复盘报告.md`；若由 LLM 网页版撰写，

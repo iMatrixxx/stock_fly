@@ -27,3 +27,13 @@ packages = [
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 addopts = "-q"
+
+[tool.ruff]
+line-length = 120
+target-version = "py310"
+exclude = [".git", "__pycache__", "data_cache", "outputs", "hithink_out", "vendor", "tools/legacy"]
+
+[tool.ruff.lint]
+# 只开低误报、高价值的规则集；E501（行长）与 N（命名）留给人工
+select = ["F", "E9", "W6", "I", "UP"]
+ignore = ["E402"]  # 脚本层 sys.path 注入后再 import 是既有约定
