@@ -86,22 +86,16 @@ def _trade_date_for(forecast_date: str, ev_dates: list[str]) -> str | None:
     return later[0] if later else None
 
 
-def _gap_trading_days(forecast_date: str, trade_date: str, root: Path = ROOT) -> int:
+def _gap_trading_days(forecast_date: str, trade_date: str, root: Path = ROOT) -> int | None:
     """F 与判卷日之间相隔几个交易日（=1 表示严格次日判卷，>1 表示中间缺盘面）。
 
-    依赖交易日历缓存；无缓存时退化为"已知有 evidence 的日期计数"，偏小但不会误判为 1。
+    走 `trading_calendar.trading_day_gap`——与选股段判卷账（score_candidates）**同一个
+    gap 口径**；两处各写一份的话，`clean` 的含义会悄悄分叉，"干净样本命中率"就不可比了。
+    无法判定返回 None → `clean=False`（宁可不算干净，也不能把未知当干净）。
     """
-    from stock_review_harness.trading_calendar import load_calendar
+    from stock_review_harness.trading_calendar import trading_day_gap
 
-    cal = load_calendar(root)
-    n = 1
-    cur = trade_date
-    prev = cal.prev(cur)
-    while prev and prev > forecast_date:
-        n += 1
-        cur = prev
-        prev = cal.prev(cur)
-    return n
+    return trading_day_gap(forecast_date, trade_date, root)
 
 
 # ---------------------------------------------------------------------------
@@ -250,8 +244,9 @@ def _print_run_summary(result: dict) -> None:
             continue
         n_used = s["hit"] + s["miss"]
         rate = f"{s['hit'] / n_used * 100:.1f}%" if n_used else "—"
-        gap = s.get("gap_trading_days", 1)
-        gap_tag = "次日" if gap == 1 else f"隔 {gap} 个交易日（参考值）"
+        gap = s.get("gap_trading_days")
+        gap_tag = ("次日" if gap == 1
+                   else (f"隔 {gap} 个交易日（参考值）" if gap else "间隔无法判定（参考值）"))
         print(f"[score] {s['forecast_date']} → {s['trade_date']}［{gap_tag}］："
               f"{s['total']} 条 → 命中 {s['hit']} / 落空 {s['miss']} / "
               f"不可复算 {s['na']}（命中率 {rate}）", flush=True)

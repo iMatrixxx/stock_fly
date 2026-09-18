@@ -36,8 +36,15 @@ from __future__ import annotations
 import json
 import re
 
-# 报告末尾预测卡区块的标题（提取锚点）
+# 报告末尾预测卡区块的标题（提取锚点；报错信息里沿用，保持与历史日志一致）
 SECTION_TITLE = "## 次日预测卡"
+# 实际匹配用的关键词 + 排除词：结构契约（report/outline.py）下该节标题为
+# `## 8. 次日预测卡（JSON）`，硬匹配 "## 次日预测卡" 会失配（`8. ` 插在中间），
+# 故按"标题行含关键词"定位；`候选对象` 是 prompt 侧的提示小节，不能当卡片区块。
+SECTION_KEYWORD = "次日预测卡"
+_SECTION_EXCLUDE = ("候选对象",)
+# 标题行（1~6 级），行内须含关键词
+_SECTION_HEADING_RE = re.compile(r"(?m)^[ \t]*#{1,6}[^\n]*" + SECTION_KEYWORD + r"[^\n]*$")
 # 单次冻结上限（宁少勿滥：预测越少越可复盘）
 MAX_CARDS = 5
 
@@ -235,15 +242,31 @@ def validate_forecast(forecast: dict) -> list[str]:
     return warns
 
 
+def _find_section_start(report_md: str) -> int:
+    """定位预测卡区块标题行的起始偏移；找不到返回 -1。
+
+    按"标题行含关键词"匹配而非字面 `## 次日预测卡`：结构契约下该节标题带编号
+    （`## 8. 次日预测卡（JSON）`），字面匹配会直接失配、静默冻结不出 forecast.json
+    （主链只打 [WARN]，不阻断——正是那种"错了不报错"的坑）。排除「候选对象」是
+    为了不把 prompt 侧的候选提示小节误当卡片区块。
+    """
+    for m in _SECTION_HEADING_RE.finditer(report_md):
+        if not any(x in m.group(0) for x in _SECTION_EXCLUDE):
+            return m.start()
+    return -1
+
+
 def extract_forecast_block(report_md: str):
     """从报告 Markdown 提取次日预测卡 JSON 块。
 
-    返回 (forecast_dict|None, error|None)：定位 `## 次日预测卡` 标题后第一个
+    返回 (forecast_dict|None, error|None)：定位含 `次日预测卡` 的标题行后第一个
     fenced ```json 块并解析；解析失败返回 None + 错误原因（不抛异常）。
     """
-    pos = report_md.find(SECTION_TITLE)
+    pos = _find_section_start(report_md)
     if pos < 0:
-        return None, f"报告无 {SECTION_TITLE} 区块"
+        return None, (f"报告无 {SECTION_TITLE} 区块"
+                      f"（标题行须含「{SECTION_KEYWORD}」，"
+                      "如 `## 8. 次日预测卡（JSON）`）")
     tail = report_md[pos:]
     m = _FENCED_JSON_RE.search(tail)
     if not m:
@@ -256,6 +279,114 @@ def extract_forecast_block(report_md: str):
     if not isinstance(obj, dict) or not isinstance(obj.get("cards"), list):
         return None, "预测卡 JSON 顶层须为含 cards 数组的对象"
     return obj, None
+
+
+VERIFICATION_SECTION_TITLE = "## 昨日预测卡验证（T-1 预测 vs T 实际，harness 纯代码复算）"
+
+
+def verification_number_view(rows: list[dict]) -> dict:
+    """预测验证节的**数字白名单视图**（供 ⑧ 门禁的 `extra_sources`）。
+
+    为什么需要它：报告第 9 段要照抄 `target`（作者当时设的阈值，如 17000 亿）与
+    `actual`（真值）——这些数**不在当日 evidence 里**（阈值是历史判断参数，
+    actual 是别的对象/别的日的值）。不并入白名单，第 9 段一写就被判"证据链外数字"，
+    作者为了过门禁只能把命中率表写成散文——正好毁掉这一节的可核查性。
+
+    只取 `target` / `actual` 两个字段：`gap_trading_days`、`clean` 之类的元数据
+    不需要出现在报告里，少放一个数就少一分被滥用为"随便编"的空间。
+    """
+    return {
+        "forecast_verification": [
+            {"id": r.get("id"), "subject": r.get("subject"),
+             "target": r.get("target"), "actual": r.get("actual")}
+            for r in rows
+        ]
+    }
+
+
+def _cell(text: object, limit: int = 60) -> str:
+    """表格单元格安全化：竖线会破坏 Markdown 表，换行会断行。"""
+    s = str(text if text is not None else "")
+    s = s.replace("|", "／").replace("\n", " ").strip()
+    return s if len(s) <= limit else s[:limit] + "…"
+
+
+def _fmt_actual(v: object) -> str:
+    """实际值格式化：float 保留到 2 位后去尾零（18391.22 不能写成 18391.2）。"""
+    if v is None:
+        return "—"
+    if isinstance(v, float):
+        s = f"{round(v, 2):.2f}".rstrip("0").rstrip(".")
+        return s or "0"
+    return str(v)
+
+
+def render_verification_section(rows: list[dict], trade_date: str) -> str:
+    """把 Scorecard 判卷行渲染成报告 prompt 的「昨日预测卡验证」节（纯函数）。
+
+    `rows` = `scorecard.jsonl` 中 `trade_date == trade_date` 的行（即"今天应当开奖的
+    那些卡"）。这是报告第 9 段**唯一可引用**的预测验证数据——没有它，第 9 段只能靠
+    记忆编历史判断，而那正是这本账要防的事。
+
+    没有可判的卡时**照样出节**（写"无待验证卡片"）：缺节会让作者分不清"今天确实没有
+    待验证的卡"和"注入挂了"，前者应如实写、后者必须暴露。
+    """
+    head = [
+        VERIFICATION_SECTION_TITLE,
+        "",
+    ]
+    if not rows:
+        head += [
+            f"当日（{trade_date}）无待验证的预测卡（前一日未冻结卡片，或该卡尚未到判卷日）。",
+            "",
+            "纪律：报告第 9 段据此写「当日无待验证的预测卡」，**禁止编造任何历史预测或命中情况**。",
+        ]
+        return "\n".join(head) + "\n"
+
+    by_date: dict[str, list[dict]] = {}
+    for r in rows:
+        by_date.setdefault(str(r.get("forecast_date") or "?"), []).append(r)
+    n = len(rows)
+    verdicts = [str(r.get("verdict") or "na") for r in rows]
+    hit = verdicts.count("hit")
+    miss = verdicts.count("miss")
+    na = len(verdicts) - hit - miss
+    rate = f"{hit / n * 100:.1f}%" if n else "—"
+    gaps = sorted({r.get("gap_trading_days") for r in rows
+                   if r.get("gap_trading_days") is not None})
+    clean = sum(1 for r in rows if r.get("clean"))
+
+    head += [
+        f"来源：T-1 的 `forecast.json` 共 {n} 张卡（预测日 "
+        + "、".join(sorted(by_date))
+        + f"）；真值取 T 日（{trade_date}）证据链，判卷键 `forecast_date:id`，"
+        "**由 harness 纯代码复算（非观点）**。",
+        "**本节是报告第 9 段唯一可引用的预测验证数据**——本节之外的历史预测/命中率",
+        "一律视为编造（门禁会按证据链外数字拦截）。",
+        "",
+        "| id | 预测日 | 假设 | subject | op | target | 实际值 | 判定 |",
+        "|---|---|---|---|---|---|---|---|",
+    ]
+    for r in sorted(rows, key=lambda x: (str(x.get("forecast_date")), str(x.get("id")))):
+        head.append(
+            f"| {_cell(r.get('id'), 12)} | {_cell(r.get('forecast_date'), 12)} "
+            f"| {_cell(r.get('hypothesis'), 70)} | {_cell(r.get('subject'), 40)} "
+            f"| {_cell(r.get('op'), 6)} | {_cell(r.get('target'), 12)} "
+            f"| {_fmt_actual(r.get('actual'))} | {_cell(r.get('verdict'), 8)} |"
+        )
+    head += [
+        "",
+        f"汇总：hit {hit} / miss {miss} / na {na}（命中率 {rate}"
+        + ("，na 须在报告中单独说明原因" if na else "") + "）；"
+        + (f"差值交易日 {('、'.join(str(g) for g in gaps))}，"
+           f"其中相邻交易日（干净样本）{clean} 张。"
+           if gaps else "差值交易日未记录。"),
+        "",
+        "纪律：① **命中率必须如实写进报告第 9 段，落空不得省略**；② 每条 miss 须说明",
+        "假设错在哪（方向错？幅度/时点错？）并写清对本报告判断的修正；③ 表中数值与判定",
+        "**照抄**，不得改写、质疑或换一种说法规避；④ na 表示真值不可得，不等于命中。",
+    ]
+    return "\n".join(head) + "\n"
 
 
 def suggest_subjects(evidence: dict, limit: int = 10) -> list[str]:
