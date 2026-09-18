@@ -2,15 +2,20 @@
 
 覆盖：归一与涨跌计算、prev 跳过休市、target 行缺失回退、网络失败/无数据降级、
 groups 汇总（evidence 层）。
+
+注：网络取数已收敛到 `data/futures.py`（唯一加载点），故 patch 打在
+`futures.fetch_text` 上；macro_snapshot 自身不再持有 fetch_text。
 """
 
 from __future__ import annotations
 
 import json
+import os
 import unittest
 from datetime import date
 from unittest import mock
 
+from stock_review_harness.data import futures as fut
 from stock_review_harness.data import macro_snapshot as mod
 
 
@@ -25,7 +30,11 @@ def _rows(dates_close: list[tuple[str, float]]) -> str:
 
 class MacroSnapshotTest(unittest.TestCase):
     def _patch(self, bodies: dict[str, str] | None = None, exc: Exception | None = None):
-        """bodies: symbol→jsonp 文本；exc 给出则 fetch_text 直接抛异常。"""
+        """bodies: symbol→jsonp 文本；exc 给出则 fetch_text 直接抛异常。
+
+        同时关闭磁盘缓存：否则 mock 造的假 K 线会写进真实 data_cache，
+        或反向让真实缓存绕过 mock 使断言时真时假。
+        """
         def fake(url: str, **kwargs):
             if exc is not None:
                 raise exc
@@ -33,7 +42,22 @@ class MacroSnapshotTest(unittest.TestCase):
             if bodies is None or symbol not in bodies:
                 return _rows([])
             return bodies[symbol]
-        return mock.patch.object(mod, "fetch_text", side_effect=fake)
+        return mock.patch.dict(
+            os.environ, {"REVIEW_CACHE_DISABLE": "1"}
+        ), mock.patch.object(fut, "fetch_text", side_effect=fake)
+
+    def _run(self, bodies=None, exc=None, date_str="2026-09-08"):
+        """跑一次快照；**局部**关闭磁盘缓存。
+
+        为什么必须关：mock 造的假 K 线若不关缓存会被写进真实 `data_cache/raw/`，
+        之后真实跑链就会把假数据当真数据读走。用 `mock.patch.dict` 而非
+        `os.environ[...] = ...`——后者在本进程内**不会还原**，会把缓存的关闭状态
+        泄漏给同一次 pytest 会话里的其它测试（实测让整个套件从 5s 变成 200s+，
+        因为其它集成测试改为全量联网）。
+        """
+        env_p, fetch_p = self._patch(bodies, exc)
+        with env_p, fetch_p:
+            return mod.fetch_macro_snapshot(date_str)
 
     def test_normal_items_and_chg(self):
         """正常回补：target 行存在，chg 相对前一交易日收盘；按 group/name 排序。"""
@@ -42,8 +66,7 @@ class MacroSnapshotTest(unittest.TestCase):
             "AL0": _rows([("2026-09-04", 50.0), ("2026-09-07", 50.0), ("2026-09-08", 49.0)]),
             "AU0": _rows([("2026-09-07", 950.0), ("2026-09-08", 953.12)]),
         }
-        with self._patch(bodies):
-            out = mod.fetch_macro_snapshot("2026-09-08")
+        out = self._run(bodies)
         self.assertIsNotNone(out)
         items = {i["code"]: i for i in out["items"]}
         self.assertEqual(len(items), 3)
@@ -62,8 +85,7 @@ class MacroSnapshotTest(unittest.TestCase):
             # target 09-08 之前只有 09-04（09-07 无行：休市被服务端剔除的等价情形）
             "CU0": _rows([("2026-09-04", 100.0), ("2026-09-08", 105.0)]),
         }
-        with self._patch(bodies):
-            out = mod.fetch_macro_snapshot("2026-09-08")
+        out = self._run(bodies)
         cu = out["items"][0]
         self.assertEqual(cu["prev_close"], 100.0)
         self.assertEqual(cu["chg_pct"], 5.0)
@@ -73,28 +95,24 @@ class MacroSnapshotTest(unittest.TestCase):
         bodies = {
             "CU0": _rows([("2026-09-04", 100.0), ("2026-09-07", 102.0), ("2026-09-08", 104.0)]),
         }
-        with self._patch(bodies):
-            out = mod.fetch_macro_snapshot("2026-09-09")  # mock 里没有 09-09 行
+        out = self._run(bodies, date_str="2026-09-09")  # mock 里没有 09-09 行
         cu = out["items"][0]
         self.assertEqual(cu["trade_date"], "2026-09-08")
         self.assertEqual(cu["close"], 104.0)
 
     def test_network_failure_returns_none(self):
         """网络失败 → None（不抛异常，调用方降级）。"""
-        with self._patch(exc=RuntimeError("boom")):
-            out = mod.fetch_macro_snapshot("2026-09-08")
+        out = self._run(exc=RuntimeError("boom"))
         self.assertIsNone(out)
 
     def test_no_items_returns_none(self):
         """所有品种均无 target/前收数据 → None。"""
-        with self._patch(bodies={}):
-            out = mod.fetch_macro_snapshot("2026-09-08")
+        out = self._run(bodies={})
         self.assertIsNone(out)
 
     def test_invalid_date_returns_none(self):
         """非法日期 → None。"""
-        with self._patch():
-            self.assertIsNone(mod.fetch_macro_snapshot("2026-13-99"))
+        self.assertIsNone(self._run(date_str="2026-13-99"))
 
 
 class MacroEvidenceGroupsTest(unittest.TestCase):

@@ -5,11 +5,15 @@
 回答：当日（含前夜盘）工业金属/化肥/农产品链期货是否走强。
 
 数据源：新浪期货日K历史（InnerFuturesNewService.getDailyKLine，纯 HTTP）。
+- **取数已收敛到 `data/futures.py`（唯一加载点）**：本模块只负责"选哪几个品种 +
+  当日快照的呈现口径"，不再自带 JSONP 解析（历史上这里与 event_verify 各写一份会漂移）。
 - symbol 形如 CU0 / AL0 / AU0 / ZN0 / M0 / C0 / LH0 / UR0（品种码+0 = 主力连续），
   返回上市以来全部日K（d日期/o开/h高/l低/c收/v量/p额/s结算），收盘与东财主连逐位一致。
 - 新浪历史接口仅支持**国内商品期货**；美元指数/离岸人民币/外盘商品（COMEX/CBOT等）
   的稳定历史源暂不可得（东财 push2his 存在 IP 级风控、新浪相关 service 已下线），
   故 v1 不含该组——报告引用本快照时禁止提及美元/外盘数值，缺口在 note 明示。
+- 品种覆盖以本模块 `_ITEMS` 为准（8 个，服务于"切周期/农化"解释变量）；
+  `futures.CATALOG` 另有 56 个品种，供事件级价格验证（event_verify）按需选用。
 
 日期口径（写报告必守）：
 - "交易日 T"的日K = T 当日日盘 + T-1 夜盘，即 A 股 T 日盘中全程可感（夜盘前一夜已走完、
@@ -33,19 +37,17 @@
 
 from __future__ import annotations
 
-import json
 import logging
 from datetime import date, datetime
 from typing import Optional
-from urllib.parse import urlencode
 
-from .net import fetch_text, fetch_many
+from . import futures
+from .net import fetch_many
 
 log = logging.getLogger(__name__)
 
-_API = "https://stock.finance.sina.com.cn/futures/api/jsonp.php/var%20t=/InnerFuturesNewService.getDailyKLine"
-
 # (新浪symbol, 展示名, 分组) —— 覆盖"切周期/农化"核心解释变量
+# 说明：这是**本快照的选品清单**，不是品种目录真源（真源 = futures.CATALOG，56 个）。
 _ITEMS: list[tuple[str, str, str]] = [
     ("CU0", "沪铜主连", "工业金属"),
     ("AL0", "沪铝主连", "工业金属"),
@@ -58,17 +60,10 @@ _ITEMS: list[tuple[str, str, str]] = [
 ]
 
 
-def _parse_kline(txt: str) -> list[dict]:
-    """jsonp → [{d,o,h,l,c,v,p,s}]；失败抛异常由上层降级。"""
-    i, j = txt.index("(["), txt.rindex("])")
-    return json.loads(txt[i + 1 : j + 1])
-
-
 def _fetch_one(args: tuple[str, str, str], target: date) -> Optional[dict]:
     """拉单个品种全量日K，取 target 行（缺失回退最近行）并算 chg。"""
     symbol, name, group = args
-    url = _API + "?" + urlencode({"symbol": symbol})
-    rows = _parse_kline(fetch_text(url, timeout=30, retries=1))
+    rows = futures.kline(symbol, end_date=target.isoformat())
     if not rows:
         return None
     dates = [r["d"] for r in rows]

@@ -131,6 +131,7 @@ class MarketData:
     dragon_seats: Optional[dict] = None  # 龙虎榜买卖前五席位 {date, stocks[], note}，机构/北向/游资结构（可选）
     macro: Optional[dict] = None  # 当日宏观行情快照 {date, items[], note}，国内商品期货主连日K（可选）
     industry_intel: Optional[dict] = None  # 产业事件聚合 {summary, node_signals[], chain_level[], stock_watchlist[], industry_counts[]}，源 events/<date>.jsonl（可选）
+    event_verification: Optional[dict] = None  # 事件验证（独立源核对）{counts, price_checks[], order_checks[], no_source_nodes[], note}；价格侧=期货序列、公告侧=巨潮账本（可选）
     notes: list[str] = field(default_factory=list)
 
 

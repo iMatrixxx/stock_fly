@@ -7,6 +7,7 @@ REVIEW_CACHE_DISABLE=1 完全关闭缓存。
 
 from __future__ import annotations
 
+import hashlib
 import json
 import os
 import re
@@ -25,7 +26,6 @@ def cache_dir() -> Path:
     if override:
         return Path(override)
     return Path(__file__).resolve().parents[2] / "data_cache"
-
 
 def cache_disabled() -> bool:
     return os.environ.get("REVIEW_CACHE_DISABLE") == "1"
@@ -46,7 +46,17 @@ def is_cached_market(market: MarketData) -> bool:
 
 
 def _safe_key(key: str) -> str:
-    return _KEY_RE.sub("_", key)
+    """把缓存键规范成安全文件名。
+
+    ⚠️ **非 ASCII（中文）键必须加摘要**：`_KEY_RE` 会把每个非 ASCII 字符压成一个 `_`，
+    于是 `sec_安泰科技` 与 `sec_耐科装备` 会压成**同一个文件名**，命中对方的内容——
+    不报错、结构完整、内容全错（实测把 4 字公司名全部串成同一个）。加原文摘要保证单射，
+    同时**保持纯 ASCII 键的文件名不变**（既有缓存继续有效）。
+    """
+    safe = _KEY_RE.sub("_", key)
+    if safe != key:
+        safe = f"{safe}-{hashlib.md5(key.encode('utf-8')).hexdigest()[:8]}"
+    return safe
 
 
 def _raw_path(key: str) -> Path:

@@ -1,7 +1,8 @@
 """产业情报消费层（P1 第⑥环）：读 events/<date>.jsonl → 聚合为 evidence.industry_intel。
 
-事件流由 tools/filter_news_signals.py 产出（7 源资讯 → 噪声过滤 → 词典预筛 → 归位
-→ 人工二次确认 → --promote）。本模块**只做确定性聚合，不含任何判断**，与
+事件流由 `tools/filter_news_signals.py` 产出（7 源资讯 → 噪声过滤 → 词典预筛 → 归位
+→ 候选池），再由主链 **④.55**（`tools/confirm_events.py`）完成二次确认后提升为正式
+事件流——裁定归属 = 写报告的 LLM。本模块**只做确定性聚合，不含任何判断**，与
 evidence.json 的"现象层"哲学一致：
 
 - node 粒度 → 节点信号分：score = Σ(事件权重 × 置信度折扣)，仅排序用；
@@ -48,6 +49,25 @@ def load_weights(signals_path: Path | None = None) -> dict[str, int]:
         return dict(FALLBACK_WEIGHTS)
 
 
+def load_event_keywords(
+    event_type_id: str, signals_path: Path | None = None
+) -> list[str]:
+    """取某事件类型的关键词族（事件类型关键词的**唯一定义点**是 signals.json）。
+
+    用途：`data/cninfo.py` 的公告检索词族必须与预筛同源——否则"验证方"用的词
+    和"生产方"用的词不同，验证就没有意义。取不到返回 []（调用方用兜底词族）。
+    """
+    p = signals_path or (REPO_ROOT / "events" / "signals.json")
+    try:
+        d = json.loads(p.read_text(encoding="utf-8"))
+        for t in d.get("event_types") or []:
+            if t.get("id") == event_type_id:
+                return [str(k) for k in (t.get("keywords") or [])]
+    except Exception:  # noqa: BLE001
+        pass
+    return []
+
+
 def load_events(events_dir: Path | None, date_str: str) -> list[dict]:
     """读 events/<date>.jsonl；文件不存在返回空列表（调用方按缺失标注）。"""
     base = Path(events_dir) if events_dir else (REPO_ROOT / "events")
@@ -77,6 +97,9 @@ def build_industry_intel(date_str: str, events_dir: Path | None = None) -> Optio
     weights = load_weights()
     by_gran: Counter = Counter()
     by_type: Counter = Counter()
+    # 确认归属计数（schema v0.3）：v2 把裁定归属定给写报告的 LLM 后，
+    # "这批事件是谁确认的"必须在消费端可答——报告 1.1 的证据等级表述要靠它。
+    by_confirmer: Counter = Counter()
     node_groups: dict[tuple[str, str], list[dict]] = {}
     chain_level: list[dict] = []
     stock_map: dict[str, dict] = {}
@@ -87,6 +110,7 @@ def build_industry_intel(date_str: str, events_dir: Path | None = None) -> Optio
         etype = ev.get("type") or "rumor"
         by_gran[gran] += 1
         by_type[etype] += 1
+        by_confirmer[str(ev.get("confirmed_by") or "unmarked")] += 1
 
         brief = {
             "event_id": ev.get("event_id"),
@@ -150,7 +174,7 @@ def build_industry_intel(date_str: str, events_dir: Path | None = None) -> Optio
 
     return {
         "date": date_str,
-        "source": f"events/{date_str}.jsonl（P1 事件流：词典预筛 + 人工二次确认）",
+        "source": f"events/{date_str}.jsonl（P1 事件流：词典预筛 + 二次确认）",
         "note": (
             "产业事件聚合（现象层，不含判断）。node_signals.score=Σ(类型权重×置信度折扣，"
             "high=1.0/mid=0.7/low=0.0)仅用于排序；chain_level 为链级事件（node=unknown，"
@@ -162,6 +186,12 @@ def build_industry_intel(date_str: str, events_dir: Path | None = None) -> Optio
             "total": len(events),
             "by_granularity": dict(by_gran),
             "by_type": dict(by_type),
+            "by_confirmer": dict(by_confirmer),
+            "confirmer_note": (
+                "by_confirmer=确认归属计数（human/rule/llm/unmarked）。"
+                "确认归属=写报告的 LLM 时该键为 llm；报告 1.1 引用事件时应据此说明来源等级，"
+                "unmarked 只出现在 v0.3 之前落盘的历史事件流里。"
+            ),
         },
         "node_signals": node_signals,
         "chain_level": chain_level,

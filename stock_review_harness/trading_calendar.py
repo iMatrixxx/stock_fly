@@ -290,3 +290,27 @@ def next_trading_day(value: object, root: Path | None = None) -> str | None:
 
 def is_trading_day(value: object, root: Path | None = None) -> bool:
     return load_calendar(root).is_trading_day(value)
+
+
+def trading_day_gap(start: object, end: object, root: Path | None = None) -> int | None:
+    """`start` 之后到 `end`（含）之间相隔几个交易日；无法判定返回 None。
+
+    gap=1 表示 `end` 是 `start` 的紧邻下一交易日。**两个判卷账（M2 预测卡 /
+    选股段候选池）都用它判定"干净样本"**，故定义必须唯一——若两处各写一份，
+    `clean` 的含义会悄悄分叉，"干净样本命中率"就不可比了。
+
+    end <= start 或日期解析失败返回 None（调用方按"非干净样本"处理，
+    绝不当成 1——把无法判定的样本算成干净样本是最坏的方向）。
+    """
+    s, e = normalize_date(start), normalize_date(end)
+    if s is None or e is None or e <= s:
+        return None
+    cal = load_calendar(root)
+    n = 1
+    cur = e
+    prev = cal.prev(cur)
+    while prev and prev > s:
+        n += 1
+        cur = prev
+        prev = cal.prev(cur)
+    return n

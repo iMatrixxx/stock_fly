@@ -25,11 +25,13 @@ from ..models import (
 )
 from . import dragon_seats as dragon_seats_mod
 from . import eastmoney, tencent, ths
+from . import events_db
 from . import industry_intel as industry_intel_mod
 from . import macro_snapshot as macro_mod
 from . import northbound
 from .cache import load_cached_market, save_market_cache
 from .net import fetch_many
+from .validate import BOARD_TAXONOMY_SUM_MAX, BOARD_TAXONOMY_SUM_MIN
 from .sina import stock_flow_history
 
 BOARD_KEEP = 8  # 量化筛选后保留的板块数量（报告取前 3）
@@ -229,6 +231,31 @@ def _patch_index_close_from_tencent(date_str: str, idx_rows: dict) -> None:
         idx_rows[name] = rows
 
 
+def _board_set_usable(boards, total) -> tuple[bool, str | None]:
+    """板块集合能否当"市场分区"用（Σ板块成交 ≈ 两市成交）。
+
+    判定与 `logic.concentration.board_taxonomy_guard` 同源（阈值取自
+    `data.validate.BOARD_TAXONOMY_SUM_*`），差别只在这里作用于抓取期：
+    不通过时**保留**同花顺已抓到的板块（供单板块涨跌幅/资金流参考），
+    但记一条 note 让下游知道"占比类指标本日不可用"。
+    """
+    if not boards:
+        return False, "板块成交额本次整体缺失（同花顺板块日线当日行未发布），板块占比与集中度不可用"
+    if not total or total <= 0:
+        return False, "两市成交额缺失，无法判断板块集合是否完整，板块占比不可用"
+    sum_yi = sum(b.turnover or 0.0 for b in boards)
+    ratio = sum_yi / total
+    if BOARD_TAXONOMY_SUM_MIN <= ratio <= BOARD_TAXONOMY_SUM_MAX:
+        return True, None
+    return False, (
+        f"板块集合不完整/口径不一致：{len(boards)} 个板块成交合计 {sum_yi:.1f} 亿 ÷ "
+        f"两市成交 {total:.1f} 亿 = {ratio * 100:.1f}%（可比较区间 "
+        f"[{BOARD_TAXONOMY_SUM_MIN * 100:.0f}%, {BOARD_TAXONOMY_SUM_MAX * 100:.0f}%]）"
+        "——不接受跨层级板块集合替换，本日板块成交占比与行业集中度标为不可用，"
+        "禁止引用任何板块占比数字或跨日比较板块占比"
+    )
+
+
 def fetch_market(
     date_str: str,
     use_cache: bool = True,
@@ -253,9 +280,23 @@ def fetch_market(
         list(ths.INDEX_LINES),
         lambda name: ths.index_daily(name, year),
         workers=6,
-        timeout=40,
+        timeout=90,
     )
-    idx_rows.pop("_errors", None)
+    idx_errors = idx_rows.pop("_errors", None)
+    if idx_errors:
+        # 抓取失败项在 fetch_many 里被置 None。下面 `_patch_index_close_from_tencent`
+        # 会用腾讯"当前快照"把 None 替换成「只含当日行」的字典——收盘价补上了，
+        # 但没有前收/历史行 → 涨跌幅、MA5、两市环比全部退化为 None，而报告看不出
+        # 是"缺哪一环"。**必须显式留痕**，否则就是静默降级（2026-09-11 实测：
+        # 6 个指数 5 个超时，证据链只剩收盘价，涨跌幅/MA5/环比全空）。
+        failed = [n for n, rows in idx_rows.items() if not rows]
+        print(
+            f"  [warn] 指数日线抓取失败 {len(failed)} 项"
+            f"（{'、'.join(failed)}），涨跌幅/MA5/环比将缺失：{idx_errors}",
+            flush=True,
+        )
+    else:
+        failed = []
     # 当日/近期复盘：同花顺指数当日行是盘中快照/缺失 → 腾讯收盘行情覆盖
     _patch_index_close_from_tencent(date_str, idx_rows)
     r30 = {name: rows.get(ymd) for name, rows in idx_rows.items() if rows}
@@ -324,32 +365,15 @@ def fetch_market(
             )
         )
     boards.sort(key=lambda b: (b.turnover or 0), reverse=True)
-    # 同花顺板块日线当日行未完整发布（< 15 个）或为盘中快照（板块成交合计
-    # 显著小于两市成交，如暴跌/当日复盘时同花顺未结算）时，用东财行业板块
-    # 全量补全（东财当日板块数据完整：涨跌幅/成交额/主力净流入同源）
-    total_board_turnover = sum(b.turnover or 0 for b in boards)
-    snapshot_like = (
-        total is not None
-        and total > 0
-        and 0 < total_board_turnover < total * 0.3
-    )
-    if len(boards) < 15 or snapshot_like:
-        try:
-            em_b = eastmoney.board_flows()
-            if len(em_b) >= 15:
-                boards = [
-                    BoardQuote(
-                        name=name,
-                        turnover=q.get("turnover_yi"),
-                        market_turnover=total if total else None,
-                        change_pct=q.get("change_pct"),
-                        main_flow=q.get("main_flow_yi"),
-                    )
-                    for name, q in em_b.items()
-                ]
-                boards.sort(key=lambda b: (b.turnover or 0), reverse=True)
-        except Exception:  # noqa: BLE001 - 东财补全失败则保留同花顺部分数据
-            pass
+    # 板块成交占比的前提是"板块集合能拼成整个市场"（Σ板块成交 ≈ 两市成交）。
+    # 同花顺行业板块是扁平口径（89~90 个；2026-09-01~09-15 实测 Σ/两市 = 99.2%~101.6%），
+    # 跨日可比；东财 m:90+t:2 则是**含一二三级嵌套**的口径（496 个；09-16 实测 Σ/两市 = 302.2%，
+    # `电子 29.21%` 里叠着 `半导体 13.86%`/`元件 7.51%`/`印制电路板 5.97%`），占比既不可加
+    # 也不可比。因此这里**不再做整表口径替换**：同花顺当日行未发布导致集合不完整时，
+    # 宁可标注缺失、让下游（集中度/迁移）放弃占比结论，也不换一份层级不同的板块集合
+    #（宁可缺失不可错值）。护栏 = data/validate.py 的 board_taxonomy_implausible
+    # + logic/concentration.board_taxonomy_guard。
+    board_ok, board_note = _board_set_usable(boards, total)
     # 东财行业板块今日主力净流入（填补 THS 板块无资金流的口径缺口）
     flow_hit = 0
     try:
@@ -528,13 +552,34 @@ def fetch_market(
             print(
                 f"  产业情报: 事件 {s['total']} 条"
                 f"（环节信号 {len(industry_intel['node_signals'])} 个 / 链级 {len(industry_intel['chain_level'])} 条 / "
-                f"观察池 {len(industry_intel['stock_watchlist'])} 只）",
+                f"观察池 {len(industry_intel['stock_watchlist'])} 只"
+                f" / 确认归属 {s.get('by_confirmer') or {}}）",
                 flush=True,
             )
         else:
             print("  [warn] 无产业事件流（events/<date>.jsonl 不存在或为空），本次不注入", flush=True)
     except Exception as e:  # noqa: BLE001
         print(f"  [warn] 产业事件流读取失败（{str(e)[:100]}），本次不注入", flush=True)
+
+    # ---------- 11. 事件验证（独立源核对；可选，缺失不阻断） ----------
+    # 放在取数期而非 evidence 组装期：价格侧要联网取期货序列、公告侧要读当日账本，
+    # 都是**数据**动作；放进纯格式化的 evidence 会让"组装证据链"变成联网操作。
+    event_verification: Optional[dict] = None
+    try:
+        event_verification = events_db.build_verification(date_str)
+        if event_verification:
+            c = event_verification["counts"]
+            print(
+                f"  事件验证: 价格侧 {len(event_verification['price_checks'])} 项 / "
+                f"公告侧 {len(event_verification['order_checks'])} 项"
+                f"（证实 {c['confirmed']} / 未同步 {c['not_confirmed']} / "
+                f"不一致 {c['ambiguous']} / 无数据 {c['no_data']}）",
+                flush=True,
+            )
+        elif industry_intel:
+            print("  [warn] 事件验证未产出（事件流为空）", flush=True)
+    except Exception as e:  # noqa: BLE001
+        print(f"  [warn] 事件验证失败（{str(e)[:100]}），本次不注入", flush=True)
 
     market = MarketData(
         date=date_str,
@@ -552,9 +597,11 @@ def fetch_market(
         dragon_seats=dragon_seats,
         macro=macro_snap,
         industry_intel=industry_intel,
+        event_verification=event_verification,
         notes=[
             "数据源：同花顺日线（指数/板块成交额）+ 东方财富涨停/跌停池 + 腾讯个股K线 + 新浪个股资金流；"
-            f"板块主力净流入：{flow_note}；中军尾盘行为取自东财分钟线（近 3 个交易日内可得）",
+            f"板块主力净流入：{flow_note}；中军尾盘行为取自东财分钟线（近 3 个交易日内可得）"
+            + ("" if board_ok else f"；⚠️ {board_note}"),
             "北向资金日频净买入未披露（2024-08-19 起），仅披露成交总额与沪深股通前十大成交活跃股"
             f"（成交额口径{('：沪股通 ' + str(len(north_top10['sh'])) + ' / 深股通 ' + str(len(north_top10['sz'])) + ' 条') if north_top10 else '，本次缺失'}）；"
             f"涨停池口径为东财（{len(zt)} 家），跌停 {len(dt)} 家",
@@ -566,9 +613,18 @@ def fetch_market(
                 else "宏观快照本次缺失（新浪期货接口不可用），报告禁止编造期货涨跌"
             ),
             (
-                f"产业事件流源=events/{date_str}.jsonl（词典预筛+人工二次确认，{industry_intel['summary']['total']} 条）"
+                f"产业事件流源=events/{date_str}.jsonl（词典预筛+二次确认，{industry_intel['summary']['total']} 条；"
+                f"确认归属 {industry_intel['summary'].get('by_confirmer') or {}}）"
                 if industry_intel
                 else "产业事件流本次缺失（events/<date>.jsonl 不存在），报告禁止编造产业事件"
+            ),
+            *(
+                [
+                    f"指数日线抓取失败 {len(failed)} 项（{'、'.join(failed)}）："
+                    f"相关指数当日涨跌幅/MA5 无法计算，仅腾讯收盘价可用；{idx_errors}"
+                ]
+                if idx_errors
+                else []
             ),
         ],
     )

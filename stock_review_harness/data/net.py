@@ -109,6 +109,42 @@ def post_json(
         raise RuntimeError(f"POST 失败 {url}: {e}") from e
 
 
+def post_form(
+    url: str,
+    payload: dict,
+    headers: dict | None = None,
+    timeout: int = DEFAULT_TIMEOUT,
+    retries: int = 1,
+) -> str:
+    """POST form-urlencoded 并返回响应文本（用于巨潮全文检索等）。
+
+    存在意义：有些接口对 `application/json` **不报错但静默忽略参数**（实测巨潮
+    hisAnnouncement/query 会忽略 searchkey/seDate 返回全量流），必须用 form 编码。
+    """
+    import urllib.parse
+
+    req = urllib.request.Request(
+        url,
+        data=urllib.parse.urlencode(payload).encode("utf-8"),
+        method="POST",
+    )
+    req.add_header("Content-Type", "application/x-www-form-urlencoded")
+    for k, v in (headers or {}).items():
+        req.add_header(k, v)
+    last = None
+    for i in range(max(1, retries)):
+        try:
+            with _opener().open(req, timeout=timeout) as resp:
+                raw = resp.read()
+            enc = resp.headers.get_content_charset() or "utf-8"
+            return raw.decode(enc, errors="replace")
+        except Exception as e:  # noqa: BLE001 - 统一包装，方便上层降级
+            last = e
+            if i < max(1, retries) - 1:
+                time.sleep(0.8 * (i + 1))
+    raise RuntimeError(f"POST form 失败 {url}: {last}") from last
+
+
 def fetch_many(
     items: Iterable,
     worker: Callable,

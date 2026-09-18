@@ -124,6 +124,7 @@ def load_market_json(path: Optional[str | Path]) -> Optional[MarketData]:
     market.dragon_seats = raw.get("dragon_seats") or None
     market.macro = raw.get("macro") or None
     market.industry_intel = raw.get("industry_intel") or None
+    market.event_verification = raw.get("event_verification") or None
     return market
 
 
@@ -145,5 +146,6 @@ def market_to_json(market: MarketData) -> dict:
         "dragon_seats": market.dragon_seats,
         "macro": market.macro,
         "industry_intel": market.industry_intel,
+        "event_verification": market.event_verification,
         "notes": market.notes,
     }

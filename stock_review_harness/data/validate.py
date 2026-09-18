@@ -21,6 +21,11 @@ STOCK_CHANGE_PCT_LIMIT = 30.5
 PREMIUM_AVG_LIMIT = 25.0
 # 炸板股平均收盘涨跌幅超过该幅度视为异常
 BLAST_AVG_LIMIT = 30.0
+# 板块成交合计 ÷ 两市成交 的合理区间（扁平行业口径实测 99.2%~101.6%，留缺板块容差）。
+# 越界说明板块集合换成了含一二三级嵌套的口径（实测 2026-09-16 达 302%），
+# 此时占比类指标不可加也不可比 —— 与 concentration.board_taxonomy_guard 同源同阈值。
+BOARD_TAXONOMY_SUM_MIN = 0.85
+BOARD_TAXONOMY_SUM_MAX = 1.15
 
 
 def _flag(anomalies: list[dict], kind: str, item: str, detail: str) -> None:
@@ -95,5 +100,22 @@ def validate_bundle(bundle: DataBundle) -> list[dict]:
         if abs(avg) > PREMIUM_AVG_LIMIT:
             _flag(anomalies, "premium_avg_implausible", "昨日涨停平均溢价",
                   f"平均溢价 {avg:+.2f}% 超出 ±{PREMIUM_AVG_LIMIT:.0f}% 常识区间")
+
+    # 7) 板块集合口径（Σ板块成交 ÷ 两市成交）：占比类指标的前提是"板块能拼成整个市场"
+    boards = [b for b in m.boards if b.turnover is not None]
+    if m.total_turnover and boards:
+        sum_yi = sum(b.turnover or 0.0 for b in boards)
+        ratio = sum_yi / m.total_turnover
+        if not (BOARD_TAXONOMY_SUM_MIN <= ratio <= BOARD_TAXONOMY_SUM_MAX):
+            _flag(
+                anomalies,
+                "board_taxonomy_implausible",
+                f"板块成交合计（{len(boards)} 个板块）",
+                f"{sum_yi:.1f} 亿 ÷ 两市成交 {m.total_turnover:.1f} 亿 = {ratio * 100:.1f}%，"
+                f"超出 [{BOARD_TAXONOMY_SUM_MIN * 100:.0f}%, "
+                f"{BOARD_TAXONOMY_SUM_MAX * 100:.0f}%]——板块集合疑似含多层级嵌套，"
+                "板块成交占比既不可跨日比较也不可在同一日内相加，"
+                "报告不得引用该日任何板块占比数字",
+            )
 
     return anomalies
