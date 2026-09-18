@@ -323,16 +323,29 @@ def _limits(min_clean_days: int) -> list[str]:
     ]
 
 
+def _resolved_min_clean_days() -> int:
+    """出 weights_v2 所需干净样本天数：优先注册表，缺失回退常量（见 select/registry.py）。"""
+    try:
+        from .registry import min_clean_days_for_v2
+
+        return min_clean_days_for_v2()
+    except Exception:  # noqa: BLE001 - 注册表不可用时回退，保证旧环境可跑
+        return MIN_CLEAN_DAYS_FOR_V2
+
+
 def summarize(
     rows: list[dict],
     clean_only: bool = True,
-    min_clean_days: int = MIN_CLEAN_DAYS_FOR_V2,
+    min_clean_days: int | None = None,
     min_ic_days: int = DEFAULT_MIN_IC_DAYS,
 ) -> dict:
     """判卷行 → 汇总（**分 live / backfill 两块**，不合并——样本内外不能混算）。
 
     `clean_only=True`（默认）只统计 gap=1 的行，与 M2 账同一纪律。
+    `min_clean_days=None`（默认）→ 读权重注册表的校准门槛。
     """
+    if min_clean_days is None:
+        min_clean_days = _resolved_min_clean_days()
     rows = list(rows or [])
     sel = [r for r in rows if (r.get("clean") or not clean_only)]
     blocks = {}

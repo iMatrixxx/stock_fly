@@ -1,0 +1,27 @@
+{
+  "note": "权重治理注册表（单一来源）：各池当前生效权重版本、生效日、回滚目标、校准门槛与纪律。改权重必须同步更新本表——scoring/ledger 的默认值与门槛均从此读取（注册表缺失时回退代码内常量）。",
+  "updated": "2026-09-18",
+  "pools": {
+    "short": {
+      "name": "短线池（个股打分）",
+      "active": "weights_v1.json",
+      "since": "2026-09-12",
+      "rollback": "weights_v0.json",
+      "evidence": "25 交易日回测（2026-07-27~09-11）驱动：符号按 IC 方向修正、剔除秩相关 1.00 冗余特征、下调无区分度特征组；未做数值自动拟合",
+      "changelog_file": "weights_v1.json"
+    },
+    "mid": {
+      "name": "中线高潜池",
+      "active": "weights_mid_v0.json",
+      "since": "2026-09-17",
+      "rollback": null,
+      "evidence": "全部先验（中线特征域与短线零重叠，IC 不可互推）；尚未回测",
+      "changelog_file": "weights_mid_v0.json"
+    }
+  },
+  "calibration_policy": {
+    "min_clean_days_for_v2": 30,
+    "min_ic_sample_per_day": 10,
+    "note": "样本不足时禁止自动拟合权重；只允许 (a) 按 IC 方向做单因子符号修正、(b) 剔除冗余特征，并写入 changelog。判卷账区分 live（样本外）与回放（样本内）——只有 live、gap=1 的干净样本计入门槛。"
+  }
+}

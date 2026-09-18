@@ -51,6 +51,20 @@ _SELECT_DIR = Path(__file__).resolve().parent
 # 改它等于改生产行为，故跟随版本号一起演进。
 DEFAULT_WEIGHTS = "weights_v1.json"
 
+
+def _resolved_default_weights() -> str:
+    """生产缺省权重文件名：优先读注册表（`weights_registry.json`），缺失回退常量。
+
+    注册表是"当前生效权重/回滚目标/校准门槛"的单一来源（见 select/registry.py）；
+    回退分支保证注册表被裁剪或损坏时主链仍可运行。
+    """
+    try:
+        from .registry import active_weights
+
+        return active_weights("short")
+    except Exception:  # noqa: BLE001 - 注册表不可用则回退常量，避免打断主链
+        return DEFAULT_WEIGHTS
+
 TIERS = ("A", "B", "C", "NA")
 
 # 权重表内嵌群（`groups` 键）的**必需键**。方向表与个股表同构，故共用校验。
@@ -69,7 +83,7 @@ def weights_file(
     "个股表按版本号寻址、方向表按路径寻址"这种记不住的差异。
     """
     if version_or_path is None:
-        return _SELECT_DIR / (default or DEFAULT_WEIGHTS)
+        return _SELECT_DIR / (default or _resolved_default_weights())
     p = Path(version_or_path)
     if p.exists():
         return p
