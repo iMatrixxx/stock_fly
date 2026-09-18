@@ -9,7 +9,7 @@ import sys
 import time
 
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), ".."))
-from tools.fetch_v2_20260730 import CACHE, ths_line  # noqa: E402
+from tools.legacy.fetch_v2_20260730 import CACHE, ths_line  # noqa: E402
 
 
 def main():
