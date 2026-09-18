@@ -7,6 +7,14 @@ name = "stock-review-harness"
 version = "2.1.0"
 description = "A 股四步深度复盘引擎（资金-锚点-周期-策略），基于现象-数据-推导三步法"
 requires-python = ">=3.10"
+# 核心运行库仅标准库（见 README §1）；以下为可选能力分组，按需安装：
+#   pip install -e ".[test]"   跑测试
+#   pip install -e ".[intel]"  跑 hithink 取数/资讯（akshare 等）
+#   pip install -e ".[dev]"    全套
+[project.optional-dependencies]
+test = ["pytest>=7"]
+intel = ["akshare>=1.16", "requests>=2.31", "beautifulsoup4>=4.12"]
+dev = ["pytest>=7", "akshare>=1.16", "requests>=2.31", "beautifulsoup4>=4.12"]
 
 [tool.setuptools]
 packages = [
@@ -15,3 +23,7 @@ packages = [
     "stock_review_harness.logic",
     "stock_review_harness.report",
 ]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"

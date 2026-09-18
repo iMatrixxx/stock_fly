@@ -20,23 +20,35 @@ from __future__ import annotations
 
 import argparse
 import json
+import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
+
+from stock_review_harness.data.chains import build_chain_index  # noqa: E402
+from stock_review_harness.data.chains import load_chains as _load_chains  # noqa: E402
 
 
 def load_chains(chains_dir: Path) -> list[dict]:
-    out = []
-    for p in sorted(chains_dir.glob("*.json")):
-        if p.name.startswith("_"):
-            continue
-        out.append(json.loads(p.read_text(encoding="utf-8")))
-    return out
+    """读全部链文件 —— **委托给 StockReviewHarness 的唯一加载点**（见 data/chains.py）。
+
+    本脚本原先自己 glob+parse 一份，与 filter_news_signals 的实现重复且返回形状不同；
+    统一到 canonical 之后，字段口径只有一处。
+    """
+    return _load_chains(chains_dir)
 
 
-def build_index(chains: list[dict]) -> tuple[dict, list]:
+def build_index(chains: list[dict]) -> tuple[dict, list, dict]:
+    """返回 (by_code, aliases, excluded)。
+
+    excluded：蹭概念排除名单（`chains/*.json` 的 `exclusions` 字段）——
+    主营不在链内、仅涨停标签机械命中，回放时从反例与分母中剔除，避免污染命中率。
+    """
     by_code: dict[str, dict] = {}
     aliases: list[tuple[str, str, str]] = []
+    excluded: dict[str, dict] = {}
     for ch in chains:
         cid = ch["chain_id"]
         for s in ch.get("stocks") or []:
@@ -47,8 +59,13 @@ def build_index(chains: list[dict]) -> tuple[dict, list]:
         for a in ch.get("signal_aliases") or []:
             for kw in a["keywords"]:
                 aliases.append((kw, a["node"], cid))
+        for e in ch.get("exclusions") or []:
+            excluded.setdefault(
+                e["code"],
+                {"name": e.get("name"), "reason": e.get("reason", ""), "chain_id": cid},
+            )
     aliases.sort(key=lambda x: -len(x[0]))
-    return by_code, aliases
+    return by_code, aliases, excluded
 
 
 def match_nodes(text: str, aliases: list[tuple[str, str, str]]) -> list[tuple[str, str]]:
@@ -89,7 +106,8 @@ def discover_dates(limit_days: int) -> list[str]:
     return sorted(dates, reverse=True)[:limit_days]
 
 
-def replay_one(date_str: str, by_code: dict, aliases: list) -> dict:
+def replay_one(date_str: str, by_code: dict, aliases: list, excluded: dict | None = None) -> dict:
+    excluded = excluded or {}
     pool = load_limit_pool(date_str)
     ev = load_evidence(date_str)
     res = {
@@ -97,6 +115,7 @@ def replay_one(date_str: str, by_code: dict, aliases: list) -> dict:
         "zt_total": len(pool) if pool else None,
         "covered": [],
         "unmapped": [],
+        "excluded": [],
         "unrelated": 0,
         "dragon_hits": [],
         "north_hits": [],
@@ -117,6 +136,17 @@ def replay_one(date_str: str, by_code: dict, aliases: list) -> dict:
                     "node": hit["node"],
                     "purity": hit["purity"],
                     "label": label,
+                }
+            )
+            continue
+        if code in excluded:
+            res["excluded"].append(
+                {
+                    "code": code,
+                    "name": name,
+                    "ladder": s.get("连板数"),
+                    "label": label,
+                    "reason": excluded[code].get("reason", ""),
                 }
             )
             continue
@@ -188,6 +218,11 @@ def render(results: list[dict], by_code: dict) -> str:
                 all_unmapped.setdefault(k, {"count": 0, "nodes": set()})
                 all_unmapped[k]["count"] += 1
                 all_unmapped[k]["nodes"].update(u["nodes"])
+        if r.get("excluded"):
+            lines.append("")
+            lines.append("**已排除（蹭概念，不计入分母）**：" + "；".join(
+                f"{x['name']}({x['code']})" for x in r["excluded"]
+            ))
         if r["dragon_hits"]:
             lines.append("")
             lines.append(
@@ -229,10 +264,10 @@ def main(argv=None) -> None:
     chains = load_chains(Path(args.chains_dir))
     if not chains:
         raise SystemExit(f"chains 目录无有效链文件: {args.chains_dir}")
-    by_code, aliases = build_index(chains)
+    by_code, aliases, excluded = build_index(chains)
 
     dates = args.date or discover_dates(args.limit_days)
-    results = [replay_one(d, by_code, aliases) for d in dates]
+    results = [replay_one(d, by_code, aliases, excluded) for d in dates]
 
     if args.json:
         text = json.dumps({"chains": [c["chain_id"] for c in chains], "results": results}, ensure_ascii=False, indent=2)

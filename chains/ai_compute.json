@@ -1,39 +1,53 @@
 {
   "chain_id": "ai_compute",
   "name": "AI 算力",
-  "version": "0.1",
-  "updated": "2026-09-10",
-  "note": "P0 静态产业链图谱（人工维护）：nodes 定义上下游关系，供 L2 事件沿链传导；stocks 为 A股映射（必须含 code 与 purity，否则无法与盘面做程序化验证）；signal_aliases 把涨停原因标签/事件文本归位到节点。图谱只描述结构与映射，不含任何买卖判断。",
+  "version": "0.2",
+  "updated": "2026-09-18",
+  "note": "P0 静态产业链图谱（人工维护）：nodes 定义上下游关系，供 L2 事件沿链传导；stocks 为 A股映射（必须含 code 与 purity，否则无法与盘面做程序化验证）；signal_aliases 把涨停原因标签/事件文本归位到节点。图谱只描述结构与映射，不含任何买卖判断。 v0.2（2026-09-18）：新增 equipment_materials 节点（设备/材料卖铲环节）；按 8 日回放反例批量补入真链内标的；新增 exclusions（蹭概念排除名单，回放时剔除出分母）。",
   "nodes": [
     {
       "id": "gpu_chip",
       "name": "算力芯片",
       "stage": "upstream",
       "upstream": [],
-      "downstream": ["storage", "packaging"],
+      "downstream": [
+        "storage",
+        "packaging"
+      ],
       "note": "GPU/ASIC，国产算力卡位，事件敏感度最高"
     },
     {
       "id": "storage",
       "name": "存储/HBM",
       "stage": "upstream",
-      "upstream": ["gpu_chip"],
-      "downstream": ["packaging"],
+      "upstream": [
+        "gpu_chip"
+      ],
+      "downstream": [
+        "packaging"
+      ],
       "note": "HBM/DRAM/内存接口与存储材料，涨价信号直接受益"
     },
     {
       "id": "packaging",
       "name": "先进封装",
       "stage": "midstream",
-      "upstream": ["storage"],
-      "downstream": ["pcb", "optical"],
+      "upstream": [
+        "storage"
+      ],
+      "downstream": [
+        "pcb",
+        "optical"
+      ],
       "note": "CoWoS/Chiplet 封测产能，算力供给瓶颈环节"
     },
     {
       "id": "pcb",
       "name": "载板/PCB/CCL",
       "stage": "midstream",
-      "upstream": ["packaging"],
+      "upstream": [
+        "packaging"
+      ],
       "downstream": [],
       "note": "高多层板/HDI/覆铜板，算力板主力"
     },
@@ -41,41 +55,737 @@
       "id": "optical",
       "name": "光互连",
       "stage": "midstream",
-      "upstream": ["packaging"],
+      "upstream": [
+        "packaging"
+      ],
       "downstream": [],
       "note": "光模块/光芯片/CPO，受算力总量驱动"
+    },
+    {
+      "id": "equipment_materials",
+      "name": "设备与材料",
+      "stage": "upstream",
+      "upstream": [],
+      "downstream": [
+        "gpu_chip",
+        "storage",
+        "packaging",
+        "pcb",
+        "optical"
+      ],
+      "note": "PCB/半导体/光模块的设备、零部件、试剂、基材（铜箔/树脂/硅片/靶材/测试仪器）——算力产能扩张的卖铲环节，纯度多为 edge"
     }
   ],
   "stocks": [
-    {"node": "gpu_chip", "code": "688256", "name": "寒武纪", "purity": "core", "note": "国产 AI 芯片龙头"},
-    {"node": "gpu_chip", "code": "688041", "name": "海光信息", "purity": "core", "note": "国产 CPU/DCU"},
-    {"node": "storage", "code": "300475", "name": "香农芯创", "purity": "swing", "note": "HBM/存储分销"},
-    {"node": "storage", "code": "603986", "name": "兆易创新", "purity": "core", "note": "NOR/DRAM 存储设计"},
-    {"node": "storage", "code": "002409", "name": "雅克科技", "purity": "edge", "note": "存储前驱体材料"},
-    {"node": "storage", "code": "000620", "name": "盈新发展", "purity": "swing", "note": "存储芯片/封测；09-08 涨停，回放补充，code 以当日 evidence 为准"},
-    {"node": "packaging", "code": "002156", "name": "通富微电", "purity": "core", "note": "先进封装/Chiplet"},
-    {"node": "packaging", "code": "600584", "name": "长电科技", "purity": "core", "note": "封测龙头"},
-    {"node": "pcb", "code": "002463", "name": "沪电股份", "purity": "core", "note": "高多层板/算力板"},
-    {"node": "pcb", "code": "002916", "name": "深南电路", "purity": "core", "note": "PCB + 封装基板"},
-    {"node": "pcb", "code": "603228", "name": "景旺电子", "purity": "core", "note": "PCB"},
-    {"node": "pcb", "code": "600183", "name": "生益科技", "purity": "core", "note": "覆铜板 CCL"},
-    {"node": "pcb", "code": "002579", "name": "中京电子", "purity": "swing", "note": "PCB/HDI；09-08 龙虎榜净买 3.54 亿，回放补充"},
-    {"node": "optical", "code": "300308", "name": "中际旭创", "purity": "core", "note": "光模块龙头"},
-    {"node": "optical", "code": "300502", "name": "新易盛", "purity": "core", "note": "光模块"},
-    {"node": "optical", "code": "300394", "name": "天孚通信", "purity": "core", "note": "光器件"},
-    {"node": "optical", "code": "688498", "name": "源杰科技", "purity": "swing", "note": "光芯片"},
-    {"node": "optical", "code": "603083", "name": "剑桥科技", "purity": "swing", "note": "光模块"}
+    {
+      "node": "gpu_chip",
+      "code": "688256",
+      "name": "寒武纪",
+      "purity": "core",
+      "note": "国产 AI 芯片龙头"
+    },
+    {
+      "node": "gpu_chip",
+      "code": "688041",
+      "name": "海光信息",
+      "purity": "core",
+      "note": "国产 CPU/DCU"
+    },
+    {
+      "node": "storage",
+      "code": "300475",
+      "name": "香农芯创",
+      "purity": "swing",
+      "note": "HBM/存储分销"
+    },
+    {
+      "node": "storage",
+      "code": "603986",
+      "name": "兆易创新",
+      "purity": "core",
+      "note": "NOR/DRAM 存储设计"
+    },
+    {
+      "node": "storage",
+      "code": "002409",
+      "name": "雅克科技",
+      "purity": "edge",
+      "note": "存储前驱体材料"
+    },
+    {
+      "node": "storage",
+      "code": "000620",
+      "name": "盈新发展",
+      "purity": "swing",
+      "note": "存储芯片/封测；09-08 涨停，回放补充，code 以当日 evidence 为准"
+    },
+    {
+      "node": "packaging",
+      "code": "002156",
+      "name": "通富微电",
+      "purity": "core",
+      "note": "先进封装/Chiplet"
+    },
+    {
+      "node": "packaging",
+      "code": "600584",
+      "name": "长电科技",
+      "purity": "core",
+      "note": "封测龙头"
+    },
+    {
+      "node": "pcb",
+      "code": "002463",
+      "name": "沪电股份",
+      "purity": "core",
+      "note": "高多层板/算力板"
+    },
+    {
+      "node": "pcb",
+      "code": "002916",
+      "name": "深南电路",
+      "purity": "core",
+      "note": "PCB + 封装基板"
+    },
+    {
+      "node": "pcb",
+      "code": "603228",
+      "name": "景旺电子",
+      "purity": "core",
+      "note": "PCB"
+    },
+    {
+      "node": "pcb",
+      "code": "600183",
+      "name": "生益科技",
+      "purity": "core",
+      "note": "覆铜板 CCL"
+    },
+    {
+      "node": "pcb",
+      "code": "002579",
+      "name": "中京电子",
+      "purity": "swing",
+      "note": "PCB/HDI；09-08 龙虎榜净买 3.54 亿，回放补充"
+    },
+    {
+      "node": "optical",
+      "code": "300308",
+      "name": "中际旭创",
+      "purity": "core",
+      "note": "光模块龙头"
+    },
+    {
+      "node": "optical",
+      "code": "300502",
+      "name": "新易盛",
+      "purity": "core",
+      "note": "光模块"
+    },
+    {
+      "node": "optical",
+      "code": "300394",
+      "name": "天孚通信",
+      "purity": "core",
+      "note": "光器件"
+    },
+    {
+      "node": "optical",
+      "code": "688498",
+      "name": "源杰科技",
+      "purity": "swing",
+      "note": "光芯片"
+    },
+    {
+      "node": "optical",
+      "code": "603083",
+      "name": "剑桥科技",
+      "purity": "swing",
+      "note": "光模块"
+    },
+    {
+      "node": "optical",
+      "code": "002281",
+      "name": "光迅科技",
+      "purity": "core",
+      "note": "光模块/光器件；09-16 涨停，映射表补齐（原缺口）"
+    },
+    {
+      "node": "optical",
+      "code": "002491",
+      "name": "通鼎互联",
+      "purity": "swing",
+      "note": "光纤光缆/通信线缆；09-16 2 连板，映射表补齐"
+    },
+    {
+      "node": "optical",
+      "code": "603042",
+      "name": "华脉科技",
+      "purity": "swing",
+      "note": "通信连接器件/光缆组件；09-16 涨停，映射表补齐"
+    },
+    {
+      "node": "optical",
+      "code": "600105",
+      "name": "永鼎股份",
+      "purity": "swing",
+      "note": "光纤光缆（兼超导/线束）；09-16 涨停，映射表补齐"
+    },
+    {
+      "node": "pcb",
+      "code": "002913",
+      "name": "奥士康",
+      "purity": "core",
+      "note": "PCB；09-16 涨停，映射表补齐"
+    },
+    {
+      "node": "pcb",
+      "code": "603328",
+      "name": "依顿电子",
+      "purity": "core",
+      "note": "PCB；09-16 涨停，映射表补齐"
+    },
+    {
+      "node": "pcb",
+      "code": "601208",
+      "name": "东材科技",
+      "purity": "edge",
+      "note": "覆铜板用电子树脂/绝缘材料（材料端）；09-16 涨停，映射表补齐"
+    },
+    {
+      "node": "packaging",
+      "code": "003031",
+      "name": "中瓷电子",
+      "purity": "core",
+      "note": "电子陶瓷封装外壳；09-16 涨停，映射表补齐"
+    },
+    {
+      "node": "gpu_chip",
+      "code": "688432",
+      "name": "有研硅",
+      "purity": "edge",
+      "note": "半导体硅片材料（上游材料，非设计）；09-16 涨停，映射表补齐"
+    },
+    {
+      "node": "pcb",
+      "code": "605058",
+      "name": "澳弘电子",
+      "purity": "core",
+      "note": "印制电路板制造；09-16 涨停（4 连板），此前判为未归链 元件 行业。"
+    },
+    {
+      "node": "pcb",
+      "code": "301251",
+      "name": "威尔高",
+      "purity": "core",
+      "note": "印制电路板制造；09-16 涨停，此前判为未归链 元件 行业。"
+    },
+    {
+      "node": "gpu_chip",
+      "code": "605358",
+      "name": "立昂微",
+      "purity": "edge",
+      "note": "半导体硅片与功率器件（上游材料，非算力芯片设计）；09-16 涨停。"
+    },
+    {
+      "node": "gpu_chip",
+      "code": "003026",
+      "name": "中晶科技",
+      "purity": "edge",
+      "note": "半导体硅材料（硅棒/硅片）；09-16 涨停（2 连板）。"
+    },
+    {
+      "node": "gpu_chip",
+      "code": "688478",
+      "name": "晶升股份",
+      "purity": "edge",
+      "note": "半导体晶体生长设备（长晶炉，上游设备）；09-16 涨停。"
+    },
+    {
+      "node": "packaging",
+      "code": "002185",
+      "name": "华天科技",
+      "purity": "core",
+      "note": "封测龙头/先进封装；09-18 涨停，映射表补齐"
+    },
+    {
+      "node": "pcb",
+      "code": "002134",
+      "name": "天津普林",
+      "purity": "core",
+      "note": "PCB 制造；09-18 涨停，映射表补齐"
+    },
+    {
+      "node": "pcb",
+      "code": "002815",
+      "name": "崇达技术",
+      "purity": "core",
+      "note": "高端 PCB/AI 服务器板；回放补齐"
+    },
+    {
+      "node": "pcb",
+      "code": "001389",
+      "name": "广合科技",
+      "purity": "core",
+      "note": "算力 PCB/高端产能；09-07 反例补齐"
+    },
+    {
+      "node": "pcb",
+      "code": "001232",
+      "name": "嘉立创",
+      "purity": "core",
+      "note": "PCB 制造+EDA（次新）；回放补齐"
+    },
+    {
+      "node": "pcb",
+      "code": "603936",
+      "name": "博敏电子",
+      "purity": "core",
+      "note": "AI 算力 PCB+光模块 PCB+陶瓷衬板；回放补齐"
+    },
+    {
+      "node": "pcb",
+      "code": "603186",
+      "name": "华正新材",
+      "purity": "core",
+      "note": "高速覆铜板/AI 算力材料；回放补齐"
+    },
+    {
+      "node": "pcb",
+      "code": "002636",
+      "name": "金安国纪",
+      "purity": "core",
+      "note": "覆铜板（CCL）；回放补齐"
+    },
+    {
+      "node": "pcb",
+      "code": "000823",
+      "name": "超声电子",
+      "purity": "core",
+      "note": "算力 PCB+存储 PCB+高端 HDI；反例最高频（4x），补齐"
+    },
+    {
+      "node": "pcb",
+      "code": "002436",
+      "name": "兴森科技",
+      "purity": "swing",
+      "note": "PCB+ABF 载板+光模块 PCB；回放补齐"
+    },
+    {
+      "node": "pcb",
+      "code": "300903",
+      "name": "科翔股份",
+      "purity": "swing",
+      "note": "陶瓷 PCB+高端 PCB+AI 算力；回放补齐"
+    },
+    {
+      "node": "pcb",
+      "code": "603386",
+      "name": "骏亚科技",
+      "purity": "swing",
+      "note": "高多层 HDI/PCB 主营；回放补齐"
+    },
+    {
+      "node": "pcb",
+      "code": "605258",
+      "name": "协和电子",
+      "purity": "swing",
+      "note": "PCB+高频通讯；回放补齐"
+    },
+    {
+      "node": "pcb",
+      "code": "301132",
+      "name": "满坤科技",
+      "purity": "swing",
+      "note": "AI 电源 PCB+光模块 PCB；回放补齐"
+    },
+    {
+      "node": "pcb",
+      "code": "688655",
+      "name": "迅捷兴",
+      "purity": "swing",
+      "note": "高端 HDI+光模块 PCB；回放补齐"
+    },
+    {
+      "node": "pcb",
+      "code": "002848",
+      "name": "高斯贝尔",
+      "purity": "edge",
+      "note": "高频高速覆铜板/AI 材料；回放补齐"
+    },
+    {
+      "node": "storage",
+      "code": "603316",
+      "name": "诚邦股份",
+      "purity": "swing",
+      "note": "半导体存储+芯片扩产（原园林转型）；回放补齐"
+    },
+    {
+      "node": "storage",
+      "code": "000670",
+      "name": "盈方微",
+      "purity": "swing",
+      "note": "存储芯片+电子元器件分销；回放补齐"
+    },
+    {
+      "node": "storage",
+      "code": "002213",
+      "name": "大为股份",
+      "purity": "swing",
+      "note": "半导体存储+锂矿；回放补齐"
+    },
+    {
+      "node": "storage",
+      "code": "600667",
+      "name": "太极实业",
+      "purity": "swing",
+      "note": "SK 海力士封测+存储芯片；回放补齐"
+    },
+    {
+      "node": "optical",
+      "code": "002902",
+      "name": "铭普光磁",
+      "purity": "swing",
+      "note": "800G 光模块+AI 磁性元器件；回放补齐"
+    },
+    {
+      "node": "optical",
+      "code": "600330",
+      "name": "天通股份",
+      "purity": "swing",
+      "note": "铌酸锂+软磁材料+光通信上游；回放补齐"
+    },
+    {
+      "node": "optical",
+      "code": "001267",
+      "name": "汇绿生态",
+      "purity": "swing",
+      "note": "光模块+CPO+客户 Coherent；回放补齐（原园林）"
+    },
+    {
+      "node": "optical",
+      "code": "601231",
+      "name": "环旭电子",
+      "purity": "swing",
+      "note": "800G 光引擎+CPO+AI 算力；回放补齐"
+    },
+    {
+      "node": "optical",
+      "code": "301486",
+      "name": "致尚科技",
+      "purity": "swing",
+      "note": "光通信 MPC/MPO 满产；回放补齐"
+    },
+    {
+      "node": "optical",
+      "code": "603052",
+      "name": "可川科技",
+      "purity": "swing",
+      "note": "硅光芯片+高速光模块；回放补齐"
+    },
+    {
+      "node": "optical",
+      "code": "002396",
+      "name": "星网锐捷",
+      "purity": "edge",
+      "note": "数据中心交换机+光通信；回放补齐"
+    },
+    {
+      "node": "optical",
+      "code": "603118",
+      "name": "共进股份",
+      "purity": "edge",
+      "note": "800G 交换机+液冷服务器；回放补齐"
+    },
+    {
+      "node": "equipment_materials",
+      "code": "000509",
+      "name": "华塑控股",
+      "purity": "edge",
+      "note": "PCB 钻针设备+工业母机；回放补齐"
+    },
+    {
+      "node": "equipment_materials",
+      "code": "301583",
+      "name": "托伦斯",
+      "purity": "edge",
+      "note": "半导体设备精密零部件+存储芯片；回放补齐"
+    },
+    {
+      "node": "equipment_materials",
+      "code": "688813",
+      "name": "泰金新能",
+      "purity": "edge",
+      "note": "铜箔装备+AI 服务器 PCB；回放补齐"
+    },
+    {
+      "node": "equipment_materials",
+      "code": "001223",
+      "name": "欧克科技",
+      "purity": "edge",
+      "note": "PCB 设备+PI 膜；回放补齐"
+    },
+    {
+      "node": "equipment_materials",
+      "code": "002957",
+      "name": "科瑞技术",
+      "purity": "edge",
+      "note": "光模块设备+半导体设备；回放补齐"
+    },
+    {
+      "node": "equipment_materials",
+      "code": "002980",
+      "name": "华盛昌",
+      "purity": "edge",
+      "note": "光通信测试仪器+CPO 测试；回放补齐"
+    },
+    {
+      "node": "equipment_materials",
+      "code": "301689",
+      "name": "电科思仪",
+      "purity": "edge",
+      "note": "光模块测试/电子测量仪器；回放补齐"
+    },
+    {
+      "node": "equipment_materials",
+      "code": "600206",
+      "name": "有研新材",
+      "purity": "edge",
+      "note": "半导体靶材+存储相关材料；回放补齐"
+    },
+    {
+      "node": "equipment_materials",
+      "code": "603938",
+      "name": "三孚股份",
+      "purity": "edge",
+      "note": "高纯四氯化硅/光纤材料；回放补齐"
+    },
+    {
+      "node": "equipment_materials",
+      "code": "600500",
+      "name": "中化国际",
+      "purity": "edge",
+      "note": "PPE 树脂（覆铜板上游）；回放补齐"
+    },
+    {
+      "node": "equipment_materials",
+      "code": "002669",
+      "name": "康达新材",
+      "purity": "edge",
+      "note": "电子级环氧树脂（PCB 上游）；回放补齐"
+    },
+    {
+      "node": "equipment_materials",
+      "code": "600110",
+      "name": "诺德股份",
+      "purity": "edge",
+      "note": "PCB 铜箔+锂电铜箔；回放补齐"
+    },
+    {
+      "node": "equipment_materials",
+      "code": "002141",
+      "name": "贤丰控股",
+      "purity": "edge",
+      "note": "覆铜板+拟布局 PCB；回放补齐"
+    },
+    {
+      "node": "equipment_materials",
+      "code": "002584",
+      "name": "西陇科学",
+      "purity": "edge",
+      "note": "PCB 用化学试剂+光刻胶配套；回放补齐"
+    },
+    {
+      "node": "equipment_materials",
+      "code": "002976",
+      "name": "瑞玛精密",
+      "purity": "edge",
+      "note": "光通信散热+5G 通信结构件；回放补齐"
+    },
+    {
+      "node": "equipment_materials",
+      "code": "600184",
+      "name": "光电股份",
+      "purity": "edge",
+      "note": "光学材料+防务光电；回放补齐"
+    },
+    {
+      "node": "equipment_materials",
+      "code": "002138",
+      "name": "顺络电子",
+      "purity": "edge",
+      "note": "片式电感/AI 服务器元器件；回放补齐"
+    },
+    {
+      "node": "equipment_materials",
+      "code": "002708",
+      "name": "光洋股份",
+      "purity": "edge",
+      "note": "高阶 PCB（主营汽车轴承，间接）；回放补齐"
+    }
   ],
   "signal_aliases": [
-    {"node": "pcb", "keywords": ["PCB", "覆铜板", "CCL", "线路板", "HDI", "高多层", "载板"]},
-    {"node": "optical", "keywords": ["光模块", "CPO", "光通信", "光芯片", "硅光", "光器件", "800G", "1.6T", "NPO", "光互连"]},
-    {"node": "storage", "keywords": ["存储", "HBM", "DRAM", "闪存", "内存接口", "存储芯片", "固态硬盘"]},
-    {"node": "packaging", "keywords": ["先进封装", "Chiplet", "封测", "CoWoS", "封装基板"]},
-    {"node": "gpu_chip", "keywords": ["算力芯片", "GPU", "ASIC", "国产芯片", "AI芯片", "DCU"]}
+    {
+      "node": "pcb",
+      "keywords": [
+        "PCB",
+        "覆铜板",
+        "CCL",
+        "线路板",
+        "HDI",
+        "高多层",
+        "载板",
+        "铜箔",
+        "环氧树脂",
+        "PPE 树脂",
+        "高频板",
+        "陶瓷衬板"
+      ]
+    },
+    {
+      "node": "optical",
+      "keywords": [
+        "光模块",
+        "CPO",
+        "光通信",
+        "光芯片",
+        "硅光",
+        "光器件",
+        "800G",
+        "1.6T",
+        "NPO",
+        "光互连",
+        "光引擎",
+        "MPO",
+        "光通信测试",
+        "光模块测试"
+      ]
+    },
+    {
+      "node": "storage",
+      "keywords": [
+        "存储",
+        "HBM",
+        "DRAM",
+        "闪存",
+        "内存接口",
+        "存储芯片",
+        "固态硬盘",
+        "存储模组",
+        "存储封测"
+      ]
+    },
+    {
+      "node": "packaging",
+      "keywords": [
+        "先进封装",
+        "Chiplet",
+        "封测",
+        "CoWoS",
+        "封装基板",
+        "封装测试"
+      ]
+    },
+    {
+      "node": "gpu_chip",
+      "keywords": [
+        "算力芯片",
+        "GPU",
+        "ASIC",
+        "国产芯片",
+        "AI芯片",
+        "DCU"
+      ]
+    },
+    {
+      "node": "equipment_materials",
+      "keywords": [
+        "PCB钻针",
+        "PCB刀具",
+        "PCB设备",
+        "光模块设备",
+        "半导体设备",
+        "测试仪器",
+        "硅片",
+        "靶材",
+        "四氯化硅",
+        "电子级环氧树脂"
+      ]
+    }
   ],
   "pending_nodes": [
-    {"id": "cooling_power", "name": "液冷/服务器电源", "note": "09-07 涨停池出现多只液冷/电源标的（盾安环境/集泰股份/江南新材/中远通等），当日为资金战场之一；节点未建前不纳入映射，相关标签也不参与反例判定"},
-    {"id": "copper_connect", "name": "铜连接/高速铜缆", "note": "待 L1 事件出现后按同一 schema 增量建链"}
+    {
+      "id": "cooling_power",
+      "name": "液冷/服务器电源",
+      "note": "09-07 涨停池出现多只液冷/电源标的（盾安环境/集泰股份/江南新材/中远通等），当日为资金战场之一；节点未建前不纳入映射，相关标签也不参与反例判定"
+    },
+    {
+      "id": "copper_connect",
+      "name": "铜连接/高速铜缆",
+      "note": "待 L1 事件出现后按同一 schema 增量建链"
+    }
   ],
-  "alias_note": "别名刻意不含『算力/服务器/液冷』等泛词：实测这些词会把蹭概念股（算力租赁、液冷硅油、家电复材等）大量误判为链内标的。别名只收硬件环节专有词；泛概念与待补链环节留给人工判断。"
+  "alias_note": "别名刻意不含『算力/服务器/液冷』等泛词：实测这些词会把蹭概念股（算力租赁、液冷硅油、家电复材等）大量误判为链内标的。别名只收硬件环节专有词；泛概念与待补链环节留给人工判断。",
+  "exclusions": [
+    {
+      "code": "002515",
+      "name": "金字火腿",
+      "reason": "主营肉制品；标签『光通信芯片+火腿』属蹭概念"
+    },
+    {
+      "code": "600103",
+      "name": "青山纸业",
+      "reason": "主营造纸（竹浆）；标签『光模块+竹浆纸』属蹭概念"
+    },
+    {
+      "code": "600261",
+      "name": "阳光照明",
+      "reason": "主营 LED 照明；仅『投资激光通信』，非链内硬件环节"
+    },
+    {
+      "code": "002971",
+      "name": "和远气体",
+      "reason": "主营工业气体；『光通信材料』非主营"
+    },
+    {
+      "code": "002174",
+      "name": "游族网络",
+      "reason": "主营游戏；『先进封装』非主营"
+    },
+    {
+      "code": "001399",
+      "name": "惠科股份",
+      "reason": "主营半导体显示面板；面板不在本链环节"
+    },
+    {
+      "code": "003001",
+      "name": "中岩大地",
+      "reason": "主营岩土工程；『PCB 刀具』非主营"
+    },
+    {
+      "code": "603956",
+      "name": "威派格",
+      "reason": "主营智慧水务；『PCB 钻针』非主营"
+    },
+    {
+      "code": "002161",
+      "name": "远望谷",
+      "reason": "主营 RFID 物联网；拟收购光泰通信尚未并表"
+    },
+    {
+      "code": "002137",
+      "name": "实益达",
+      "reason": "间接持股宇树科技；『先进封装』非主营"
+    },
+    {
+      "code": "002787",
+      "name": "华源控股",
+      "reason": "主营金属包装；『光模块』非主营"
+    },
+    {
+      "code": "300243",
+      "name": "瑞丰高材",
+      "reason": "主营 PVC 助剂；『PCB』为助剂应用端"
+    }
+  ]
 }
