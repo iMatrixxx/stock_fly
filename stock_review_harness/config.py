@@ -6,13 +6,11 @@ from datetime import datetime, timedelta
 
 # ========== 日期配置 ==========
 # 默认分析日期（可覆盖）
-DEFAULT_DATE = (datetime.now() - timedelta(days=0)).strftime("%Y%m%d")
 # 注意：A股交易日判断需要额外处理，这里先用简单逻辑
 
 # ========== Step 1: 锁定战场 阈值 ==========
 BOARD_VOLUME_RATIO_THRESHOLD = 3.0       # 板块成交额占全市场比例 > 3%
 BOARD_CHANGE_THRESHOLD = 2.0             # 板块涨跌幅显著 > |2%|
-NORTH_BOUND_LARGE_THRESHOLD = 50.0       # 北向净买入 > 50亿（蓝筹护盘信号）
 TOP_BOARD_COUNT = 3                      # 锁定前3个核心板块
 
 # ========== Step 2: 识别锚点 阈值 ==========
@@ -92,4 +90,3 @@ FORECAST_SCORE_BANDS = [
 
 # ========== 输出配置 ==========
 REPORT_ENCODING = "utf-8"
-REPORT_SUFFIX = "_复盘报告.md"

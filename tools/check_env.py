@@ -25,9 +25,13 @@ import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-HITHINK_VENV = Path("/Users/imatrix/.workbuddy/binaries/python/envs/hithink/bin/python")
-DEFAULT_VENV = Path("/Users/imatrix/.workbuddy/binaries/python/envs/default/bin/python")
-CHROME = Path("/Applications/Google Chrome.app/Contents/MacOS/Google Chrome")
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
+
+from stock_review_harness import runtime  # noqa: E402
+HITHINK_VENV = Path(runtime.HITHINK_VENV_PY)
+DEFAULT_VENV = Path(runtime.DEFAULT_VENV_PY)
+CHROME = Path(runtime.CHROME)
 ENV_FILE = Path.home() / ".stockfly_review.env"
 CRED_FILE = Path.home() / "Library/Application Support/hithink-finance/credentials.env"
 

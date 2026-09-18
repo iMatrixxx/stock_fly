@@ -24,7 +24,7 @@
   8. **⑧ 校验门禁**：三通道校验（数字比对 + 覆盖检查 + 选股层纪律）未通过则中止，
      不渲染 PDF、不发邮件（--skip-verify 可放行）
   9. Markdown → HTML → Chrome headless → PDF
-  10. SMTP 发送 PDF（附 Markdown 原文）至 MAIL_TO（默认 imatrixxxlee@gmail.com）
+  10. SMTP 发送 PDF（附 Markdown 原文）至 MAIL_TO（默认见 runtime.DEFAULT_MAIL_TO）
 
 用法：
   python3 tools/daily_review_pdf.py                 # 前一交易日
@@ -66,6 +66,7 @@ from tools.daily_review import (  # noqa: E402
     fetch_snapshot_limit_pool,
     write_report_with_llm,
 )
+from stock_review_harness import runtime  # noqa: E402
 from stock_review_harness.artifact_paths import (  # noqa: E402
     candidates_path,
     evidence_path,
@@ -85,10 +86,10 @@ from stock_review_harness.trading_calendar import (  # noqa: E402
 )
 from tools.md2html import md_to_html  # noqa: E402
 
-CHROME = "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
-DEFAULT_SMTP_HOST = "smtp.gmail.com"
+CHROME = runtime.CHROME
+DEFAULT_SMTP_HOST = runtime.SMTP_HOST
 DEFAULT_SMTP_PORT = "465"
-DEFAULT_SMTP_USER = "imatrixxxlee@gmail.com"
+DEFAULT_SMTP_USER = runtime.SMTP_USER
 # 日历缓存超过该天数就尝试联网刷新（失败不阻断；见 _maybe_refresh_calendar）
 CALENDAR_MAX_AGE_DAYS = 7
 

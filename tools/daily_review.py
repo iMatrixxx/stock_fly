@@ -12,7 +12,7 @@
 
 环境变量：
   SMTP_HOST / SMTP_PORT / SMTP_USER / SMTP_PASSWORD（邮箱授权码）/
-  SMTP_USE_SSL=1 / MAIL_TO（默认 imatrixxxlee@gmail.com）
+  SMTP_USE_SSL=1 / MAIL_TO（默认见 runtime.DEFAULT_MAIL_TO）
   LLM_API_URL / LLM_API_KEY / LLM_MODEL（可选：自动写报告；否则只出证据链+prompt）
   REVIEW_SKILL_DIR / REVIEW_CACHE_DIR（可选）
 
@@ -48,16 +48,17 @@ from stock_review_harness.artifact_paths import (  # noqa: E402
 from stock_review_harness.data.net import post_json  # noqa: E402
 from stock_review_harness.report.prompt import build_prompt  # noqa: E402
 from stock_review_harness.trading_calendar import load_calendar  # noqa: E402
+from stock_review_harness import runtime  # noqa: E402
 
 DEFAULT_SKILL_DIR = Path("/Users/imatrix/.codex/skills/review-a-share-market")
 DEFAULT_TEMPLATE = ROOT / "assets" / "llm_report_prompt.md"
-DEFAULT_MAIL_TO = "imatrixxxlee@gmail.com"
-DEFAULT_SMTP_HOST = "smtp.gmail.com"
-DEFAULT_SMTP_PORT = "465"
-DEFAULT_SMTP_USER = "imatrixxxlee@gmail.com"
+DEFAULT_MAIL_TO = runtime.DEFAULT_MAIL_TO
+DEFAULT_SMTP_HOST = runtime.SMTP_HOST
+DEFAULT_SMTP_PORT = runtime.SMTP_PORT
+DEFAULT_SMTP_USER = runtime.SMTP_USER
 ENV_FILE = Path.home() / ".stockfly_review.env"
 # fetch_news 资讯增量采集（供复盘"消息面/催化归因"参考；需含 akshare 的 venv）
-NEWS_PY = "/Users/imatrix/.workbuddy/binaries/python/envs/hithink/bin/python"
+NEWS_PY = runtime.HITHINK_VENV_PY
 # fetch_market_snapshot（fuyao API 大盘/涨停池快照）同用此 venv
 SNAPSHOT_PY = NEWS_PY
 

@@ -5,7 +5,7 @@
 同样需要 `HITHINK_FINANCE_API_KEY` 或用户级 credentials.env），因此**必须用 hithink venv
 运行**：
 
-  PY=/Users/imatrix/.workbuddy/binaries/python/envs/hithink/bin/python
+  PY=<hithink venv 解释器，见 stock_review_harness/runtime.py>
   $PY tools/refresh_trading_calendar.py            # 写入 data_cache/trading_calendar.json
   $PY tools/refresh_trading_calendar.py --stdout   # 只打印，不落盘
 
