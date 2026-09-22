@@ -54,6 +54,7 @@ ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
+from stock_review_harness.data import news_raw  # noqa: E402
 from stock_review_harness.data.chains import load_chain_index  # noqa: E402
 
 SOURCE_TIER = {
@@ -78,6 +79,38 @@ VIA_CONFIDENCE = {
     "out_of_scope": "low",
     "unmapped": "low",
 }
+
+# ② 跳归约分档：把"筛选出来的原始标题"按**可映射性**分档，并只给最无锚点的一档设预算。
+#
+# 依据是既有的 `VIA_CONFIDENCE` 体系，不新造判据：
+#   chain     —— 定了主体（extra_code / name_match）或归了链（lexicon_node / lexicon_chain）
+#                → 这是 ③ 供需卡唯一的原料来源，**全量保留**；
+#   industry  —— 命中行业标签但未归链（out_of_scope）→ 报告"宏观催化"的方向解释，全量保留；
+#   unmapped  —— 既未定主体、未归链、连行业标签都没有 → 既进不了 ③，也进不了"宏观催化"，
+#                只会白占 ④.55 裁定的注意力预算。
+#
+# 2026-09-22 实测 40/79 条属 unmapped，内含「万达集团在大连成立珩祥置业公司」
+# 「非法养老APP以"民惠通"等为名诈骗」「成都1宗宅地溢价39.6%成交」等与产业链供需
+# 完全无关的条目。
+TIER_CHAIN = "chain"
+TIER_INDUSTRY = "industry"
+TIER_UNMAPPED = "unmapped"
+# 未锚定档预算：按**事件权重降序**取前 N（权重取自 events/signals.json，
+# order_win=5 > price_increase/shortage=4 > capacity_expansion=3 > policy=2 > rumor=1）。
+# 于是「小鹏机器人已完成供应链审厂及核心零部件定点」（权重 5，但行业词典未覆盖）这类
+# 有价值记录仍能留下，而「成都1宗宅地」（policy=2）自然沉底——**按可解释的权重截断，
+# 而不是按类型硬删**，免得把词典覆盖缺口误当成噪声。
+UNMAPPED_CAP = 8
+
+
+def tier_of(cand: dict) -> str:
+    """候选的归约档位（见上方 TIER_* 说明）。判据全部是机器可判的事实。"""
+    via = (cand.get("_review") or {}).get("via")
+    if via == "unmapped":
+        return TIER_UNMAPPED
+    if via == "out_of_scope":
+        return TIER_INDUSTRY
+    return TIER_CHAIN
 
 
 def load_json(p: Path):
@@ -329,11 +362,13 @@ def classify(rec: dict, ctx: dict) -> dict | None:
         "tags": [x for x in [extra.get("type")] if x],
         "_review": {
             "via": via,
+            "subject": news_raw.subject_key(rec),  # ② 跳同主题聚合键（见 reduce_candidates）
             "matched_types": matched_types,
             "matched_keywords": matched_kws,
             "lexicon_label": industry[0] if industry else None,
             "weight": ctx["weights"].get(etype),
             "raw_id": rec.get("id"),
+            "dup_sources": list(rec.get("_dup_sources") or []),
             "confirm": False,
         },
     }
@@ -349,31 +384,119 @@ def strip_empty(d: dict) -> dict:
 # ---------- 主流程 ----------
 
 def collect(news_dir: Path, date_str: str | None, ctx: dict):
-    recs = []
-    for p in sorted(news_dir.glob("*.jsonl")):
-        for line in p.read_text(encoding="utf-8").splitlines():
-            line = line.strip()
-            if not line:
-                continue
-            try:
-                recs.append(json.loads(line))
-            except json.JSONDecodeError:
-                continue
-    if date_str:
-        recs = [r for r in recs if (r.get("ts") or "")[:10] == date_str]
-    return recs
+    """读当日 raw 资讯。
+
+    **读层已收敛到 `data.news_raw`**（唯一实现点）：日切 + 跨源指纹去重（cls/em
+    搬运同一条新闻只留一条）。此前本函数与 `tools/daily_review._news_brief` 各写一份
+    遍历，两处口径不同且都要全量 parse 全部源文件（notice 单源已 2.4 万条）。
+    返回形状不变（records 列表），归约统计由 `run` 从 `read_day` 直接取。
+    """
+    return news_raw.read_day(news_dir, date_str, dedup=True)["records"]
 
 
-def run(date_str: str | None, ctx: dict, news_dir: Path):
-    recs = collect(news_dir, date_str, ctx)
+def reduce_candidates(candidates: list[dict], stats: Counter,
+                      *, unmapped_cap: int = UNMAPPED_CAP) -> list[dict]:
+    """② 跳归约：把"筛选出来的原始标题"压成"聚合后的事件卡"。
+
+    链路从**筛选**转向**归约**的地方。此前只在 `run` 里按标题精确去重，后果是
+    "条数少了但每条信息量没变"，且同一主题仍被拆成多条——2026-09-22 实测：
+    《轻工纺织产业发展"十五五"规划》一条政策占了 4 条候选，把 ④.55 的裁定预算挤掉。
+
+    两步，都可机器复核：
+
+    **1) 同主题聚合** —— 键 = (主体, 粒度, 链, 环节)。主体取自 `news_raw.subject_key`
+    （有 code 用 code；否则取标题主句，主句过短则退回整条标题，防止把当天所有同地名
+    快讯并成一条）。聚合成一条后，被并入者的 `event_id` 收进 `_review.merged`，
+    条数进 `_review.merged_count`，`matched_types` / `matched_keywords` 取并集。
+
+    > 键里**刻意不含 `type`**：同一条政策的不同分点会命中不同事件类型（『印发：鼓励
+    > 兼并重组』→ order_win、『印发：支持上市融资』→ policy），按 type 分会把同一条
+    > 政策切回多条。副作用是好的——`industry_intel` 的节点信号分原本会把同一条政策
+    > 按分点数**重复计分**，聚合后这个虚高自然消失。
+
+    **2) 分档 + 预算** —— 见 `tier_of`；只有未锚定档按权重截断（`unmapped_cap`）。
+
+    **只并"同主体+同粒度+同环节"的记录**，不做语义相似度合并——错并会把两条独立
+    事件压成一条，是静默丢事实；漏并只是多占一点预算。宁可漏并。
+    """
+    groups: dict[tuple, list[dict]] = {}
+    order: list[tuple] = []
+    for c in candidates:
+        rev = c.get("_review") or {}
+        key = (rev.get("subject"), c.get("granularity"), c.get("chain_id"),
+               c.get("node"))
+        if key not in groups:
+            groups[key] = []
+            order.append(key)
+        groups[key].append(c)
+
+    merged_cards: list[dict] = []
+    for key in order:
+        grp = groups[key]
+        if len(grp) == 1:
+            merged_cards.append(grp[0])
+            continue
+        # 代表条：权重最高 → 文本最短（最短标题通常是主标题，长的分点标题是它的展开）
+        # → ts 最早。三级都是确定性键，保证同一份数据两次运行结果一致。
+        rep = min(grp, key=lambda c: (-(c["_review"].get("weight") or 0),
+                                      len(c.get("text") or ""),
+                                      str(c.get("ts") or "")))
+        rev = rep["_review"]
+        # 存 **raw_id** 而不是 event_id：编号在归约之后才发生（见 run 末尾），此处
+        # event_id 尚未赋值，存下来只会是一串 None。raw_id 是资讯层主键，
+        # 事后可回到 hithink_out/raw/news/*.jsonl 逐条对账。
+        rev["merged_raw_ids"] = [c["_review"].get("raw_id") for c in grp if c is not rep]
+        rev["merged_count"] = len(grp)
+        types = list(rev.get("matched_types") or [])
+        kws = list(rev.get("matched_keywords") or [])
+        dups = list(rev.get("dup_sources") or [])
+        for c in grp:
+            if c is rep:
+                continue
+            crev = c["_review"]
+            for t in (crev.get("matched_types") or []):
+                if t not in types:
+                    types.append(t)
+            for k in (crev.get("matched_keywords") or []):
+                if k not in kws:
+                    kws.append(k)
+            for s in (crev.get("dup_sources") or []):
+                if s not in dups:
+                    dups.append(s)
+        rev["matched_types"], rev["matched_keywords"], rev["dup_sources"] = types, kws, dups
+        stats["topic_merged"] += len(grp) - 1
+        merged_cards.append(rep)
+
+    buckets: dict[str, list[dict]] = {TIER_CHAIN: [], TIER_INDUSTRY: [], TIER_UNMAPPED: []}
+    for c in merged_cards:
+        buckets[tier_of(c)].append(c)
+    unm = buckets[TIER_UNMAPPED]
+    if len(unm) > unmapped_cap:
+        unm.sort(key=lambda c: (-(c["_review"].get("weight") or 0), str(c.get("ts") or "")))
+        stats["unmapped_truncated"] = len(unm) - unmapped_cap
+        unm = unm[:unmapped_cap]
+    for name, items in (("tier_chain", buckets[TIER_CHAIN]),
+                        ("tier_industry", buckets[TIER_INDUSTRY]),
+                        ("tier_unmapped", unm)):
+        stats[name] = len(items)
+    stats["after_reduce"] = sum(stats[k] for k in
+                                ("tier_chain", "tier_industry", "tier_unmapped"))
+    # 顺序＝锚点强度降序：chain 档是 ③ 供需卡的原料，排前面让 event_id 也按此递进
+    return buckets[TIER_CHAIN] + buckets[TIER_INDUSTRY] + unm
+
+
+def run(date_str: str | None, ctx: dict, news_dir: Path, *, reduce: bool = True):
+    rd = news_raw.read_day(news_dir, date_str, dedup=True)
+    recs = rd["records"]
     stats = Counter()
+    stats["scanned"] = rd["stats"]["scanned"]
+    stats["source_dup_dropped"] = rd["stats"]["dup_dropped"]
     noise_counter = Counter()
     noise_examples: dict[str, list] = defaultdict(list)
     candidates = []
     seen_titles: set[str] = set()
     seq = 0
     for r in recs:
-        stats["scanned"] += 1
         title = (r.get("title") or "").strip()
         text = f"{title} {(r.get('content') or '').strip()}".strip()
         rid = noise_rule(
@@ -395,10 +518,15 @@ def run(date_str: str | None, ctx: dict, news_dir: Path):
             continue
         if title:
             seen_titles.add(title)
-        seq += 1
-        cand["event_id"] = f"E-{(date_str or '00000000').replace('-', '')}-{seq:04d}"
         candidates.append(cand)
-        stats["candidates"] += 1
+
+    candidates = (reduce_candidates(candidates, stats) if reduce
+                  else candidates)
+    # event_id 按**归约后**的顺序重编：它本就是"池内顺序号"，若在归约前编号，
+    # 聚合时被并掉的号会留下空洞，让下游误以为"池子里丢了几条"。
+    for seq, c in enumerate(candidates, start=1):
+        c["event_id"] = f"E-{(date_str or '00000000').replace('-', '')}-{seq:04d}"
+    stats["candidates"] = len(candidates)
     return recs, candidates, stats, noise_counter, noise_examples
 
 
@@ -406,8 +534,18 @@ def render(date_str, recs, candidates, stats, noise_counter, noise_examples) -> 
     lines = [
         f"# 信号预筛候选池 {date_str or '(全部)'}",
         "",
-        f"> 生成时间：{datetime.now():%Y-%m-%d %H:%M}；扫描 {stats['scanned']} 条 → "
-        f"噪声剔除 {stats['noise_dropped']} 条 → 跨源重复 {stats['dup_dropped']} 条 → 候选 {stats['candidates']} 条",
+        f"> 生成时间：{datetime.now():%Y-%m-%d %H:%M}",
+        f"> 漏斗：扫描 {stats['scanned']} 条 → 跨源同题 {stats.get('source_dup_dropped', 0)} 条"
+        f" → 噪声剔除 {stats['noise_dropped']} 条 → 同标题 {stats['dup_dropped']} 条"
+        f" → 同主题归并 {stats.get('topic_merged', 0)} 条 → **候选 {stats['candidates']} 条**",
+        f"> 分档：chain {stats.get('tier_chain', 0)} 条（③ 供需卡原料）｜ "
+        f"industry {stats.get('tier_industry', 0)} 条（报告宏观催化）｜ "
+        f"unmapped {stats.get('tier_unmapped', 0)} 条（预算 {UNMAPPED_CAP}，"
+        f"截断 {stats.get('unmapped_truncated', 0)} 条）",
+        "",
+        "> 归约口径：跨源同题＝主体代码+归一化标题完全一致（读层 `data/news_raw`）；"
+        "同主题归并＝主体+粒度+链+环节同键（**不含事件类型**，同政策的不同分点须并）；"
+        "档位依据既有 `via`：`unmapped` 未定主体/未归链/无行业标签，故单独设预算。",
         "",
     ]
     if noise_counter:
@@ -439,13 +577,16 @@ def render(date_str, recs, candidates, stats, noise_counter, noise_examples) -> 
         lines.append("")
 
     lines += ["## 候选明细（按类型权重降序）", "",
-              "| 权重 | 粒度 | 类型 | 归位 | via | 信源 | 标题 |",
-              "|---:|---|---|---|---|---|---|"]
+              "| 权重 | 粒度 | 类型 | 归位 | via | 信源 | 归并 | 标题 |",
+              "|---:|---|---|---|---|---|---|---|"]
     for c in sorted(candidates, key=lambda x: -x["_review"]["weight"]):
         loc = f"{c['chain_id']}/{c['node']}" if c["chain_id"] != "other" else c["industry"][0]
+        rev = c["_review"]
+        src = c["source"] + ("".join(f"+{s}" for s in rev.get("dup_sources") or []))
+        merged = f"同主题 {rev['merged_count']}" if rev.get("merged_count", 1) > 1 else ""
         lines.append(
-            f"| {c['_review']['weight']} | {c['granularity']} | {c['type']} | {loc} | "
-            f"{c['_review']['via']} | {c['source']} | {c['text'][:60]} |"
+            f"| {rev['weight']} | {c['granularity']} | {c['type']} | {loc} | "
+            f"{rev['via']} | {src} | {merged} | {c['text'][:60]} |"
         )
     lines += ["", "> 候选池仅为候选：命中词典不等于事件，须二次确认（补 verify_ts）后方可写入 events/<date>.jsonl。"]
     lines.append("> 单点新闻是噪音，成序列才是信号——勿据单条候选下结论。")
@@ -569,13 +710,15 @@ def default_paths(root: Path) -> tuple[Path, Path, Path]:
     )
 
 
-def generate(date_str: str, *, news_dir: Path, chains_dir: Path, out_dir: Path) -> dict:
-    """预筛一步：读资讯 → 噪声过滤 → 词典命中 → 归位 → 写候选池 <out_dir>/<date>.jsonl。
+def generate(date_str: str, *, news_dir: Path, chains_dir: Path, out_dir: Path,
+             reduce: bool = True) -> dict:
+    """预筛一步：读资讯 → 噪声过滤 → 词典命中 → 归位 → **② 跳归约** → 写候选池。
 
     只做机器可判的事，不写正式事件流（那要等确认，见 `confirm_by_rule` / `promote`）。
+    `reduce=False` 关闭"无锚点传闻剔除 + 同主题聚合"（旧行为，仅用于对照与排障）。
     """
     ctx = build_ctx(_CtxArgs(news_dir, chains_dir, out_dir))
-    recs, candidates, stats, nc, ne = run(date_str, ctx, news_dir)
+    recs, candidates, stats, nc, ne = run(date_str, ctx, news_dir, reduce=reduce)
     out_dir = Path(out_dir)
     out_dir.mkdir(parents=True, exist_ok=True)
     cand_path = out_dir / f"{date_str}.jsonl"
@@ -728,6 +871,8 @@ def main(argv=None) -> None:
     ap.add_argument("--auto", action="store_true",
                     help="= 预筛 + --auto-confirm + --promote（主链每日调用形态）")
     ap.add_argument("--dump-noise", action="store_true", help="输出被噪声词典剔除的记录（校准用）")
+    ap.add_argument("--no-reduce", action="store_true",
+                    help="关闭 ② 跳归约（无锚点传闻剔除 + 同主题聚合），回到旧行为")
     ap.add_argument("--json", action="store_true", help="输出候选 JSON")
     args = ap.parse_args(argv)
 
@@ -769,7 +914,8 @@ def main(argv=None) -> None:
         return
 
     res = generate(date_str, news_dir=news_dir,
-                   chains_dir=Path(args.chains_dir), out_dir=Path(args.out_dir))
+                   chains_dir=Path(args.chains_dir), out_dir=Path(args.out_dir),
+                   reduce=not args.no_reduce)
     candidates, cand_path = res["candidates"], res["cand_path"]
     if args.json:
         print(json.dumps(candidates, ensure_ascii=False, indent=2))

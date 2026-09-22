@@ -72,6 +72,37 @@ def _intel_by_node(industry_intel: dict | None) -> tuple[dict, dict]:
     return by_node, by_chain
 
 
+def _sd_by_node(supply_demand: dict | None) -> dict[tuple[str, str], list[dict]]:
+    """供需卡（③ 跳）→ {(chain_id, node): [卡投影]}。
+
+    这一跳把「事件」变成「环节的某个变量往哪变」，是 ④ A股映射唯一有方向性的输入：
+    `intel_score` 只说"这个环节有事件"，`sd_variables` 才说"它的需求在上行"。
+    投影**只带可核对的字段**，不复述证据原文（原文在 `supply_demand.cards` 里，
+    两处都存会让同一句话有两个真源）。
+    """
+    out: dict[tuple[str, str], list[dict]] = {}
+    if not supply_demand:
+        return out
+    for c in supply_demand.get("cards") or []:
+        key = (c.get("chain_id"), c.get("node"))
+        if not key[0] or not key[1]:
+            continue
+        out.setdefault(key, []).append({
+            "card_id": c.get("card_id"),
+            "variable": c.get("variable"),
+            "variable_label": c.get("variable_label"),
+            "direction": c.get("direction"),
+            "direction_label": c.get("direction_label"),
+            "score": c.get("score"),
+            "event_count": c.get("event_count"),
+            "max_grade": c.get("max_grade"),
+            "verification": c.get("verification") or {},
+        })
+    for cards in out.values():
+        cards.sort(key=lambda c: (-(c.get("score") or 0.0), str(c.get("card_id") or "")))
+    return out
+
+
 def _northbound_by_code(market: MarketData) -> dict[str, dict]:
     """沪深股通前十大活跃股 → {code: {deal_amt_yi, close_pct, side}}（成交额口径）。"""
     nb = market.northbound_top10 or {}
@@ -110,6 +141,7 @@ def build_chain_map(
     market: MarketData,
     limit_pool: LimitPoolData,
     industry_intel: dict | None = None,
+    supply_demand: dict | None = None,
     chains_dir: Path | str | None = None,
     index: ChainIndex | None = None,
 ) -> dict | None:
@@ -123,10 +155,11 @@ def build_chain_map(
     nb_by_code = _northbound_by_code(market)
     dragon_by_code = _dragon_by_code(market)
     intel_node, intel_chain = _intel_by_node(industry_intel)
+    sd_node = _sd_by_node(supply_demand)
 
     chains_out: list[dict] = []
     all_unmapped: dict[str, int] = {}
-    grand = {"zt_hit": 0, "nb_hit": 0, "dragon_hit": 0}
+    grand = {"zt_hit": 0, "nb_hit": 0, "dragon_hit": 0, "sd_nodes": 0}
 
     for ch in idx.chains:
         cid = ch.get("chain_id") or ""
@@ -189,7 +222,13 @@ def build_chain_map(
                 "dragon_net_buy_yi": _f(dragon_net),
                 "intel_score": (sig or {}).get("score"),
                 "intel_events": (sig or {}).get("events") or [],
+                # ③ 跳供需卡：环节的哪个变量在往哪变。**只对有卡的节点非空**，
+                # 无卡节点是空列表（不是 None）——"这天该环节没有可推演的供需变化"
+                # 与"没取到"是两件事，用空列表表达前者。
+                "sd_variables": sd_node.get((cid, nid), []),
             })
+            if sd_node.get((cid, nid)):
+                grand["sd_nodes"] += 1
 
         mapped_codes = {m["code"] for m in idx.stocks_by_chain.get(cid, [])}
         zt_mapped = mapped_codes & zt_by_code.keys()
@@ -265,6 +304,9 @@ def build_chain_map(
             "totals.zt_coverage_pct=链内映射标的中当日涨停占比，是**映射表完整度**指标，"
             "不是收益指标；pending_hint_industries 为「盘面在涨但映射表未覆盖个股」的环节线索，"
             "unmapped_zt_industries 为完全未归链的涨停行业（补表清单，须先核主营）。"
+            "**nodes[].sd_variables 是 ③ 跳供需卡在本环节的投影**（哪个变量在往哪变），"
+            "与 intel_score（本环节有无事件）并列而**不做加权合成**：前者是方向、后者是强度，"
+            "合成会把两件事混成一个不可解释的数。`grand_totals.sd_nodes` 是有供需卡的环节数。"
         ),
         "chains": chains_out,
         "grand_totals": {**grand, "chain_count": len(chains_out)},

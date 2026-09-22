@@ -244,8 +244,10 @@ def _news_brief(date_str: str, max_items: int = 40) -> str:
     """
     import json as _json
 
-    newsdir = ROOT / "hithink_out" / "raw" / "news"
-    if not newsdir.exists():
+    from stock_review_harness.data import news_raw as _news_raw
+
+    rd = _news_raw.read_day(date_str=date_str)
+    if not rd["records"]:
         return ""
     base_kw = ("机器人", "液冷", "算力", "人工智能", "芯片", "半导体", "存储",
                "光模块", "CPO", "服务器", "数据中心", "英伟达", "特斯拉", "华为",
@@ -271,25 +273,20 @@ def _news_brief(date_str: str, max_items: int = 40) -> str:
     kw = {k for k in kw if len(k) >= 2}
 
     rows: list[tuple[str, str, str, str]] = []  # (ts, src, title, hit)
-    for jf in sorted(newsdir.glob("*.jsonl")):
-        src = jf.stem
-        for line in jf.open(encoding="utf-8"):
-            try:
-                r = _json.loads(line)
-            except Exception:  # noqa: BLE001
-                continue
-            if str(r.get("ts", ""))[:10] != date_str:
-                continue
-            title = str(r.get("title") or "")
-            content = str(r.get("content") or "")
-            if src == "notice":
-                nm = str((r.get("extra") or {}).get("name") or "")
-                hit = next((k for k in kw if k in nm or k in title), "")
-            else:
-                hit = next((k for k in kw if k in title or k in content[:200]), "")
-            if not hit:
-                continue
-            rows.append((r.get("ts", ""), src, title[:80], hit))
+    for r in rd["records"]:
+        src = str(r.get("source") or "other")
+        title = str(r.get("title") or "")
+        content = str(r.get("content") or "")
+        if src == "notice":
+            nm = str((r.get("extra") or {}).get("name") or "")
+            hit = next((k for k in kw if k in nm or k in title), "")
+        else:
+            hit = next((k for k in kw if k in title or k in content[:200]), "")
+        if not hit:
+            continue
+        # 跨源同报在标题尾部标注其他源名（多源同报是可信度信号，不额外占名额）
+        dup = "".join(f"+{s}" for s in (r.get("_dup_sources") or []))
+        rows.append((r.get("ts", ""), src + dup, title[:80], hit))
     if not rows:
         return ""
     rows.sort()

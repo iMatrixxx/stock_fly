@@ -20,6 +20,7 @@ from ..logic.diagnostics import diagnose
 from ..logic.forecast import forecast_capital_migration
 from ..logic.migration import build_capital_migration
 from ..logic.rivalry import build_leader_rivalry
+from ..logic.supply_demand import build_supply_demand
 from ..models import DataBundle
 
 
@@ -670,9 +671,16 @@ def to_evidence_dict(bundle: DataBundle) -> dict:
     capital_migration = build_capital_migration(
         bundle.date, bundle.market, board_series, zt_history
     )
-    # 事件流聚合只算一次：industry_intel 节与 chain_map 的节点事件分共用同一份数据，
-    # 两次调用虽幂等，但共用变量能保证两者引用的"事件"完全一致（避免将来参数漂移）。
+    # 事件流聚合只算一次：industry_intel 节、supply_demand 节与 chain_map 的节点事件分
+    # 共用同一份数据，两次调用虽幂等，但共用变量能保证三者引用的"事件"完全一致
+    # （避免将来参数漂移）。
     industry_intel = _industry_intel_section(bundle)
+    # ③ 跳供需卡：由 industry_intel 确定性归约而来，故必须**先于** chain_map 构造
+    # ——chain_map 的 nodes[].sd_variables 要挂它。
+    supply_demand = build_supply_demand(
+        bundle.date, industry_intel,
+        event_verification=bundle.market.event_verification,
+    )
     return {
         "meta": {
             "date": bundle.date,
@@ -695,6 +703,9 @@ def to_evidence_dict(bundle: DataBundle) -> dict:
         "market": _market_section(bundle),
         "macro": _macro_section(bundle),
         "industry_intel": industry_intel,
+        # ③ 跳：事件 → 供需变化（需求/供给/价格/产能 的方向）。报告 1.1 的"供需推演"
+        # 从此有结构化事实可引、门禁也可核；此前这段全靠 LLM 自由发挥。
+        "supply_demand": supply_demand,
         # 事件验证：给第 1 段的事件配独立源核对（价格侧=期货序列，公告侧=巨潮账本）
         "event_verification": _event_verification_section(bundle),
         "dragon_top": _dragon_section(bundle),
@@ -725,6 +736,7 @@ def to_evidence_dict(bundle: DataBundle) -> dict:
         "chain_map": build_chain_map(
             bundle.date, bundle.market, bundle.limit_pool,
             industry_intel=industry_intel,
+            supply_demand=supply_demand,
         ),
     }
 

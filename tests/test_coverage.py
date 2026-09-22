@@ -89,11 +89,18 @@ class CheckCoverageFixtureTest(unittest.TestCase):
 
 
 class CheckCoveragePipelineSmokeTest(unittest.TestCase):
-    """真实 evidence（09-04 fuyao 主链验收产物，字段完整）冒烟。"""
+    """真实 evidence（09-04 fuyao 主链验收产物，字段完整）冒烟。
+
+    该产物在 `outputs/` 下、按约定**不入库**，所以 CI 的干净检出里没有它——缺产物时
+    整体跳过（与 `test_verify_gate.RealReportRegressionTest` 用同一护栏），而不是让
+    setUpClass 抛 FileNotFoundError 把 3 个用例全变成 ERROR 挂掉整个 job。
+    """
 
     @classmethod
     def setUpClass(cls):
         p = Path(__file__).resolve().parents[1] / "outputs" / "2026-09-04" / "evidence.json"
+        if not p.exists():
+            raise unittest.SkipTest("09-04 evidence 不在（outputs/ 不入库），跳过")
         cls.evidence = json.loads(p.read_text(encoding="utf-8"))
 
     def test_full_coverage_report_passes(self):

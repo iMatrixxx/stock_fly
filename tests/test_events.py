@@ -327,9 +327,15 @@ def test_run_end_to_end_dedup_and_stats(news_dir, ctx):
     recs, cands, stats, nc, _ = run("2026-09-08", ctx, news)
     assert stats["scanned"] == 4
     assert stats["noise_dropped"] == 1           # 美国耐用品订单
-    assert stats["dup_dropped"] == 1             # cls/em 同名
+    # cls/em 同名在**读层**合一（`data/news_raw`），不再落到 run 的标题去重里。
+    # 两条路径的效果同为"只留一条"，但计数分开后能看出压缩发生在哪一跳。
+    assert stats["source_dup_dropped"] == 1
+    assert stats["dup_dropped"] == 0
     assert stats["candidates"] == 2
     assert nc["us_macro_data"] == 1
+    # 幸存的那条要带住被合并的源名（多源同报是可信度信号，不能丢）
+    kept = [r for r in recs if r.get("_dup_sources")]
+    assert len(kept) == 1 and kept[0]["_dup_sources"] == ["em"]
     ids = [c["event_id"] for c in cands]
     assert ids == ["E-20260908-0001", "E-20260908-0002"]
     assert all(re.fullmatch(r"E-\d{8}-\d{4}", i) for i in ids)
@@ -492,3 +498,144 @@ def test_promote_writes_only_confirmed_and_strips_review(tmp_cand_dir):
     assert "_review" not in kept[0], "_review 是复核信息，不得进正式事件流"
     assert kept[0]["verify_ts"], "promote 必须写 verify_ts（何时确认的可追溯性）"
 
+
+
+# ---------- 5) ② 跳归约（2026-09-22 新增） ----------
+#
+# 链路 资讯 → 产业事件 → 供需变化 → A股映射 的第二跳。此前只有"按标题精确去重"，
+# 后果是条数少了但每条信息量没变，且同一主题仍被拆成多条。
+# 归约 = 同主题聚合 + 分档预算，两条都要在"该合的合 / 不该合的绝不合并"上把住。
+
+def _cand_row(event_id, text, via, etype="policy", weight=3,
+              chain="other", node="unknown", gran="industry", subject=None,
+              ts="2026-09-08T10:00:00+08:00"):
+    from stock_review_harness.data.news_raw import subject_key
+    return {
+        "event_id": event_id, "ts": ts, "type": etype, "granularity": gran,
+        "chain_id": chain, "node": node, "industry": ["其他"], "target": None,
+        "text": text, "url": None, "source": "em", "source_tier": "event",
+        "confidence": "mid", "verify_ts": None, "tags": [],
+        "_review": {
+            "via": via,
+            "subject": subject if subject is not None else subject_key(
+                {"title": text, "extra": {}}),
+            "matched_types": [etype], "matched_keywords": [], "weight": weight,
+            "raw_id": None, "dup_sources": [], "confirm": False,
+        },
+    }
+
+
+def _reduce(rows):
+    from collections import Counter
+
+    from tools.filter_news_signals import reduce_candidates
+    stats = Counter()
+    out = reduce_candidates(rows, stats)
+    return out, stats
+
+
+def test_reduce_tier_by_via():
+    rows, stats = _reduce([
+        _cand_row("E-1", "某链内公司中标", "lexicon_node"),        # chain
+        _cand_row("E-2", "种业板块关注", "out_of_scope"),           # industry
+        _cand_row("E-3", "万达集团成立置业公司", "unmapped"),       # unmapped
+    ])
+    assert [c["event_id"] for c in rows] == ["E-1", "E-2", "E-3"]   # chain 档排最前
+    assert (stats["tier_chain"], stats["tier_industry"], stats["tier_unmapped"]) == (1, 1, 1)
+
+
+def test_reduce_merges_same_subject_across_event_types():
+    """同一条政策的不同分点会命中不同事件类型（→order_win、→policy），
+    按 type 分会把一条政策切回多条，故聚合键**不含 type**。"""
+    subj = "t:某产业十五五规划印发"
+    rows, stats = _reduce([
+        _cand_row("E-1", "某产业十五五规划印发", "unmapped", "policy", 2, subject=subj),
+        _cand_row("E-2", "某产业十五五规划印发：鼓励兼并重组", "unmapped", "order_win",
+                  5, subject=subj),
+        _cand_row("E-3", "某产业十五五规划印发：支持上市融资", "unmapped", "policy",
+                  2, subject=subj),
+    ])
+    assert len(rows) == 1, "同主体+同粒度+同环节须并为一条"
+    rep = rows[0]
+    assert rep["_review"]["weight"] == 5                     # 权重最高者作代表
+    assert rep["_review"]["merged_count"] == 3
+    assert len(rep["_review"]["merged_raw_ids"]) == 2        # 存 raw_id，不是 None 的 event_id
+    assert set(rep["_review"]["matched_types"]) == {"policy", "order_win"}
+    assert stats["topic_merged"] == 2
+
+
+def test_reduce_does_not_merge_different_subjects():
+    rows, _ = _reduce([
+        _cand_row("E-1", "甲公司中标", "unmapped", subject="t:甲公司"),
+        _cand_row("E-2", "乙公司中标", "unmapped", subject="t:乙公司"),
+    ])
+    assert len(rows) == 2
+    assert not rows[0]["_review"].get("merged_count")
+
+
+def test_reduce_does_not_merge_across_chain_node():
+    """同主体但归到不同环节，不能并——它们指向不同的供需归宿。"""
+    subj = "t:同一条消息"
+    rows, _ = _reduce([
+        _cand_row("E-1", "同一条消息", "lexicon_node", chain="ai_compute", node="gpu_chip",
+                  gran="node", subject=subj),
+        _cand_row("E-2", "同一条消息", "lexicon_node", chain="ai_compute", node="storage",
+                  gran="node", subject=subj),
+    ])
+    assert len(rows) == 2
+
+
+def test_reduce_caps_unmapped_by_weight_not_by_type():
+    """未锚定档按**事件权重**截断：权重高的（order_win=5）留下，policy=2 沉底。
+
+    这样「小鹏机器人已完成供应链审厂」（词典未覆盖但确有价值）不会被误删，
+    而「成都1宗宅地溢价39.6%成交」自然出局——比按类型硬删更少误伤。
+    """
+    rows = [_cand_row(f"E-{i}", f"无关快讯{i}", "unmapped", "policy", 2)
+            for i in range(10)]
+    rows += [_cand_row("E-K1", "小鹏机器人已完成供应链审厂", "unmapped", "order_win", 5),
+             _cand_row("E-K2", "另一条重要产业进展", "unmapped", "order_win", 5)]
+    out, stats = _reduce(rows)
+    assert len(out) == 8                                     # UNMAPPED_CAP
+    assert {"E-K1", "E-K2"} <= {c["event_id"] for c in out}
+    assert stats["unmapped_truncated"] == 4
+
+
+def test_reduce_keeps_chained_tier_uncapped():
+    """chain 档是 ③ 供需卡唯一的原料来源，不设预算。"""
+    rows = [_cand_row(f"E-{i}", f"链内事件{i}", "lexicon_node", "order_win", 5,
+                      chain="ai_compute", node="gpu_chip", gran="node",
+                      subject=f"t:链内事件{i}")
+            for i in range(50)]
+    out, stats = _reduce(rows)
+    assert len(out) == 50 and stats["tier_chain"] == 50
+
+
+def test_run_renumbers_event_ids_contiguously_after_reduce():
+    """event_id 按**归约后**顺序重编：若在归约前编号，被并掉的号会留空洞，
+    让下游误以为"池子里丢了几条"。"""
+
+    from tools.filter_news_signals import run
+
+    class _Args:
+        chains_dir = str(ROOT / "chains")
+
+    ctx = build_ctx(_Args())
+    d = Path(tempfile.mkdtemp(prefix="_tmp_news_", dir=str(ROOT / "tests")))
+    try:
+        base = "某产业十五五规划印发"
+        recs = [
+            _rec(base, source="cls"),
+            _rec(f"{base}：鼓励兼并重组做大做强", source="em"),
+            _rec(f"{base}：支持符合条件企业上市融资", source="em"),
+        ]
+        (d / "mix.jsonl").write_text(
+            "\n".join(json.dumps(r, ensure_ascii=False) for r in recs) + "\n",
+            encoding="utf-8")
+        _, cands, stats, _, _ = run("2026-09-08", ctx, d)
+        ids = [c["event_id"] for c in cands]
+        assert ids == [f"E-20260908-{i:04d}" for i in range(1, len(cands) + 1)]
+        assert stats["topic_merged"] >= 1
+        assert stats["after_reduce"] == stats["candidates"] == len(cands)
+    finally:
+        shutil.rmtree(d, ignore_errors=True)

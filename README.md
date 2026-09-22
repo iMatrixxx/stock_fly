@@ -77,13 +77,15 @@ build_dabanke_from_  │       models.py（统一数据模型）       outputs/<
 | 数据访问 | `data/multiday.py` | 多日上下文（前 N 交易日数据串联） |
 | 数据访问 | `data/validate.py` | 数据核验，拦截口径异常进 `meta.anomalies`（含 `board_taxonomy_implausible` 板块口径异常——板块成交合计÷两市成交越出可比较区间即判定嵌套、占比指标不可用） |
 | 数据访问 | `data/chains.py` | 产业链图谱加载（**唯一加载点**：`chains/*.json` → `ChainIndex`；`tools/filter_news_signals`、`tools/replay_chain_coverage` 均委托此处，避免两套实现漂移） |
+| 数据访问 | `data/news_raw.py` | **原始资讯统一读层**（`hithink_out/raw/news/*.jsonl` 的唯一入口）：日切 → **跨源指纹去重**（主体代码 + 归一化标题；cls/em 互相搬运的同一条新闻只留一条，其余源名进 `_dup_sources`）→ 归一化标题与**主体键**（`subject_key`，供同主题聚合）。此前 `filter_news_signals` 与 `daily_review._news_brief` 各写一份遍历、口径不同且都要全量 parse 全部源文件 |
 | 确定性分析 | `logic/cycle.py` | 情绪周期演变（晋级链 / 梯队 / 龙头命运） |
 | 确定性分析 | `logic/migration.py` | 资金迁移路径（板块 3 日动能 / 集中度演变） |
 | 确定性分析 | `logic/rivalry.py` | 龙头竞争关系（同高度竞争 / 昨日龙头断板） |
 | 确定性分析 | `logic/forecast.py` | 次日资金预测打分 |
 | 确定性分析 | `logic/diagnostics.py` | 矛盾诊断（数据张力清单，LLM 须调和） |
 | 确定性分析 | `logic/concentration.py` | **资金集中度**：行业成交占比分档（top1/top3/top5/top8 + HHI）+ 涨停池参与度与内部集中度；含**板块口径护栏**（Σ板块成交÷两市成交须 ∈[85%,115%]，越界则 `industry` 段整体置 `None` 并记 `industry_absent_reason`；`zt` 段与口径无关、恒可用） |
-| 确定性分析 | `logic/chain_map.py` | **产业链当日映射**：个股→环节（按 `chains` 映射表 + `purity` 纯度 core/swing/edge），三类来源（涨停池/北向活跃/龙虎榜样本）**并置不合成**；节点资金只用个股级原始值，**禁止把板块级资金流摊到环节上归因** |
+| 确定性分析 | `logic/chain_map.py` | **产业链当日映射**：个股→环节（按 `chains` 映射表 + `purity` 纯度 core/swing/edge），三类来源（涨停池/北向活跃/龙虎榜样本）**并置不合成**；节点资金只用个股级原始值，**禁止把板块级资金流摊到环节上归因**。节点新增 **`sd_variables`**——承接 ③ 跳供需卡（该环节哪个变量在往哪变），与 `intel_score`（有无事件）**并列不合成**（前者是方向、后者是强度，合成会把两件事混成一个不可解释的数） |
+| 确定性分析 | `logic/supply_demand.py` | **供需推演层**（链路第 ③ 跳，2026-09-22 新增）：事件流 → **供需卡** `{环节, 变量, 方向}`。变量域 `demand`/`supply`/`price`/`capacity`，方向描述该变量自身变化（`supply·down`＝供给收缩/缺货）。**确定性归约，不含主观判断**。三条准入纪律：`node=unknown` 的链级事件不产卡（归到单一环节就是编造）、`policy`/`rumor` 显式排除（见 `EXCLUDED_TYPES`，`test_variable_table_covers_all_signal_types` 防"词典加类型而本层默默不认"）、`low` 置信度不产卡。同环节同变量同方向的多条事件**并成一张卡**（score 相加），故卡数远小于事件数 |
 | 确定性分析 | `logic/event_confirm.py` | **事件二次确认**（P1 第⑤环，主链 ④.55）：三层防线——① 否决规则（`events/confirm_rules.json`：澄清/否定、价格反向、关键词只在公司名里、治理定式二道防线；**可翻案须写 `override_reason`**）② 结构性不合格 ineligible（确认了也无处可落，**不可翻案**）③ LLM 裁定（只允许 confirm/reject，**禁止改写 `type/granularity/chain_id/node/target/text`** 等机器事实字段）。产出**裁定包**（自带判断材料，不依赖上下文）→ **裁定书**（幂等，与候选池分开存放）→ 打勾回候选池。落盘含 `confirmed_by`/`confirm_reason` 审计（schema v0.3） |
 | 确定性分析 | `logic/event_verify.py` | **④ 事件外部验证层**：把 `events/<date>.jsonl` 的事件分别对**期货价（价格类）**与**巨潮公告（订单/扩产类）**做独立源交叉核对，出**四态结论** `confirmed/not_confirmed/ambiguous/no_data`（`no_data`≠`not_confirmed`）；`match_commodities` 用**最长优先 + 区间遮蔽**防子串双配（"铝价"不得在"氧化铝价"里再命中）；`strength` 分 direct/upstream/weak（只证上游成本侧，不得替环节产品涨价背书） |
 | 输出组装 | `report/evidence.py` | 证据链 JSON 组装（含 data_gaps/anomalies/diagnostics/quantified；`board_pools` 板块内领涨标的池——涨停股按行业归组落到个股，供报告写板块必落标的；题材浓度 ratio_pct+mainline(≥20%)；`dragon_seats` 龙虎榜席位结构；`macro` 当日宏观快照——国内商品期货主连涨跌，供"当日宏观催化"小节对照板块切换有无期货端印证；**v2 新增 `capital_concentration` 资金集中度 + `chain_map` 产业链当日映射 + `event_verification` 事件外部验证**（纯透传 `bundle.market.event_verification`，不在组装期联网），供养第 3.5 / 1.1 / 1.2 段） |
@@ -112,7 +114,8 @@ build_dabanke_from_  │       models.py（统一数据模型）       outputs/<
 | `build_dabanke_from_fuyao.py` | fuyao `raw/pools.json` → 统一涨停池 JSON（历史文件名，功能与"大班客"无关；并聚合同目录 `raw/dragon.json` → `dragon_top` 龙虎榜异动股资金节） |
 | `build_dabanke_from_eastmoney.py` | 快照失败时的东财涨停池回退构建器 |
 | `fetch_news.py` | ④.5 资讯/公告增量采集（cls/em/notice/cctv/csrc/miit/ndrc，幂等断点）。**在主链里已上移到 evidence 构建之前**——事件流预筛要用当日资讯，且 `industry_intel` 由 evidence 构建时读取 |
-| `filter_news_signals.py` | ④.5 产业情报预筛：7 源资讯 → 噪声剔除 → 词典命中 → 归位 → 候选池；`--auto-confirm`（按白名单规则确认，**默认留空**）/`--auto`（确认+提升）/`--promote`（仅提升）。**二次确认已迁至 ④.55**（`confirm_events.py`），本脚本只负责把候选池刷出来 |
+| `filter_news_signals.py` | ④.5 产业情报预筛：7 源资讯 → 噪声剔除 → 词典命中 → 归位 → **② 跳归约** → 候选池；`--auto-confirm`（按白名单规则确认，**默认留空**）/`--auto`（确认+提升）/`--promote`（仅提升）/`--no-reduce`（关归约，回到旧行为，仅用于对照）。**二次确认已迁至 ④.55**（`confirm_events.py`），本脚本只负责把候选池刷出来 |
+| ↳ ② 跳归约 | 同上 | **归约 = 同主题聚合 + 分档预算**（2026-09-22 新增）。① **同主题聚合**：键 = (主体, 粒度, 链, 环节)，**刻意不含事件类型**——同一条政策的不同分点会命中不同类型（『印发：鼓励兼并重组』→`order_win`、『印发：支持上市融资』→`policy`），按 type 分会把一条政策切回多条；副作用是好的：`industry_intel` 的节点分原本会按分点数**重复计分**，聚合后虚高消失。② **分档**：`chain`（定了主体或归了链，是 ③ 供需卡唯一原料，**全量保留**）｜`industry`（命中行业标签未归链，进报告"宏观催化"）｜`unmapped`（无主体、无链、无行业，**按事件权重截断到 `UNMAPPED_CAP`**）。实测 09-22：79 → 42 条，chain 档 31 条（74%），同主题归并 4 条、未锚定截断 31 条 |
 | `confirm_events.py` | **④.55 事件二次确认**（裁定归属 = 写报告的 LLM）：`packet`（预筛 + 出裁定包 `outputs/<date>/confirm_packet.md/.json`）/ `apply`（读裁定书 → **fail-closed 校验** → 打勾回候选池 → `promote` 提升为 `events/<date>.jsonl`；`--dry-run` 只校验）/ `status`（候选池·裁定书·事件流三态 + 按确认归属计数）。**幂等**：可重复执行，候选池每天重建后按裁定书重新打勾 |
 | `fetch_events_db.py` | **④.6 事件库构建**：`--date`（默认前一交易日）抓取**巨潮公告台账**落盘 `hithink_out/raw/cninfo/<date>.jsonl`（**不可重建，必须存**）并预热期货日K缓存；`--no-ledger`/`--no-futures`/`--dry-run` 可选。**公开源、先定源后建库**，源决策见 `assets/data_source_decision_d.md` |
 | `md2html.py` | Markdown → 自包含 HTML（⑨ PDF 前置） |
@@ -159,7 +162,7 @@ build_dabanke_from_  │       models.py（统一数据模型）       outputs/<
 | ② | 大盘快照 | fuyao SDK（`fetch_market_snapshot.py`） | `hithink_out/raw/pools.json`：指数/板块/涨跌停池/连板天梯/昨日涨停池 + `premiums` 溢价节（步骤 3.5：昨日池 92/93 只逐票算开盘溢价与 A 杀） |
 | ③ | 联网补行情 | harness（东财/同花顺/腾讯/新浪） | 成交额、板块资金流、中军 K 线/溢价/尾盘、跌幅榜、**龙虎榜买卖前五席位（dragon_seats，机构/北向/游资结构，净买前 12 采样）**、北向十大活跃股、**当日宏观快照（macro_snapshot：新浪期货日K主力连续 8 品种，含前夜盘）**；失败降级标注不中断 |
 | ④ | 腾讯补缺 | harness | 同花顺日线缺行时，用腾讯行情补两市成交与沪深 300（**快照时间戳日期须等于复盘日**，否则跳过，见 §6.6） |
-| ④.5 | 资讯采集 + 产业情报预筛 | `fetch_news.py` + `filter_news_signals.py` | ① `hithink_out/raw/news/*.jsonl`（幂等去重；关键词取当日 evidence 题材）；② 预筛出 `events/candidates/<date>.jsonl`（扫描→噪声剔除→词典命中→归位）。**必须先于 ⑤**：`fetch_market` 步骤 10 读 `events/<date>.jsonl` 聚合 `market.industry_intel`。**白名单默认留空＝不自动确认**（首版设 `extra_code` 已被实测否掉，见 §12.1 与 design_decisions R12）；`--no-intel` 可整步跳过。资讯摘要注入 prompt 时**按发布时间分 A/B 两桶**——A（≤15:00 盘前/盘中）可作当日归因，B（盘后）仅限次日条件预期 |
+| ④.5 | 资讯采集 + 产业情报预筛 | `fetch_news.py` + `filter_news_signals.py` | ① `hithink_out/raw/news/*.jsonl`（幂等去重；关键词取当日 evidence 题材）；② 预筛出 `events/candidates/<date>.jsonl`（**读层统一走 `data/news_raw`：日切 + 跨源指纹去重** → 扫描 → 噪声剔除 → 词典命中 → 归位 → **② 跳归约（同主题聚合 + 分档预算）**）。**必须先于 ⑤**：`fetch_market` 步骤 10 读 `events/<date>.jsonl` 聚合 `market.industry_intel`。**白名单默认留空＝不自动确认**（首版设 `extra_code` 已被实测否掉，见 §12.1 与 design_decisions R12）；`--no-intel` 可整步跳过。资讯摘要注入 prompt 时**按发布时间分 A/B 两桶**——A（≤15:00 盘前/盘中）可作当日归因，B（盘后）仅限次日条件预期 |
 | ④.55 | **产业事件二次确认** | `confirm_events.py`（④.5 刚生成的候选池） | **裁定归属 = 写报告的 LLM**。三种状态：① `outputs/<date>/confirm_decisions.json` 存在 → 校验（**fail-closed，不过即不落盘**）→ 打勾回候选池 → `promote` 提升为 `events/<date>.jsonl`；② 不存在 → 按当前候选池出裁定包 `outputs/<date>/confirm_packet.md` 并打印待裁定条数（**不阻断复盘**，第 1 段届时写"无已确认产业事件流"）；③ 无候选 → 直接返回。**必须夹在 ④.5 与 ⑤ 之间**：晚于 ④.5 才用得上刚生成的候选池、且**不重跑预筛**（重跑会重排 `event_id` 使裁定书失效）；早于 ⑤ 才能让证据链首次构建就读到事件流。`--no-confirm` 整步跳过 |
 | ④.6 | 事件库构建（④ 验证取数） | `fetch_events_db.py` | ① 抓**巨潮公告台账**落盘 `hithink_out/raw/cninfo/<date>.jsonl`（订单/扩产类事件的外部佐证；**不可重建，必须存**）；② 预热期货日K缓存。**必须先于 ⑤**——`fetch_market` 步骤 11 读台账 + 期货做事件外部验证，产出 `market.event_verification`。`--no-events-db` 可整步跳过（验证节将退化为 `no_data`） |
 | ⑤ | 证据链 + prompt | harness（确定性） | `outputs/<date>/evidence.json`（纯数据：情绪/资金/周期 + **`board_pools` 板块内领涨标的池**——涨停股按行业归组列个股，写板块资金必落标的；无该行业=当日无涨停，子板块资金不编造；**v2 新增 `capital_concentration` 资金集中度 + `chain_map` 产业链当日映射 + `event_verification` 事件外部验证**——⑤ 步骤 11 读 ④.6 落盘台账做交叉核对）+ `outputs/<date>/prompt.md` |
@@ -308,7 +311,8 @@ hithink 项目侧（`/Users/imatrix/data/hithink/scripts/`）的同名脚本已�
   （封板率/晋级率/溢价/梯队/行业集中度）、`dragon_top`（龙虎榜异动股资金聚合，可选）、
   `leaders_candidates`（中军候选原始数据）、
   `high_ladder_stocks`（高标个股）、`industry_intel`（产业事件聚合，可选，源
-  `events/<date>.jsonl`）——**不含 phase/仓位/信号等任何判定**；
+  `events/<date>.jsonl`）、`supply_demand`（**供需卡**：事件 → 环节×变量×方向的
+  确定性归约，可选，由 `industry_intel` 派生）——**不含 phase/仓位/信号等任何判定**；
 - `leaders_candidates.industry` 为东财涨停池行业标签，可能只反映次要属性，板块归属
   需结合主营判断；涨停池个股尾盘统一标注"涨停封板"；
 - `meta.data_gaps`：显式列出数据缺口（如北向未披露），LLM 不得编造；
@@ -372,7 +376,7 @@ tools/run_tests.sh
 > `python3 -m unittest discover -s tests` 跑会踩两种坑：解释器里没有 pytest 时**直接报 import
 > 错误**；有 pytest 时那 30+ 个用例被 unittest **静默跳过**。统一用
 > `tools/run_tests.sh`（自动在候选解释器里挑带 pytest 的那个，可用 `PYTEST_PY` 覆盖），
-> 当前基线 **633 passed + 5 subtests**（2026-09-22 实测；此前长期滞留在 `545`，属文档漂移）。
+> 当前基线 **685 passed + 5 subtests**（2026-09-22 实测；此前长期滞留在 `545`，属文档漂移；后经 633 → 685 两次扩充）。
 
 ### 5.1 依赖与环境自检（2026-09-18 起）
 
