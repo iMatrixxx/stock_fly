@@ -1,0 +1,107 @@
+{
+  "chain_id": "satellite",
+  "name": "卫星互联网",
+  "version": "0.1",
+  "updated": "2026-09-20",
+  "note": "P0 静态产业链图谱（人工维护）：nodes 定义上下游关系，供 L2 事件沿链传导；stocks 为 A股映射（必须含 code 与 purity，否则无法与盘面做程序化验证）；signal_aliases 把涨停原因标签/事件文本归位到节点。图谱只描述结构与映射，不含任何买卖判断。 v0.1（2026-09-20）：新建。结构按『制造发射 → 地面段 → 用户段与运营』分层；星载载荷单独成节点，因相控阵/T-R 组件与卫星平台的价格与订单事件彼此独立、且是国产替代叙事的主要落点。标的取自 westock 板块『卫星互联网』(pt02GN2098) 成分股，逐个核验 code。",
+  "nodes": [
+    {
+      "id": "satellite_mfg",
+      "name": "卫星制造",
+      "stage": "upstream",
+      "upstream": ["payload_rf"],
+      "downstream": ["constellation_ops"],
+      "note": "卫星平台、整星总装与星上电子"
+    },
+    {
+      "id": "launch_vehicle",
+      "name": "火箭与发射",
+      "stage": "upstream",
+      "upstream": [],
+      "downstream": ["satellite_mfg", "constellation_ops"],
+      "note": "运载火箭、发射服务与地面发射设施"
+    },
+    {
+      "id": "payload_rf",
+      "name": "星载载荷与相控阵",
+      "stage": "upstream",
+      "upstream": [],
+      "downstream": ["satellite_mfg"],
+      "note": "相控阵天线、T/R 组件、射频前端：载荷价值量核心"
+    },
+    {
+      "id": "ground_station",
+      "name": "地面站与测控",
+      "stage": "midstream",
+      "upstream": ["constellation_ops"],
+      "downstream": ["user_terminal"],
+      "note": "信关站、测控站与星地链路设备"
+    },
+    {
+      "id": "user_terminal",
+      "name": "终端与天线",
+      "stage": "midstream",
+      "upstream": ["ground_station"],
+      "downstream": [],
+      "note": "用户终端、动中通与天线"
+    },
+    {
+      "id": "constellation_ops",
+      "name": "星座运营与服务",
+      "stage": "downstream",
+      "upstream": ["satellite_mfg", "launch_vehicle"],
+      "downstream": ["ground_station"],
+      "note": "星座组网、卫星通信运营与数据服务"
+    }
+  ],
+  "stocks": [
+    {"node": "satellite_mfg", "code": "600118", "name": "中国卫星", "purity": "core", "note": "卫星整星制造龙头"},
+    {"node": "satellite_mfg", "code": "300342", "name": "天银机电", "purity": "swing", "note": "星敏感器"},
+    {"node": "satellite_mfg", "code": "688523", "name": "航天环宇", "purity": "swing", "note": "星载结构与天线"},
+    {"node": "satellite_mfg", "code": "300455", "name": "航天智装", "purity": "edge", "note": "航天智能装备"},
+    {"node": "satellite_mfg", "code": "688818", "name": "电科蓝天", "purity": "edge", "note": "星载电源"},
+    {"node": "launch_vehicle", "code": "603131", "name": "上海沪工", "purity": "edge", "note": "航天焊接装备与发射配套"},
+    {"node": "launch_vehicle", "code": "000901", "name": "航天科技", "purity": "edge", "note": "航天配套"},
+    {"node": "launch_vehicle", "code": "300159", "name": "新研股份", "purity": "edge", "note": "航天结构件"},
+    {"node": "payload_rf", "code": "001270", "name": "铖昌科技", "purity": "core", "note": "相控阵 T/R 芯片"},
+    {"node": "payload_rf", "code": "688375", "name": "国博电子", "purity": "core", "note": "T/R 组件与射频模块"},
+    {"node": "payload_rf", "code": "301050", "name": "雷电微力", "purity": "core", "note": "毫米波相控阵"},
+    {"node": "payload_rf", "code": "300782", "name": "卓胜微", "purity": "swing", "note": "射频前端芯片"},
+    {"node": "payload_rf", "code": "300762", "name": "上海瀚讯", "purity": "core", "note": "星载宽带通信载荷"},
+    {"node": "payload_rf", "code": "688387", "name": "信科移动", "purity": "swing", "note": "星地融合通信"},
+    {"node": "ground_station", "code": "688418", "name": "震有科技", "purity": "core", "note": "地面核心网与信关站"},
+    {"node": "ground_station", "code": "002544", "name": "普天科技", "purity": "swing", "note": "卫星通信地面设备"},
+    {"node": "ground_station", "code": "002465", "name": "海格通信", "purity": "core", "note": "北斗与卫星通信终端"},
+    {"node": "ground_station", "code": "002151", "name": "北斗星通", "purity": "swing", "note": "北斗导航与测控"},
+    {"node": "user_terminal", "code": "688311", "name": "盟升电子", "purity": "core", "note": "卫星通信终端与天线"},
+    {"node": "user_terminal", "code": "002446", "name": "盛路通信", "purity": "swing", "note": "微波天线"},
+    {"node": "user_terminal", "code": "002792", "name": "通宇通讯", "purity": "swing", "note": "天线与射频器件"},
+    {"node": "user_terminal", "code": "300136", "name": "信维通信", "purity": "swing", "note": "天线与射频模组"},
+    {"node": "user_terminal", "code": "300045", "name": "华力创通", "purity": "swing", "note": "卫星通信基带与终端"},
+    {"node": "constellation_ops", "code": "601698", "name": "中国卫通", "purity": "core", "note": "卫星通信运营龙头"},
+    {"node": "constellation_ops", "code": "688568", "name": "中科星图", "purity": "core", "note": "卫星数据与空天信息服务"},
+    {"node": "constellation_ops", "code": "300053", "name": "航宇微", "purity": "edge", "note": "宇航电子与卫星大数据"}
+  ],
+  "signal_aliases": [
+    {"node": "satellite_mfg", "keywords": ["卫星制造", "卫星平台", "星载", "卫星整星", "卫星载荷"]},
+    {"node": "launch_vehicle", "keywords": ["商业火箭", "可回收火箭", "运载火箭", "发射服务"]},
+    {"node": "payload_rf", "keywords": ["相控阵", "T/R组件", "星载相控阵", "毫米波组件", "射频前端"]},
+    {"node": "ground_station", "keywords": ["地面站", "信关站", "卫星测控", "测控站"]},
+    {"node": "user_terminal", "keywords": ["卫星终端", "动中通", "卫星天线", "卫星电话"]},
+    {"node": "constellation_ops", "keywords": ["卫星互联网", "星座组网", "低轨卫星", "商业航天", "卫星运营"]}
+  ],
+  "pending_nodes": [
+    {
+      "id": "satellite_material",
+      "name": "星载材料",
+      "note": "碳纤维复合材料与星载结构材料（如中复神鹰/光威复材）与卫星制造强相关，但主营分散在航空/风电复材，归链会显著稀释节点纯度；待细分标的清晰后建节点"
+    },
+    {
+      "id": "vacuum_electronics",
+      "name": "行波管/真空电子器件",
+      "note": "星载行波管放大器是卫星有效载荷关键件，A 股标的少且多与军工电子混营，暂不建节点"
+    }
+  ],
+  "alias_note": "别名只收环节专有词。刻意不含裸『卫星』『航天』——实测这类泛词会把卫星导航、遥感、军工电子等相邻行业的涨停标签整体误命中到本链；星座运营统一由『星座组网』『低轨卫星』等专有词承接。",
+  "exclusions": []
+}

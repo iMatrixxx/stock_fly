@@ -157,3 +157,79 @@ def test_real_day_20260908():
     assert out["summary"]["total"] == 4
     assert out["summary"]["by_granularity"].get("node") == 4
     assert any(s["node"] == "gpu_chip" for s in out["node_signals"])
+
+
+# ---------------------------------------------------------------------------
+# ④.55 裁定漏斗计数并入证据链（2026-09-18：让报告 1.1 能正规引用收口条数）
+# ---------------------------------------------------------------------------
+
+def _write_confirm(path: Path) -> Path:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(json.dumps({
+        "date": "2026-09-08",
+        "decided_by": "llm",
+        "packet_counts": {"candidates": 80, "tbd": 70, "vetoed": 2, "ineligible": 0},
+        "decisions": {"decisions": 80, "confirm": 7, "reject": 65, "override": 0},
+        "audit": {"confirm": 8, "reject": 72, "override": 0, "untouched": 0},
+        "warnings": ["已在正式事件流，无需重复裁定"],
+        "events_path": "events/2026-09-08.jsonl",
+    }, ensure_ascii=False), encoding="utf-8")
+    return path
+
+
+def test_confirmation_funnel_merged_into_evidence():
+    rows = [_ev("E-1", "node", "order_win", "high", node="pcb")]
+    cr = _write_confirm(TMP / "confirm_result.json")
+    out = ii.build_industry_intel("2026-09-08", events_dir=_write_events(rows),
+                                  confirm_result=cr)
+    conf = out["confirmation"]
+    assert conf["decided_by"] == "llm"
+    assert conf["packet"]["candidates"] == 80
+    assert conf["decisions"]["confirm"] == 7
+    assert conf["audit"]["confirm"] == 8
+    assert "不可相加" in conf["note"], "必须写明三套计数口径不同"
+
+
+def test_confirmation_absent_when_result_missing():
+    """裁定结果缺失时不造数（老日期/断链日仍应正常工作）。"""
+    rows = [_ev("E-1", "node", "order_win", "high", node="pcb")]
+    out = ii.build_industry_intel("2026-09-08", events_dir=_write_events(rows),
+                                  confirm_result=TMP / "no_such_confirm.json")
+    assert "confirmation" not in out
+
+
+def test_load_confirmation_keeps_only_int_counts():
+    p = TMP / "cr_mixed.json"
+    p.write_text(json.dumps({
+        "packet_counts": {"candidates": 80, "note": "文本", "flag": True},
+        "audit": {"confirm": 8},
+    }, ensure_ascii=False), encoding="utf-8")
+    conf = ii.load_confirmation("2026-09-08", p)
+    assert conf["packet"] == {"candidates": 80}, "非整数/布尔不得进白名单"
+    assert conf["decisions"] == {}
+
+
+def test_load_confirmation_returns_none_on_unreadable():
+    bad = TMP / "cr_bad.json"
+    bad.write_text("{not json", encoding="utf-8")
+    assert ii.load_confirmation("2026-09-08", bad) is None
+    assert ii.load_confirmation("2026-09-08", TMP / "absent.json") is None
+
+
+def test_confirmation_counts_are_citable_by_gate():
+    """本次改动的目的：漏斗条数写进报告不再被判链外数字。"""
+    sys.path.insert(0, str(ROOT))
+    from stock_review_harness.report.checklist import verify_report_numbers
+
+    rows = [_ev("E-1", "node", "order_win", "high", node="pcb")]
+    cr = _write_confirm(TMP / "confirm_result.json")
+    out = ii.build_industry_intel("2026-09-08", events_dir=_write_events(rows),
+                                  confirm_result=cr)
+    r = verify_report_numbers("本次候选 80 条，最终确认 8 条、驳回 72 条。",
+                              {"industry_intel": out})
+    assert r["suspects"] == []
+
+    # 反证：摘掉 confirmation 后同一句会被判链外 → 证明上面的通过来自本次改动
+    stripped = {"industry_intel": {k: v for k, v in out.items() if k != "confirmation"}}
+    r2 = verify_report_numbers("本次候选 80 条。", stripped)
+    assert "80" in r2["suspects"]

@@ -22,7 +22,7 @@ from collections import Counter
 from pathlib import Path
 from typing import Optional
 
-from ..artifact_paths import REPO_ROOT
+from ..artifact_paths import REPO_ROOT, confirm_result_path
 
 # 置信度折扣（L2 打分预留口径；low 明细保留但不得分）
 CONF_FACTOR = {"high": 1.0, "mid": 0.7, "low": 0.0}
@@ -88,7 +88,53 @@ def load_events(events_dir: Path | None, date_str: str) -> list[dict]:
     return out
 
 
-def build_industry_intel(date_str: str, events_dir: Path | None = None) -> Optional[dict]:
+def load_confirmation(date_str: str, result_path: Path | None = None) -> Optional[dict]:
+    """读 ④.55 的裁定结果 → 漏斗计数块；文件不存在或不可解析返回 None（诚实标注缺失）。
+
+    为什么要把这份计数并进证据链：报告 1.1 讲"机器预筛 → LLM 二次确认"的收口时，
+    最自然的写法就是给出漏斗条数（候选 N / 待定 N / 否决 N / 确认 N / 驳回 N）。
+    但这些数字若不在 evidence 里，就会被 ⑧ 门禁的数字核对判成**链外数字**——
+    于是"能写的事实"反而写不出来。并入后它们与其它聚合计数同为可引用项。
+    """
+    p = Path(result_path) if result_path else confirm_result_path(None, date_str)
+    try:
+        raw = json.loads(p.read_text(encoding="utf-8"))
+    except Exception:  # noqa: BLE001 —— 缺失/损坏不阻断事件流消费
+        return None
+    if not isinstance(raw, dict):
+        return None
+
+    def _ints(d: object) -> dict:
+        """只收非负整数计数，避免把路径/字符串混进白名单。"""
+        if not isinstance(d, dict):
+            return {}
+        return {str(k): v for k, v in d.items()
+                if isinstance(v, int) and not isinstance(v, bool) and v >= 0}
+
+    packet = _ints(raw.get("packet_counts"))
+    decisions = _ints(raw.get("decisions"))
+    audit = _ints(raw.get("audit"))
+    if not (packet or decisions or audit):
+        return None
+    return {
+        "decided_by": raw.get("decided_by"),
+        "packet": packet,
+        "decisions": decisions,
+        "audit": audit,
+        "note": (
+            "④.55 事件二次确认的漏斗计数（来源 outputs/<date>/confirm_result.json）。"
+            "**audit 是最终生效口径**（`confirm`/`reject`/`override`/`untouched`），"
+            "packet 是候选池分档、decisions 是裁定书逐条计数——三者**口径不同、不可相加**。"
+            "报告 1.1 可用它说明收口情况，但不得由条数推断事件的重要性或真伪。"
+        ),
+    }
+
+
+def build_industry_intel(
+    date_str: str,
+    events_dir: Path | None = None,
+    confirm_result: Path | None = None,
+) -> Optional[dict]:
     """聚合当日事件流为 evidence.industry_intel；无事件流返回 None（诚实标注缺失）。"""
     events = load_events(events_dir, date_str)
     if not events:
@@ -199,4 +245,9 @@ def build_industry_intel(date_str: str, events_dir: Path | None = None) -> Optio
         "industry_counts": [
             {"industry": k, "count": v} for k, v in industry_counts.most_common()
         ],
+        **(
+            {"confirmation": conf}
+            if (conf := load_confirmation(date_str, confirm_result)) is not None
+            else {}
+        ),
     }

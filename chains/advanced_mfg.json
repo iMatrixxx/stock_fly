@@ -1,0 +1,107 @@
+{
+  "chain_id": "advanced_mfg",
+  "name": "先进制造",
+  "version": "0.1",
+  "updated": "2026-09-20",
+  "note": "P0 静态产业链图谱（人工维护）：nodes 定义上下游关系，供 L2 事件沿链传导；stocks 为 A股映射（必须含 code 与 purity，否则无法与盘面做程序化验证）；signal_aliases 把涨停原因标签/事件文本归位到节点。图谱只描述结构与映射，不含任何买卖判断。 v0.1（2026-09-20）：新建。范围收敛在『工业母机及其配套』——机床本体、数控系统、数控刀具、精密功能部件、激光加工、智能制造集成；工业机器人本体归 robot 链，不在本链重复收录。标的取自 westock 板块『工业母机』(pt02081426) 成分股，逐个核验 code。",
+  "nodes": [
+    {
+      "id": "cnc_system",
+      "name": "数控系统",
+      "stage": "upstream",
+      "upstream": [],
+      "downstream": ["machine_tool"],
+      "note": "数控装置与运动控制：机床的『大脑』，国产化率最低的环节"
+    },
+    {
+      "id": "cutting_tool",
+      "name": "刀具与精密工具",
+      "stage": "upstream",
+      "upstream": [],
+      "downstream": ["machine_tool"],
+      "note": "硬质合金与超硬刀具：耗材属性，与开工率直接相关"
+    },
+    {
+      "id": "precision_part",
+      "name": "精密零部件",
+      "stage": "upstream",
+      "upstream": [],
+      "downstream": ["machine_tool", "laser_equipment"],
+      "note": "主轴、精密铸件、机床功能部件"
+    },
+    {
+      "id": "machine_tool",
+      "name": "机床与工业母机",
+      "stage": "midstream",
+      "upstream": ["cnc_system", "cutting_tool", "precision_part"],
+      "downstream": ["smart_mfg"],
+      "note": "金属切削与成形机床整机"
+    },
+    {
+      "id": "laser_equipment",
+      "name": "激光加工设备",
+      "stage": "midstream",
+      "upstream": ["precision_part"],
+      "downstream": ["smart_mfg"],
+      "note": "激光器与激光切割/焊接设备"
+    },
+    {
+      "id": "smart_mfg",
+      "name": "智能制造与集成",
+      "stage": "downstream",
+      "upstream": ["machine_tool", "laser_equipment"],
+      "downstream": [],
+      "note": "柔性产线、工厂自动化零部件与整线集成"
+    }
+  ],
+  "stocks": [
+    {"node": "machine_tool", "code": "688305", "name": "科德数控", "purity": "core", "note": "五轴联动机床龙头"},
+    {"node": "machine_tool", "code": "601882", "name": "海天精工", "purity": "core", "note": "数控机床整机"},
+    {"node": "machine_tool", "code": "688697", "name": "纽威数控", "purity": "swing", "note": "中高端数控机床"},
+    {"node": "machine_tool", "code": "688558", "name": "国盛智科", "purity": "swing", "note": "数控机床与智能装备"},
+    {"node": "machine_tool", "code": "300083", "name": "创世纪", "purity": "swing", "note": "钻攻机与通用机床"},
+    {"node": "machine_tool", "code": "000410", "name": "沈阳机床", "purity": "edge", "note": "老牌机床整机"},
+    {"node": "cnc_system", "code": "300161", "name": "华中数控", "purity": "core", "note": "国产数控系统龙头"},
+    {"node": "cnc_system", "code": "301510", "name": "固高科技", "purity": "swing", "note": "运动控制器"},
+    {"node": "cnc_system", "code": "300508", "name": "维宏股份", "purity": "edge", "note": "运动控制与数控系统"},
+    {"node": "cutting_tool", "code": "688059", "name": "华锐精密", "purity": "core", "note": "数控刀具"},
+    {"node": "cutting_tool", "code": "000657", "name": "中钨高新", "purity": "core", "note": "硬质合金与刀具"},
+    {"node": "cutting_tool", "code": "688308", "name": "欧科亿", "purity": "swing", "note": "数控刀具"},
+    {"node": "cutting_tool", "code": "300488", "name": "恒锋工具", "purity": "swing", "note": "精密刃具与工具"},
+    {"node": "cutting_tool", "code": "688257", "name": "新锐股份", "purity": "edge", "note": "硬质合金工具"},
+    {"node": "cutting_tool", "code": "301377", "name": "鼎泰高科", "purity": "edge", "note": "精密刀具与钻针"},
+    {"node": "precision_part", "code": "002595", "name": "豪迈科技", "purity": "core", "note": "精密模具与机械件"},
+    {"node": "precision_part", "code": "300100", "name": "双林股份", "purity": "swing", "note": "精密零部件"},
+    {"node": "precision_part", "code": "300809", "name": "华辰装备", "purity": "swing", "note": "轧辊磨床与精密磨削"},
+    {"node": "precision_part", "code": "002903", "name": "宇环数控", "purity": "edge", "note": "精密磨削设备"},
+    {"node": "laser_equipment", "code": "002008", "name": "大族激光", "purity": "core", "note": "激光加工设备龙头"},
+    {"node": "laser_equipment", "code": "300747", "name": "锐科激光", "purity": "core", "note": "光纤激光器龙头"},
+    {"node": "laser_equipment", "code": "688518", "name": "联赢激光", "purity": "swing", "note": "激光焊接设备"},
+    {"node": "laser_equipment", "code": "300480", "name": "光力科技", "purity": "edge", "note": "半导体与激光切割设备"},
+    {"node": "smart_mfg", "code": "301029", "name": "怡合达", "purity": "swing", "note": "工厂自动化零部件"},
+    {"node": "smart_mfg", "code": "603011", "name": "合锻智能", "purity": "edge", "note": "成形机床与智能装备"},
+    {"node": "smart_mfg", "code": "688125", "name": "安达智能", "purity": "edge", "note": "智能装备集成"}
+  ],
+  "signal_aliases": [
+    {"node": "machine_tool", "keywords": ["工业母机", "数控机床", "五轴联动", "加工中心", "机床"]},
+    {"node": "cnc_system", "keywords": ["数控系统", "运动控制", "数控装置"]},
+    {"node": "cutting_tool", "keywords": ["硬质合金", "数控刀具", "超硬刀具", "精密刃具"]},
+    {"node": "precision_part", "keywords": ["机床主轴", "机床功能部件", "精密铸件", "精密磨削"]},
+    {"node": "laser_equipment", "keywords": ["激光加工", "光纤激光器", "激光焊接", "激光切割"]},
+    {"node": "smart_mfg", "keywords": ["智能制造", "柔性产线", "智能装备集成"]}
+  ],
+  "pending_nodes": [
+    {
+      "id": "additive_mfg",
+      "name": "增材制造",
+      "note": "金属 3D 打印（如铂力特/华曙高科）与减材制造的客户结构与叙事不同，且当前涨停标签多与军工/航天绑定，暂不建节点"
+    },
+    {
+      "id": "precision_metrology",
+      "name": "精密测量仪器",
+      "note": "三坐标/量具量仪是机床精度的度量环节，A 股标的规模小且分散，暂不建节点"
+    }
+  ],
+  "alias_note": "别名只收环节专有词，且刻意与 robot 链去重：『滚珠丝杠』『行星滚柱丝杠』已归 robot.screw，本链 precision_part 改用『机床主轴』『机床功能部件』等机床侧专有词，避免同一标签在两链间产生归属歧义。",
+  "exclusions": []
+}

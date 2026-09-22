@@ -133,6 +133,21 @@ _REPORT_URL = (
 SOURCE_CLIST = "em_clist_push2delay"
 SOURCE_DATACENTER = "em_datacenter_valuation+reports"
 
+# 单通道取数的**熔断线**（不是精确阈值）。
+#
+# 为什么需要它：两条通道的正常产量都是全市场 5000+ 只（沪深 5560 + 北交所 356）。
+# 取到 0 只、或只取到几百只，**只可能是上游故障**（分页中断、接口改返回结构），
+# 不可能是"今天市场只有这么多票"。但在 2026-09-22 之前，这种情况会静默通过：
+# `latest_snapshot` 把单页失败降级为 `break` → 返回 `{}` 且不抛异常 →
+# `fundamentals_asof` 照常标 `source=em_clist_push2delay / point_in_time=True` →
+# `_build_midterm` 拿到空 dict 后 `midterm_universe` 的主循环空转（链内标的也一并丢掉）
+# → 产出 `universe=0/scored=0` 的空壳 → 门禁见 `scored==0` 静默跳过。
+# 四段静默叠加成"看起来正常但没有中线池"。
+#
+# 1000 这个数**刻意取得极低**：它只用来回答"这个结果明显坏掉了吗"，不做质量判断
+# （部分覆盖仍可用，只是会打 WARN）。全市场 5500+ 的规模下，1000 在可见的未来不会误伤。
+MIN_EXPECTED_STOCKS = 1000
+
 
 # ---------- 归一 ----------
 
@@ -230,14 +245,17 @@ def _clist_ttl() -> int:
     return C.POOL_TTL_TODAY_HOURS * 3600
 
 
-def _clist_page(market: str, pn: int, ymd: str) -> list[dict]:
+def _clist_page(market: str, pn: int, ymd: str, use_cache: bool = True) -> list[dict]:
     url = (f"https://{HOST}/api/qt/clist/get?pn={pn}&pz={PZ_MAX}&po=1&np=1"
            f"&fltt=2&invt=2&fid=f3&fs={MARKETS[market]}&fields={CLIST_FIELDS}")
     key = f"em_fund_clist_{market}_{ymd}_p{pn}"
-    hit = cache_get_json(key, _clist_ttl())
-    if isinstance(hit, list):
-        return hit
-    data = fetch_json(url, timeout=25, retries=5, cache_key=key, cache_ttl=_clist_ttl())
+    ttl = _clist_ttl() if use_cache else 0
+    if ttl > 0:
+        hit = cache_get_json(key, ttl)
+        # 只认**非空**缓存：历史版本会把失败时的空页写进缓存，命中即等于把故障锁 1 小时
+        if isinstance(hit, list) and hit:
+            return hit
+    data = fetch_json(url, timeout=25, retries=5, cache_key=key, cache_ttl=ttl)
     body = data.get("data") or {}
     diff = body.get("diff") or []
     rows = []
@@ -245,7 +263,10 @@ def _clist_page(market: str, pn: int, ymd: str) -> list[dict]:
         row = _normalize_clist(r)
         if is_a_share(row.get("code")):
             rows.append(row)
-    cache_put_json(key, rows)
+    if rows:
+        # **空页绝不写缓存**：空只可能来自异常/截断，不是"这一天这个市场没有票"这样的事实。
+        # 写进去会让后续重试全部命中空页，故障在 TTL 内自锁（2026-09-22 的实际表现）。
+        cache_put_json(key, rows)
     return rows
 
 
@@ -258,16 +279,22 @@ def latest_snapshot(use_cache: bool = True) -> dict[str, dict]:
 
     分页按 `pz=100` 走（硬上限），沪深A 56 页 + 北交所 4 页；单页失败不中断整体，
     该页缺的票以"不在快照里"体现（下游视为未披露，不编造）。
+
+    **不完整必须响铃**：单页失败累计数与总产量都会检查，异常时打 `[WARN]`。
+    返回值本身不做降级——由 `fundamentals_asof` 决定是回退另一通道还是标记 degraded。
+    调用方**不得**把空 dict 当成"今天没有股票"。
     """
     ymd = datetime.now().strftime("%Y%m%d")
     out: dict[str, dict] = {}
+    failed: list[str] = []
     for market in ("hs", "bj"):
         pn = 1
         while pn <= 200:
             try:
-                rows = _clist_page(market, pn, ymd)
-            except Exception:  # noqa: BLE001 - 单页失败不阻断整轮
+                rows = _clist_page(market, pn, ymd, use_cache=use_cache)
+            except Exception as e:  # noqa: BLE001 - 单页失败不阻断整轮
                 rows = []
+                failed.append(f"{market}:p{pn}:{type(e).__name__}")
             if not rows:
                 break
             for r in rows:
@@ -277,6 +304,10 @@ def latest_snapshot(use_cache: bool = True) -> dict[str, dict]:
             if len(rows) < PZ_MAX:
                 break
             pn += 1
+    if failed or len(out) < MIN_EXPECTED_STOCKS:
+        detail = f"失败页 {len(failed)} 个" + (f"（{'、'.join(failed[:5])}）" if failed else "")
+        print(f"[WARN] clist 全市场快照不完整：取到 {len(out)} 只（期望 ≥"
+              f"{MIN_EXPECTED_STOCKS}），{detail}", flush=True)
     return out
 
 
@@ -387,8 +418,47 @@ def reports_asof(date_str: str, use_cache: bool = True, periods: int = 2) -> dic
 
 # ---------- 分流入口 ----------
 
+# 各通道的自述（进 `note`，便于回溯"这个数从哪条通道来、按什么口径取"）
+_CHANNEL_NOTE: dict[str, str] = {
+    SOURCE_CLIST: "走 clist 当前快照（PE/PB 由当日收盘价算出）",
+    SOURCE_DATACENTER: (
+        "走 datacenter 逐日通道：估值按 TRADE_DATE 逐日取、"
+        "业绩按 NOTICE_DATE<=as-of 过滤（真 point-in-time，不偷未来）"),
+}
+
+
+def _datacenter_stocks(date_str: str, use_cache: bool = True) -> dict[str, dict]:
+    """datacenter 逐日通道的装配（估值 ∪ 业绩）。
+    
+    抽成函数是为了让 `fundamentals_asof` 的**回退**能复用它——回退路径里再抄一遍
+    装配逻辑，就等于埋下"两条通道慢慢分叉"的种子。
+    """
+    val = valuation_on(date_str, use_cache=use_cache)
+    rep = reports_asof(date_str, use_cache=use_cache)
+    stocks: dict[str, dict] = {}
+    for code, v in val.items():
+        row = _blank(code)
+        _fill(row, v)
+        _fill(row, rep.get(code) or {})
+        stocks[code] = row
+    # 只有业绩、没有当日估值记录的票（如当日停牌）也保留：PE/PB 为 None，ROE/成长可用
+    for code, rp in rep.items():
+        if code not in stocks:
+            row = _blank(code)
+            _fill(row, rp)
+            stocks[code] = row
+    return stocks
+
+
+def _load_channel(date_str: str, source: str, use_cache: bool = True) -> dict[str, dict]:
+    """按通道名取基本面 → `{code: row}`。两条通道的**唯一分发点**。"""
+    if source == SOURCE_CLIST:
+        return latest_snapshot(use_cache=use_cache)
+    return _datacenter_stocks(date_str, use_cache=use_cache)
+
+
 def fundamentals_asof(date_str: str, use_cache: bool = True) -> dict:
-    """按 as-of 自动分流 → `{date, source, point_in_time, count, stocks, note}`。
+    """按 as-of 自动分流 → `{date, source, point_in_time, count, stocks, note, ...}`。
 
     规则（两条，无第三种情形）：
 
@@ -398,39 +468,68 @@ def fundamentals_asof(date_str: str, use_cache: bool = True) -> dict:
     | < 今天 | datacenter 逐日 | clist 会把今天的估值写进历史 |
 
     as-of 晚于今天直接抛错：那一天还没发生，不存在"当时的基本面"。
+
+    **不完整时自动回退、且绝不静默**（2026-09-22 的教训）：主通道取到的股票数低于
+    `MIN_EXPECTED_STOCKS` 时，改用另一条通道重取（`use_cache=False`，避免命中被污染的
+    缓存），谁更完整用谁；两条都空则置 `degraded=True` 并打 WARN。
+    返回值新增两个键（向后兼容，原有键语义不变）：
+
+    - `fallback_from`  —— 回退发生时的原通道名；未回退为 `None`；
+    - `degraded`       —— 两条通道都没取到数据（`count == 0`）。
+
+    **回退是单向的：只允许 clist → datacenter，禁止 datacenter → clist。**
+    as-of < 今天时 datacenter 是**唯一合法**通道；此时若产量不足就回退到 clist，
+    等于把今天的估值写进历史日——正是本模块第一条纪律（"宁可缺，不可偷未来"）
+    明令禁止的事。故历史日产量不足只告警、不回退，宁可让下游 degraded。
+
+    **调用方契约**：`degraded=True` 时必须把下游（中线池）降级为"无数据"，
+    **不得**把空 dict 喂给建池逻辑——那会产出 0 只的池子，看起来像"这天没有标的"。
     """
     today = _today()
     if date_str > today:
         raise ValueError(f"复盘日 {date_str} 晚于今天 {today}，无基本面数据")
-    if date_str == today:
-        stocks = latest_snapshot(use_cache=use_cache)
-        source, pit = SOURCE_CLIST, True
-        note = ("as-of = 今天，走 clist 当前快照（PE/PB 由当日收盘价算出）")
-    else:
-        val = valuation_on(date_str, use_cache=use_cache)
-        rep = reports_asof(date_str, use_cache=use_cache)
-        stocks = {}
-        for code, v in val.items():
-            row = _blank(code)
-            _fill(row, v)
-            _fill(row, rep.get(code) or {})
-            stocks[code] = row
-        # 只有业绩、没有当日估值记录的票（如当日停牌）也保留：PE/PB 为 None，ROE/成长可用
-        for code, rp in rep.items():
-            if code not in stocks:
-                row = _blank(code)
-                _fill(row, rp)
-                stocks[code] = row
-        source, pit = SOURCE_DATACENTER, True
-        note = ("as-of < 今天，走 datacenter 逐日通道：估值按 TRADE_DATE 逐日取、"
-                "业绩按 NOTICE_DATE<=复盘日 过滤（真 point-in-time，不偷未来）")
+
+    primary = SOURCE_CLIST if date_str == today else SOURCE_DATACENTER
+    asc = "as-of = 今天" if date_str == today else "as-of < 今天"
+    stocks = _load_channel(date_str, primary, use_cache=use_cache)
+    source = primary
+    note = f"{asc}，{_CHANNEL_NOTE[primary]}"
+
+    fallback_from = None
+    if len(stocks) < MIN_EXPECTED_STOCKS:
+        if primary == SOURCE_CLIST:
+            print(f"[WARN] 基本面通道 {primary} 只取到 {len(stocks)} 只"
+                  f"（<{MIN_EXPECTED_STOCKS}），回退 {SOURCE_DATACENTER} 复核", flush=True)
+            alt = _load_channel(date_str, SOURCE_DATACENTER, use_cache=False)
+            if len(alt) > len(stocks):
+                fallback_from, source, stocks = primary, SOURCE_DATACENTER, alt
+                note = (f"{asc}，{_CHANNEL_NOTE[SOURCE_DATACENTER]}"
+                        f"｜主通道 {primary} 产量不足，已回退本通道（{len(stocks)} 只）")
+            else:
+                note += (f"｜回退通道 {SOURCE_DATACENTER} 仅 {len(alt)} 只，"
+                         f"未优于主通道，保留主通道结果")
+        else:
+            # as-of < 今天：**没有合法替代通道**（见 docstring 的单向回退纪律）
+            print(f"[WARN] 历史日 {date_str} 的 {primary} 只取到 {len(stocks)} 只"
+                  f"（<{MIN_EXPECTED_STOCKS}）；clist 通道不合法（会偷未来），"
+                  f"不回退、只降级", flush=True)
+            note += (f"｜{primary} 产量不足（{len(stocks)} 只），"
+                     f"无合法替代通道（clist 对历史日会偷未来），不回退")
+
+    degraded = not stocks
+    if degraded:
+        print(f"[WARN] {date_str} 两条基本面通道均返回空，degraded=True："
+              f"中线段必须降级为无数据（不得产出 0 只空池）", flush=True)
+
     return {
         "date": date_str,
         "source": source,
-        "point_in_time": pit,
+        "point_in_time": True,
         "count": len(stocks),
         "stocks": stocks,
         "note": note,
+        "fallback_from": fallback_from,
+        "degraded": degraded,
     }
 
 

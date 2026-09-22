@@ -1,7 +1,7 @@
 {
-  "version": "0.1",
-  "updated": "2026-09-10",
-  "note": "行业归位词典：把政策源/电报源的行业文本映射到 chains/<chain_id>.json 的节点或链级。用于 events/<date>.jsonl 的 node 归位（粒度 granularity=node 或 industry）。",
+  "version": "0.2",
+  "updated": "2026-09-20",
+  "note": "行业归位词典：把政策源/电报源的行业文本映射到 chains/<chain_id>.json 的节点或链级。用于 events/<date>.jsonl 的 node 归位（粒度 granularity=node 或 industry）。 v0.2（2026-09-20）：图谱扩到四条链（新增 robot/satellite/advanced_mfg），机器人、卫星互联网自 out_of_scope_industries 回升为正式映射；同时补 ai_compute 的 equipment_materials 条目——该节点 09-18 已在 chains 侧新增，词典侧此前缺失，导致『设备/材料』类新闻无法归到该节点。",
   "relation_to_chain_aliases": "chains/<chain_id>.json 的 signal_aliases 匹配『涨停原因标签』（短标签，如 PCB/光模块），面向盘面回放；本词典匹配『新闻/政策正文』（长句，如『信息通信业十五五规划』），面向事件归位。两者指向同一批 node，但输入形态与精度要求不同，故分文件维护。node 取值必须存在于对应 chains/<chain_id>.json，由 tests/test_events.py 校验。",
   "scope_rule": "node 为 null 表示**链级事件**（政策/宏观作用于整条链，无法归到单一环节），写入事件时 node=unknown，L2 按链级衰减处理，不得强行塞给某一节点。",
   "industries": [
@@ -46,11 +46,149 @@
       "node": "pcb",
       "keywords": ["PCB", "电路板", "覆铜板", "覆铜", "线路板", "HDI", "高多层", "载板", "CCL"],
       "note": "含高多层/HDI（如『AI算力高多层、高阶HDI电路板』）"
+    },
+    {
+      "label": "设备与材料",
+      "chain_id": "ai_compute",
+      "node": "equipment_materials",
+      "keywords": ["半导体设备", "封装设备", "测试设备", "硅片", "靶材", "PCB设备", "PCB钻针", "电子级环氧树脂"],
+      "note": "卖铲环节（v0.2 补录：节点 09-18 已在 chains 侧建好，词典侧此前缺失）。『半导体设备』按最长优先压过『半导体』，不会被抢到 gpu_chip"
+    },
+    {
+      "label": "机器人减速器",
+      "chain_id": "robot",
+      "node": "reducer",
+      "keywords": ["谐波减速器", "RV减速器", "精密减速器", "减速器", "一体化关节"],
+      "note": "旋转关节价值量最高的环节"
+    },
+    {
+      "label": "机器人丝杠",
+      "chain_id": "robot",
+      "node": "screw",
+      "keywords": ["行星滚柱丝杠", "滚珠丝杠", "丝杠螺母", "丝杠"],
+      "note": "直线关节核心件，国产化率低"
+    },
+    {
+      "label": "机器人伺服",
+      "chain_id": "robot",
+      "node": "servo_motor",
+      "keywords": ["无框力矩电机", "空心杯电机", "伺服电机", "力矩电机", "伺服系统"],
+      "note": "关节驱动电机与伺服"
+    },
+    {
+      "label": "机器人灵巧手",
+      "chain_id": "robot",
+      "node": "dexterous_hand",
+      "keywords": ["灵巧手", "电子皮肤", "末端执行器"],
+      "note": "微型驱动与触觉密集环节"
+    },
+    {
+      "label": "机器人传感",
+      "chain_id": "robot",
+      "node": "sensor",
+      "keywords": ["六维力传感器", "力矩传感器", "力觉传感器", "触觉传感器", "3D视觉"],
+      "note": "力控与感知环节"
+    },
+    {
+      "label": "人形机器人",
+      "chain_id": "robot",
+      "node": "humanoid_body",
+      "keywords": ["人形机器人本体", "人形机器人整机", "人形机器人", "具身智能"],
+      "note": "整机总成与执行器总成。刻意不含裸『机器人』——该词会把工业/服务/概念标签整体误命中"
+    },
+    {
+      "label": "机器人集成",
+      "chain_id": "robot",
+      "node": "system_integration",
+      "keywords": ["机器人集成", "机器人应用", "机器人产线"],
+      "note": "场景落地与产线集成"
+    },
+    {
+      "label": "卫星制造",
+      "chain_id": "satellite",
+      "node": "satellite_mfg",
+      "keywords": ["卫星制造", "卫星平台", "卫星整星", "卫星载荷", "星载结构"],
+      "note": "整星总装与平台。刻意不含裸『卫星』——卫星导航/遥感属相邻行业"
+    },
+    {
+      "label": "火箭发射",
+      "chain_id": "satellite",
+      "node": "launch_vehicle",
+      "keywords": ["商业火箭", "运载火箭", "可回收火箭", "发射服务", "发射场"],
+      "note": "运载与发射服务"
+    },
+    {
+      "label": "星载载荷",
+      "chain_id": "satellite",
+      "node": "payload_rf",
+      "keywords": ["星载相控阵", "相控阵天线", "T/R组件", "毫米波组件", "射频前端"],
+      "note": "有效载荷价值量核心：相控阵与 T/R 组件"
+    },
+    {
+      "label": "地面站测控",
+      "chain_id": "satellite",
+      "node": "ground_station",
+      "keywords": ["信关站", "地面站", "卫星测控", "测控站", "星地链路"],
+      "note": "地面段设备与核心网"
+    },
+    {
+      "label": "卫星终端",
+      "chain_id": "satellite",
+      "node": "user_terminal",
+      "keywords": ["卫星终端", "动中通", "卫星天线", "卫星电话", "卫星通信终端"],
+      "note": "用户段终端与天线"
+    },
+    {
+      "label": "星座运营",
+      "chain_id": "satellite",
+      "node": "constellation_ops",
+      "keywords": ["卫星互联网", "星座组网", "低轨卫星", "商业航天", "卫星运营", "卫星通信服务"],
+      "note": "运营与服务：政策与组网进度多落此"
+    },
+    {
+      "label": "工业母机",
+      "chain_id": "advanced_mfg",
+      "node": "machine_tool",
+      "keywords": ["工业母机", "数控机床", "五轴联动", "加工中心", "金属切削机床"],
+      "note": "机床整机环节"
+    },
+    {
+      "label": "数控系统",
+      "chain_id": "advanced_mfg",
+      "node": "cnc_system",
+      "keywords": ["数控系统", "数控装置", "运动控制"],
+      "note": "机床『大脑』，国产化率最低"
+    },
+    {
+      "label": "数控刀具",
+      "chain_id": "advanced_mfg",
+      "node": "cutting_tool",
+      "keywords": ["数控刀具", "硬质合金", "超硬刀具", "精密刃具"],
+      "note": "耗材属性，与开工率直接相关"
+    },
+    {
+      "label": "精密功能部件",
+      "chain_id": "advanced_mfg",
+      "node": "precision_part",
+      "keywords": ["机床主轴", "机床功能部件", "精密铸件", "精密磨削"],
+      "note": "主轴/铸件等机床配套件。丝杠/导轨类关键词归 robot.screw，不在本节点重复"
+    },
+    {
+      "label": "激光加工",
+      "chain_id": "advanced_mfg",
+      "node": "laser_equipment",
+      "keywords": ["激光加工", "光纤激光器", "激光焊接", "激光切割"],
+      "note": "激光器与加工设备"
+    },
+    {
+      "label": "智能制造",
+      "chain_id": "advanced_mfg",
+      "node": "smart_mfg",
+      "keywords": ["智能制造", "柔性产线", "智能装备集成"],
+      "note": "产线与工厂自动化集成"
     }
   ],
   "out_of_scope_industries": [
-    {"label": "机器人", "keywords": ["人形机器人", "机器人", "具身智能", "具身", "减速器", "丝杠", "伺服", "灵巧手", "谐波减速器"]},
-    {"label": "卫星互联网", "keywords": ["商业航天", "卫星互联网", "卫星", "火箭", "星座", "太空", "地面站"]},
     {"label": "房地产", "keywords": ["土拍", "涉宅用地", "城中村", "老旧小区", "二手房", "危旧房", "城市更新", "限购", "房贷"]},
     {"label": "食品饮料", "keywords": ["白酒", "茅台", "啤酒", "乳业", "调味品"]},
     {"label": "农业", "keywords": ["猪肉", "生猪", "肉价", "种植", "种业", "饲料", "化肥", "水产"]},
@@ -62,5 +200,5 @@
     {"label": "金融监管", "keywords": ["理财", "受贿", "整改", "清退", "质权融资"]},
     {"label": "生态环保", "keywords": ["古树名木", "三北工程", "生态修复", "草原修复"]}
   ],
-  "out_of_scope_note": "这些行业暂不属于四张图谱（AI算力/机器人/卫星互联网/先进制造），归为 industry=other 保留在事件流中但不进链；未来建对应链时从此处回升为正式映射。与 chains 的 pending_nodes 定位一致。"
+  "out_of_scope_note": "这些行业**当前没有对应的链文件**，归为 chain_id=other（industry 仍写具体标签、不是 other）保留在事件流中但不进链；未来建对应链时从此处回升为正式映射，做法与 chains 的 pending_nodes 一致。注意『暂不属于』指的是图谱**已落地**的范围，而非永久排除——机器人/卫星互联网已于 v0.2 建链并从此表移出。"
 }

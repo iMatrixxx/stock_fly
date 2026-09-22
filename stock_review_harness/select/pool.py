@@ -51,6 +51,15 @@ OUT_OF_POOL_MARK = "池外补充"
 # 中线池在 prompt 里的**子**标题（同为 H3，挂在候选池节之下，理由同 DIRECTION_SECTION_TITLE）
 MIDTERM_SECTION_TITLE = "### 中线高潜池（基本面视角，与短线池并列不可比）"
 
+# 名次（rank）刻意不进数字白名单：放行 1..N 的序号等于放行**全部小整数**，会实质废掉
+# 数字核对（见 `report/checklist._SOURCE_SKIP_KEYS`）。但池内表格渲染名次才好读，故凡是
+# 带 `#` 列的 prompt 小节都必须显式声明"名次不得写入报告"，否则报告引名次会被门禁判为
+# 链外数字（2026-09-18 复审确认的每日假拦源之一）。
+RANK_USE_NOTE = (
+    "**名次（`#` 列）仅供本表排序参考，不得写入报告**——序号不在证据链白名单内，"
+    "写进报告会被数字门禁判为链外数字；要表达强弱请引用 score / tier / 星级 / 关键特征。"
+)
+
 DEFAULT_TOP_K = 15
 DEFAULT_MIDTERM_TOP_K = 20
 # 中线池里单列的「链内标的在本池的名次」条数（见 build_midterm_document）
@@ -259,6 +268,9 @@ def build_midterm_document(
         "top_k": top_k,
         "source": meta.get("source"),
         "point_in_time": meta.get("point_in_time"),
+        # 回退过的通道名（未回退为 None）。与 `source` 并列落盘，理由同 `source`：
+        # "这批基本面从哪来"是可审计事实，不能只留在日志里（日志不进产物、不可回放）。
+        "fallback_from": meta.get("fallback_from"),
         "counts": {
             "universe": len(rows),
             "scored": len(scored),
@@ -478,6 +490,7 @@ def _render_directions(ddoc: dict) -> list[str]:
         "3. 方向名本身不是标的、不含代码，**不参与池内外核对**；但方向内写出的"
         f"**每一只票都必须在候选池内**，池外票仍须在同一行标「{OUT_OF_POOL_MARK}」；",
         "4. 方向强而方向内个股弱时，**如实写出这个冲突**，不要为了自洽而改事实。",
+        f"5. {RANK_USE_NOTE}",
         "",
         "| # | 星级 | 分级 | score | 覆盖率 | 方向 | 关键特征 | 方向内龙头（代码/名称/tier） |",
         "|---|---|---|---|---|---|---|---|",
@@ -532,6 +545,7 @@ def _render_midterm(mdoc: dict) -> list[str]:
         "5. `净利同比`/`营收同比` 有极值（低基数或扭亏可上万个百分点）——"
         "照抄原值即可，**不得**据此称'高增长'；同比只作参考，score 已是横截面名次、"
         "不会被极值绑架。",
+        f"6. {RANK_USE_NOTE}",
         "",
         "| # | tier | score | 覆盖率 | 代码 | 名称 | 行业 | 链环节 | PE(TTM) | PB | "
         "ROE% | 营收同比% | 净利同比% | 总市值(亿) |",
@@ -612,6 +626,7 @@ def render_prompt_section(doc: dict, max_compact: int = 200) -> str:
         "**禁止改写、外推或编造本表没有的分数**；",
         "4. 池内没有符合条件的标的时，如实写"
         "「当日候选池无符合条件标的」，不得为凑数选入 C 层低分票。",
+        f"5. {RANK_USE_NOTE}",
     ]
     # 方向榜排在个股表之前——这就是"先方向后个股"在 prompt 里的物理体现：
     # 若把它放在个股表之后，模型会先读到 15 只票再读方向，等于先入为主地绑定了标的。

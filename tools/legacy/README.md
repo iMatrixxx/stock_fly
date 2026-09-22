@@ -1,6 +1,6 @@
 # tools/legacy/ — 历史一次性脚本归档
 
-这些脚本是 2026-07~08 期间为**特定交易日**做专项补数/调试留下的一次性工具，已被主链
+这些脚本是 2026-07~09 期间为**特定交易日**做专项补数/调试留下的一次性工具，已被主链
 （`tools/daily_review_pdf.py` → `stock_review_harness`）取代。归档而非删除的原因：
 它们记录了当年"数据源不可用时如何手工拼数"的路径，仍可用于**离线回放复现**与故障排查。
 
@@ -15,6 +15,7 @@
 | `fetch_missing_lines.py` / `fetch_pool_lines.py` | 补抓同花顺缺失日线（依赖 `fetch_v2_20260730` 作 lib） |
 | `fetch_quotes_m5_0731.py` / `fetch_quotes_m5_date.py` / `fetch_quotes_tx.py` | 腾讯分时/日 K 实验抓取 |
 | `fetch_v2_20260730.py` | 上述脚本共用的抓取函数库（`ths_line` / `CACHE`） |
+| `boll_lower_breakout_rsi_oversold.py` | 09-11 BOLL(20,2) 下轨破位 + RSI 双超卖 + SMA120 上行的抄底策略实证（一次性研究，非主链） |
 
 ## 使用须知
 

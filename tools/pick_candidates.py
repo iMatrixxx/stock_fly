@@ -138,6 +138,12 @@ def _build_midterm(
     降级不静默（告警进日志），且后果在报告侧可见：契约 v3 的 5.2 小节写不出数据时，
     结构检查与覆盖检查都会亮灯。
 
+    **"取到空基本面"也算失败**（2026-09-22 的教训）。全市场永远有 5000+ 只票，
+    取到 0 只只可能是上游故障；若在此继续往下走，`midterm_universe` 因为主循环遍历的是
+    fundamentals，会把链内标的也一并丢掉，产出 `universe=0/scored=0` 的**空壳文档**，
+    而门禁见 `scored==0` 会静默跳过——看起来像"这天没有中线标的"。故空基本面与取数异常
+    走**同一条降级路径**（返回 None，让 5.2 缺节被结构检查拦住）。
+
     `loader` 是测试注入点（默认走 `fundamentals.fundamentals_asof`）。
     """
     from stock_review_harness.data import fundamentals as F
@@ -149,6 +155,17 @@ def _build_midterm(
         print(f"[WARN] 基本面取数失败，本次不产出中线段（报告 5.2 将无数据）：{e}", flush=True)
         return None
 
+    fund = fund or {}
+    stocks = fund.get("stocks") or {}
+    if not stocks:
+        print(f"[WARN] 基本面取数为空（source={fund.get('source')}，"
+              f"degraded={fund.get('degraded')}），中线段降级为 None"
+              f"（不产出 0 只空池）", flush=True)
+        return None
+    if fund.get("fallback_from"):
+        print(f"[INFO] 基本面通道已从 {fund['fallback_from']} 回退到 "
+              f"{fund.get('source')}（{len(stocks)} 只）", flush=True)
+
     idx = load_chain_index(chains_dir)
     members = {
         code: {"chain_id": r.get("chain_id"), "chain_name": r.get("chain_name"),
@@ -156,13 +173,19 @@ def _build_midterm(
                "purity": r.get("purity")}
         for code, r in idx.by_code.items()
     }
-    uni = midterm_universe(fund.get("stocks") or {}, members,
+    uni = midterm_universe(stocks, members,
                            (evidence or {}).get("board_pools"))
+    if not uni["rows"]:
+        print(f"[WARN] 中线基础池为空（基本面 {len(stocks)} 只、链内 {len(members)} 只、"
+              f"活跃行业 {len(uni['active_industries'])} 个均无交集），"
+              f"中线段降级为 None", flush=True)
+        return None
     w = weights or load_midterm_weights(weights_path)
     rows = score_midterm(midterm_features(uni["rows"]), w)
     meta = dict(uni)
     meta["source"] = fund.get("source")
     meta["point_in_time"] = fund.get("point_in_time")
+    meta["fallback_from"] = fund.get("fallback_from")
     return build_midterm_document(date_str, rows, w, universe_meta=meta, top_k=top_k)
 
 

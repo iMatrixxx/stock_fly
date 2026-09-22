@@ -73,5 +73,31 @@ class FencedJsonExemptTest(unittest.TestCase):
         self.assertIn("99999", r["suspects"])
 
 
+class PoolRenderingPrecisionTest(unittest.TestCase):
+    """池侧 2 位渲染（`select/pool._fmt`）照抄进报告不得被判编造。
+
+    复现的原始 bug：证据 `311.5455913213` 被池按 2 位印成 `311.55`，报告照抄后经
+    `_norm_num`（1 位）归一得 `311.6`，而证据侧按原值归一是 `311.5` → 判成编造数字。
+    白名单因此同时收「按原值 1 位」与「按 2 位渲染后再 1 位」两种形式。
+    """
+
+    EVIDENCE = {"select": {"rows": [{"score": 311.5455913213, "coverage": 0.7391}]}}
+
+    def test_two_decimal_pool_rendering_accepted(self):
+        # 报告照抄池内渲染的 311.55
+        r = verify_report_numbers("个股分 311.55。", self.EVIDENCE)
+        self.assertEqual(r["suspects"], [])
+
+    def test_one_decimal_rounding_accepted(self):
+        # 报告自行收敛到 1 位也应放行
+        r = verify_report_numbers("个股分 311.5。", self.EVIDENCE)
+        self.assertEqual(r["suspects"], [])
+
+    def test_fabricated_neighbour_still_flagged(self):
+        # 只增不减：相邻值仍须拦下，白名单没有被放宽到"附近的任何数"
+        r = verify_report_numbers("个股分 313.55。", self.EVIDENCE)
+        self.assertIn("313.55", r["suspects"])
+
+
 if __name__ == "__main__":
     unittest.main()

@@ -217,6 +217,14 @@ def midterm_universe(fundamentals: dict[str, dict],
 
     返回 `{rows, industry_match, active_industries, target_industries, note}`。
     **本函数不做任何筛选**（除"在不在池内"这个定义本身）：池子是超集，取舍交给打分器。
+
+    **遍历主体是两边取并集**（`set(fundamentals) | set(chain_members)`），不是只遍历
+    fundamentals。这是 2026-09-22 空壳事件暴露的第二处缺陷：若只遍历 fundamentals，
+    链内标的的命运就绑在"它今天有没有出现在基本面表里"上——基本面通道一旦漏页，
+    **链内 157 只会与活跃行业标的一起整批消失**，而函数的 `note` 还写着"链内 157 只"。
+    链内标的的成员资格来自链图谱，与基本面取数成败无关，故必须独立成立：
+    基本面缺席者以空基本面入池，打分时按覆盖率收缩为 NA（`score_rows` 的既有纪律），
+    **不填 0**。
     """
     funds = fundamentals or {}
     members = chain_members or {}
@@ -227,8 +235,8 @@ def midterm_universe(fundamentals: dict[str, dict],
     targets = sorted({em for ems in mapping.values() for em in ems})
 
     rows: list[dict] = []
-    for code in sorted(funds):
-        f = funds[code] or {}
+    for code in sorted(set(funds) | set(members)):
+        f = funds.get(code) or {}
         mem = members.get(code)
         industry = f.get("industry")
         in_active = bool(industry and industry in targets)
@@ -258,6 +266,10 @@ def midterm_universe(fundamentals: dict[str, dict],
     )
     if unmatched:
         note += f"未能匹配东财口径的涨停池行业名：{'、'.join(unmatched)}。"
+    no_fund = [c for c in members if c not in funds]
+    if no_fund:
+        note += (f"链内 {len(no_fund)} 只不在基本面表内，以空基本面入池"
+                 f"（打分按覆盖率收缩为 NA，不填 0）。")
     return {
         "rows": rows,
         "industry_match": mapping,

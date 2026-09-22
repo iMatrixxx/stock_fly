@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "title": "IndustryChain",
-  "description": "产业链静态图谱契约（chains/<chain_id>.json）。P0 只做结构与 A股映射，不含买卖判断。文件名以 _ 开头的文件（如本契约）不视为链数据。 v0.2（2026-09-18）新增 exclusions 字段契约。",
+  "description": "产业链静态图谱契约（chains/<chain_id>.json）。P0 只做结构与 A股映射，不含买卖判断。文件名以 _ 开头的文件（如本契约）不视为链数据。 v0.2（2026-09-18）新增 exclusions 字段契约。 v0.3（2026-09-20）：补 pending_nodes / alias_note 的显式声明——两者此前已存在于 ai_compute.json 但契约未声明（仅靠 additionalProperties 才合法），同日新增的三张图继续沿用，故一并补上；实际校验仍由 tests/test_chains.py 与 test_chain_exclusions.py 承担（本文件约束的是人，不是程序）。",
   "type": "object",
   "required": [
     "chain_id",
@@ -31,6 +31,35 @@
     },
     "note": {
       "type": "string"
+    },
+    "pending_nodes": {
+      "type": "array",
+      "description": "暂缓环节：已观察到资金/事件活动、但当前刻意不建节点的环节。不参与映射，其标签也不进反例分母（作用与 industry_lexicon 的 out_of_scope_industries 同构，区别是本字段记环节、那份记整条行业）。结构比 nodes 轻——只需 id/name/note；晋级为正式节点时必须补 stage/upstream/downstream 三字段后才能移入 nodes。",
+      "items": {
+        "type": "object",
+        "required": [
+          "id",
+          "name"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9_]*$"
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1
+          },
+          "note": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": true
+      }
+    },
+    "alias_note": {
+      "type": "string",
+      "description": "signal_aliases 的取舍说明：为什么某些泛词刻意不收、以及与其他链的去重约定，供后人改别名时参考。"
     },
     "nodes": {
       "type": "array",

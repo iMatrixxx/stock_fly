@@ -53,6 +53,11 @@ from stock_review_harness.select.pool import (  # noqa: E402
 )
 
 TMP = Path(__file__).resolve().parent / "_tmp_midterm"
+# 中线段测试用的**空链目录**：目录不存在 → `load_chains` 返回 `[]`（见其 docstring）。
+# 必须显式传入，因为 `chains_dir=None` 会落到真实的 `chains/`（157 只链内标的），
+# 而 `midterm_universe` 的遍历主体自 2026-09-22 起是 `fundamentals ∪ chain_members`：
+# 真实图谱会把 stub 基本面之外的 157 只一并拉进池子，测试就不再密封了。
+CHAINS_EMPTY = TMP / "chains"
 DAY = "2026-09-17"
 
 
@@ -168,6 +173,31 @@ class MidtermUniverseTest(unittest.TestCase):
                                                 mv=12_560_160_000.0)},
                                {}, _boards(("汽车零部", 4, False)))
         self.assertAlmostEqual(uni["rows"][0]["fundamentals"]["total_mv_yi"], 125.6)
+
+    def test_chain_member_survives_absent_fundamentals(self):
+        """**回归（2026-09-22 空壳事件）**：链内标的的成员资格来自链图谱，
+
+        与基本面取数成败无关。旧实现遍历主体是 fundamentals，链内标的会随基本面
+        一起整批消失（而 `note` 还写着"链内 N 只"）。
+        """
+        uni = midterm_universe({}, self.members, self.pools)
+        self.assertEqual([r["code"] for r in uni["rows"]], ["600003"])
+        self.assertIsNotNone(uni["rows"][0]["membership"])
+        self.assertFalse(uni["rows"][0]["in_active_industry"])
+        # 空基本面 → 原件为 None（不是 0），打分时按覆盖率收缩为 NA
+        self.assertIsNone(uni["rows"][0]["fundamentals"]["pe_ttm"])
+        self.assertIsNone(uni["rows"][0]["fundamentals"]["total_mv_yi"])
+        self.assertIn("不在基本面表内", uni["note"])
+
+    def test_chain_member_absent_flag_only_when_really_missing(self):
+        """链内标的都在基本面表里时，note 不得出现"缺席"字样（避免噪声告警）。"""
+        uni = midterm_universe(self.funds, self.members, self.pools)
+        self.assertNotIn("不在基本面表内", uni["note"])
+
+    def test_both_empty_yields_no_rows(self):
+        """两边都空 → 空池。`_build_midterm` 据此降级为 None（不产出空壳文档）。"""
+        uni = midterm_universe({}, {}, self.pools)
+        self.assertEqual(uni["rows"], [])
 
 
 class IndustryRelativeTest(unittest.TestCase):
@@ -307,6 +337,16 @@ class BuildMidtermDocumentTest(unittest.TestCase):
         doc = self._doc()
         self.assertEqual(doc["discipline"]["report_section"], MIDTERM_REPORT_SECTION)
         self.assertFalse(doc["point_in_time"] is None)
+
+    def test_fallback_from_persisted_in_product(self):
+        """回退过的通道名必须进产物——"这批基本面从哪来"要可审计，不能只在日志里。"""
+        self.assertIsNone(self._doc()["fallback_from"])          # 未回退
+        uri = dict(self.uni)
+        uri["source"] = "em_datacenter_valuation+reports"
+        uri["fallback_from"] = "em_clist_push2delay"
+        doc = build_midterm_document(DAY, self.rows, load_midterm_weights(),
+                                     universe_meta=uri, top_k=3)
+        self.assertEqual(doc["fallback_from"], "em_clist_push2delay")
         self.assertIn("尚未验证", doc["note"])
         self.assertIn("未验证", load_midterm_weights()["unvalidated_note"])
 
@@ -537,7 +577,8 @@ class PickCandidatesMidtermIOTest(unittest.TestCase):
 
     def test_run_for_date_writes_midterm_segment(self):
         from tools.pick_candidates import run_for_date
-        doc = run_for_date(DAY, TMP, quiet=True, midterm_loader=self._loader)
+        doc = run_for_date(DAY, TMP, quiet=True, midterm_loader=self._loader,
+                           chains_dir=CHAINS_EMPTY)
         mid = doc["midterm"]
         self.assertIsNotNone(mid)
         self.assertEqual(mid["counts"]["universe"], 3)     # 银行股在圈外
@@ -555,9 +596,52 @@ class PickCandidatesMidtermIOTest(unittest.TestCase):
         def boom(_date):
             raise RuntimeError("网络不可达")
 
-        doc = run_for_date(DAY, TMP, quiet=True, midterm_loader=boom)
+        doc = run_for_date(DAY, TMP, quiet=True, midterm_loader=boom,
+                           chains_dir=CHAINS_EMPTY)
         self.assertIsNone(doc["midterm"])                  # 降级，不抛错
         self.assertGreater(doc["counts"]["universe"], -1)  # 短线池照常产出
+
+    def test_empty_fundamentals_degrades_to_none_not_empty_shell(self):
+        """**回归（2026-09-22 空壳事件）**：空基本面 ≠ "这天没有中线标的"。
+
+        旧行为：`fundamentals_asof(今天)` 走 clist 返回空 → `midterm_universe` 主循环空转
+        → 产出 `universe=0/scored=0` 的空壳 → 门禁见 `scored==0` 静默跳过，看起来一切正常。
+        新行为：与取数异常走同一条降级路径（None）。
+        """
+        from tools.pick_candidates import run_for_date
+
+        def empty(_date):
+            return {"date": _date, "source": "em_clist_push2delay",
+                    "point_in_time": True, "count": 0, "stocks": {},
+                    "degraded": True, "fallback_from": None}
+
+        doc = run_for_date(DAY, TMP, quiet=True, midterm_loader=empty,
+                           chains_dir=CHAINS_EMPTY)
+        self.assertIsNone(doc["midterm"])
+        self.assertGreater(doc["counts"]["universe"], -1)   # 短线池不受连累
+
+    def test_no_intersection_degrades_to_none(self):
+        """有基本面但既非链内、行业也不活跃 → 池为空，同样是 None 而不是空壳。"""
+        from tools.pick_candidates import run_for_date
+
+        def offscope(_date):
+            return {"date": _date, "source": "stub", "point_in_time": True,
+                    "count": 1, "degraded": False, "fallback_from": None,
+                    "stocks": {"000001": _fund("000001", "圈外丁", "银行Ⅱ",
+                                               pe=5, pb=0.5)}}
+
+        doc = run_for_date(DAY, TMP, quiet=True, midterm_loader=offscope,
+                           chains_dir=CHAINS_EMPTY)
+        self.assertIsNone(doc["midterm"])
+
+    def test_empty_stocks_dict_from_loader_degrades(self):
+        """loader 直接给 `stocks={}`（无 degraded 标记）也必须拦下——不能只信标记位。"""
+        from tools.pick_candidates import run_for_date
+
+        doc = run_for_date(DAY, TMP, quiet=True,
+                           midterm_loader=lambda d: {"stocks": {}},
+                           chains_dir=CHAINS_EMPTY)
+        self.assertIsNone(doc["midterm"])
 
     def test_cli_accepts_direction_weights_argument(self):
         """回归：`--directions` 曾是死参数（run_for_date 无该形参 → CLI 必崩）。"""

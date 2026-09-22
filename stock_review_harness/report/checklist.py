@@ -65,7 +65,15 @@ def _norm_num(s: str) -> str:
 
 
 def _collect_evidence_numbers(evidence: dict) -> set[str]:
-    """证据链中所有数值的归一化字符串集合（含字符串字段里出现的数字）。"""
+    """证据链中所有数值的归一化字符串集合（含字符串字段里出现的数字）。
+
+    每个数值收**两种归一化形式**：按原值 1 位归一，以及按 2 位渲染后再 1 位归一。
+    原因：选股段（`select/pool._fmt`）一律按 **2 位小数**把分数/覆盖率/原始值渲染进
+    prompt，报告"照抄本表数值"后再经 `_norm_num`（1 位）归一，可能与按原值归一的
+    字符串不同——典型是 x.xx5 边界：证据 `311.5455913213` 被池印成 `311.55`，
+    报告照抄 `311.55` → 归一 `311.6`；而按原值归一是 `311.5` → **判成编造数字**。
+    两种形式都收只增不减，不会放过真正的编造值。
+    """
     out: set[str] = set()
     _NUM_RE = re.compile(r"-?\d+(?:\.\d+)?")
 
@@ -78,6 +86,7 @@ def _collect_evidence_numbers(evidence: dict) -> set[str]:
                 walk(x)
         elif isinstance(v, (int, float)) and not isinstance(v, bool):
             out.add(_norm_num(str(v)))
+            out.add(_norm_num(f"{float(v):.2f}"))  # 池侧 2 位渲染形式（见上）
         elif isinstance(v, str):
             for tok in _NUM_RE.findall(v):
                 out.add(_norm_num(tok))

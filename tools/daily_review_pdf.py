@@ -290,7 +290,15 @@ def md_to_pdf(report_md: Path, pdf_path: Path, html_path: Path) -> bool:
 
     先删除已存在的旧 PDF：等待循环用「文件存在且 >1000B」判断 Chrome 是否写完，
     若目标已存在会把旧文件误判为新产物、提前终止 Chrome，导致重渲染不生效。
+
+    **入参一律 resolve()**：`file://{html_path}` 是这里拼的，若传入相对路径会得到
+    `file://outputs/<date>/x.html` 这种非法 URL → Chrome 打开空文档 → 产出**白页 PDF**
+    （表现为 1 页 / Letter 而非 A4 / 全文仅几十字符）。流水线内 ROOT 本是绝对路径，
+    但脚本直调时极易踩到，故此处在函数内强制归一（2026-09-18 实测踩坑）。
     """
+    report_md = Path(report_md).resolve()
+    pdf_path = Path(pdf_path).resolve()
+    html_path = Path(html_path).resolve()
     md_to_html(report_md, html_path)
     pdf_path.unlink(missing_ok=True)
     profile = tempfile.mkdtemp(prefix="chrome_pdf_")

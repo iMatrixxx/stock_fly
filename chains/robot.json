@@ -1,0 +1,112 @@
+{
+  "chain_id": "robot",
+  "name": "人形机器人",
+  "version": "0.1",
+  "updated": "2026-09-20",
+  "note": "P0 静态产业链图谱（人工维护）：nodes 定义上下游关系，供 L2 事件沿链传导；stocks 为 A股映射（必须含 code 与 purity，否则无法与盘面做程序化验证）；signal_aliases 把涨停原因标签/事件文本归位到节点。图谱只描述结构与映射，不含任何买卖判断。 v0.1（2026-09-20）：新建。结构按『上游核心零部件 → 本体总成 → 系统集成』三段式；零部件节点拆分到减速器/丝杠/伺服电机/灵巧手/传感器五个环节，因这五个环节的价格与订单事件彼此独立、且是国产替代叙事的主要落点。标的取自 westock 板块『人形机器人』(pt02GN2238) 与『工业母机』(pt02081426) 成分股，逐个核验 code；工业机器人本体归本链，不在 advanced_mfg 重复收录。 未收录 300024 新松机器人：其股票名恰为『机器人』三字，而 name_match 走子串匹配，收录后任何含『机器人』的新闻正文都会被误归到该标的（实测『工业机器人订单增长』即被误判为 stock 级 target）。需先给 name_match 加短名/泛词保护，再补录；本链其余 3 字名（埃斯顿/埃夫特/拓斯达/新时达/贝斯特/欧科亿）均为专有名词，无此风险。",
+  "nodes": [
+    {
+      "id": "reducer",
+      "name": "减速器",
+      "stage": "upstream",
+      "upstream": [],
+      "downstream": ["humanoid_body"],
+      "note": "谐波/RV 减速器：旋转关节成本占比最高的环节"
+    },
+    {
+      "id": "screw",
+      "name": "丝杠",
+      "stage": "upstream",
+      "upstream": [],
+      "downstream": ["humanoid_body"],
+      "note": "行星滚柱丝杠/滚珠丝杠：直线关节核心，国产化率低"
+    },
+    {
+      "id": "servo_motor",
+      "name": "伺服与电机",
+      "stage": "upstream",
+      "upstream": [],
+      "downstream": ["dexterous_hand", "humanoid_body"],
+      "note": "无框力矩电机/空心杯电机/伺服系统"
+    },
+    {
+      "id": "dexterous_hand",
+      "name": "灵巧手",
+      "stage": "upstream",
+      "upstream": ["servo_motor", "sensor"],
+      "downstream": ["humanoid_body"],
+      "note": "灵巧手总成与末端执行器：微型驱动 + 触觉感知密集环节"
+    },
+    {
+      "id": "sensor",
+      "name": "传感器",
+      "stage": "upstream",
+      "upstream": [],
+      "downstream": ["dexterous_hand", "humanoid_body"],
+      "note": "六维力/力矩/触觉/3D 视觉"
+    },
+    {
+      "id": "humanoid_body",
+      "name": "人形机器人本体",
+      "stage": "midstream",
+      "upstream": ["reducer", "screw", "servo_motor", "dexterous_hand", "sensor"],
+      "downstream": ["system_integration"],
+      "note": "整机总成与机电执行器总成"
+    },
+    {
+      "id": "system_integration",
+      "name": "系统集成与应用",
+      "stage": "downstream",
+      "upstream": ["humanoid_body"],
+      "downstream": [],
+      "note": "产线集成、场景落地与运维"
+    }
+  ],
+  "stocks": [
+    {"node": "reducer", "code": "688017", "name": "绿的谐波", "purity": "core", "note": "谐波减速器龙头"},
+    {"node": "reducer", "code": "002472", "name": "双环传动", "purity": "core", "note": "RV/谐波减速器齿轮龙头"},
+    {"node": "reducer", "code": "002896", "name": "中大力德", "purity": "core", "note": "精密减速器与一体化关节"},
+    {"node": "reducer", "code": "000837", "name": "秦川机床", "purity": "swing", "note": "RV 减速器 + 机床"},
+    {"node": "reducer", "code": "301368", "name": "丰立智能", "purity": "swing", "note": "减速器精密齿轮"},
+    {"node": "reducer", "code": "001306", "name": "夏厦精密", "purity": "edge", "note": "精密齿轮件"},
+    {"node": "screw", "code": "300580", "name": "贝斯特", "purity": "core", "note": "行星滚柱丝杠"},
+    {"node": "screw", "code": "603667", "name": "五洲新春", "purity": "core", "note": "丝杠/轴承"},
+    {"node": "screw", "code": "603009", "name": "北特科技", "purity": "swing", "note": "丝杠产线"},
+    {"node": "screw", "code": "301261", "name": "恒工精密", "purity": "swing", "note": "丝杠与精密件"},
+    {"node": "servo_motor", "code": "300124", "name": "汇川技术", "purity": "core", "note": "伺服系统龙头"},
+    {"node": "servo_motor", "code": "603728", "name": "鸣志电器", "purity": "core", "note": "空心杯电机/步进电机"},
+    {"node": "servo_motor", "code": "300660", "name": "江苏雷利", "purity": "swing", "note": "微特电机"},
+    {"node": "servo_motor", "code": "688160", "name": "步科股份", "purity": "swing", "note": "无框力矩电机"},
+    {"node": "servo_motor", "code": "002979", "name": "雷赛智能", "purity": "swing", "note": "运动控制与步进"},
+    {"node": "dexterous_hand", "code": "003021", "name": "兆威机电", "purity": "core", "note": "灵巧手总成/微型驱动"},
+    {"node": "dexterous_hand", "code": "002527", "name": "新时达", "purity": "edge", "note": "本体+驱控系统"},
+    {"node": "sensor", "code": "603662", "name": "柯力传感", "purity": "core", "note": "六维力/称重传感器"},
+    {"node": "sensor", "code": "688322", "name": "奥比中光", "purity": "swing", "note": "3D 视觉感知"},
+    {"node": "sensor", "code": "300007", "name": "汉威科技", "purity": "edge", "note": "柔性触觉传感"},
+    {"node": "humanoid_body", "code": "002747", "name": "埃斯顿", "purity": "core", "note": "工业机器人龙头"},
+    {"node": "humanoid_body", "code": "688836", "name": "宇树科技", "purity": "core", "note": "人形机器人整机"},
+    {"node": "humanoid_body", "code": "688165", "name": "埃夫特", "purity": "swing", "note": "工业机器人本体"},
+    {"node": "humanoid_body", "code": "002050", "name": "三花智控", "purity": "core", "note": "机电执行器总成"},
+    {"node": "humanoid_body", "code": "601689", "name": "拓普集团", "purity": "core", "note": "执行器总成"},
+    {"node": "system_integration", "code": "300607", "name": "拓斯达", "purity": "swing", "note": "自动化产线集成"},
+    {"node": "system_integration", "code": "688218", "name": "江苏北人", "purity": "edge", "note": "焊接机器人集成"}
+  ],
+  "signal_aliases": [
+    {"node": "reducer", "keywords": ["谐波减速器", "RV减速器", "减速器", "精密减速器", "一体化关节"]},
+    {"node": "screw", "keywords": ["行星滚柱丝杠", "滚珠丝杠", "丝杠", "丝杠螺母"]},
+    {"node": "servo_motor", "keywords": ["无框力矩电机", "空心杯电机", "伺服电机", "力矩电机", "伺服系统"]},
+    {"node": "dexterous_hand", "keywords": ["灵巧手", "电子皮肤", "末端执行器"]},
+    {"node": "sensor", "keywords": ["六维力传感器", "力矩传感器", "力觉传感器", "触觉传感器", "3D视觉"]},
+    {"node": "humanoid_body", "keywords": ["人形机器人", "具身智能", "人形机器人本体", "人形机器人整机"]},
+    {"node": "system_integration", "keywords": ["机器人集成", "智能产线", "机器人应用"]}
+  ],
+  "pending_nodes": [
+    {
+      "id": "harmonic_material",
+      "name": "谐波减速器柔轮材料",
+      "note": "柔轮用特殊钢与热处理工艺是谐波减速器良率瓶颈，但 A 股尚无主营该材料的纯正标的；待出现可归位标的或 L1 事件后再建节点"
+    }
+  ],
+  "alias_note": "别名只收环节专有词。刻意不含裸『机器人』——实测该词会把『机器人概念』『工业机器人』『服务机器人』乃至蹭概念标的整体误命中到 humanoid_body；本链各节点均为硬件环节，整机叙事统一由 humanoid_body 的『人形机器人』承接。",
+  "exclusions": []
+}

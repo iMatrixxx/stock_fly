@@ -246,8 +246,11 @@ def test_classify_paths(ctx):
     assert c["_review"]["via"] == "lexicon_chain"
 
     # 未建链行业 → industry / out_of_scope
-    c = classify(_rec("金力永磁：已获具身机器人电机转子项目定点"), ctx)
-    assert c["granularity"] == "industry" and c["industry"] == ["机器人"]
+    # 注：此处原用『金力永磁…具身机器人…』，2026-09-20 机器人建链后『机器人』已从
+    # out_of_scope 移入 industries，该文本不再落在本分支，故改用仍属 oos 的『农业』。
+    c = classify(_rec("生猪价格上涨，养殖户补栏意愿增强"), ctx)
+    assert c["granularity"] == "industry" and c["industry"] == ["农业"]
+    assert c["_review"]["via"] == "out_of_scope"
 
     # 命中信号但无任何归位 → industry=其他
     c = classify(_rec("某某公司：中标2亿元项目"), ctx)
@@ -298,7 +301,7 @@ def test_via_confidence_table_covers_all_vias(ctx):
         _rec("中际旭创：签署合同"),
         _rec("某公司：新建产线生产HDI电路板"),
         _rec("信息通信业十五五规划"),
-        _rec("金力永磁：具身机器人电机转子项目定点"),
+        _rec("生猪价格上涨，养殖户补栏意愿增强"),
         _rec("某某公司：中标2亿元项目"),
     ]
     for r in samples:

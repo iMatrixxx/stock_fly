@@ -26,6 +26,7 @@ JSON → 由 LLM 完成判断与报告撰写**。harness 只负责"算得准"，
 | 查产业链映射覆盖 | §12 · `python3 tools/replay_chain_coverage.py --limit-days 8` |
 | 查数据源能力边界与缺口 | §6 · `assets/data_source_gaps.md`、`assets/data_source_decision_d.md` |
 | 找历史一次性脚本 | §9 · `tools/legacy/README.md` |
+| 看优化清单与进度（唯一真源） | `assets/optimization_backlog.md` |
 
 ---
 
@@ -72,7 +73,7 @@ build_dabanke_from_  │       models.py（统一数据模型）       outputs/<
 | 数据访问 | `data/futures.py` | **期货日K唯一加载点**：新浪 `InnerFuturesNewService.getDailyKLine` 主力连续日线（`CATALOG` 56 品种），提供 `kline/row_on/latest_row/window/change_pct`；**只取 ≤ 目标日的行**（不偷未来）。`macro_snapshot` 与 `event_verify` 均委托此处，避免两套实现漂移 |
 | 数据访问 | `data/cninfo.py` | 巨潮公告全文检索（`hisAnnouncement/query`，**必须 form-urlencoded POST**——JSON body 会被静默忽略，见 §12.3）+ 主体名解析（`topSearch`）；公告台账的抓取侧 |
 | 数据访问 | `data/events_db.py` | **公告台账持久化 + ④ 验证编排**：台账按日落盘 `hithink_out/raw/cninfo/<date>.jsonl`（不可重建，必须存）；`build_verification` 晚导入 `logic.event_verify`（避开 data→logic 循环） |
-| 数据访问 | `data/fundamentals.py` | **中线池基本面载荷**（东财公开源，point-in-time）：`valuation_on`（`RPT_VALUEANALYSIS_DET` 按 `TRADE_DATE` 逐日取 PE_TTM/PB_MRQ）+ `reports_asof`（`RPT_LICO_FN_CPD` 按 `NOTICE_DATE ≤ 日` 取 ROE/成长）。**历史日不得用 clist 快照**——那给的是「今天」的估值＝偷未来；`PE/PB ≤ 0 → None`（亏损股返回负数）；前缀只留 60/00/30/68/92（业绩表混入新三板与 B 股） |
+| 数据访问 | `data/fundamentals.py` | **中线池基本面载荷**（东财公开源，point-in-time）：`valuation_on`（`RPT_VALUEANALYSIS_DET` 按 `TRADE_DATE` 逐日取 PE_TTM/PB_MRQ）+ `reports_asof`（`RPT_LICO_FN_CPD` 按 `NOTICE_DATE ≤ 日` 取 ROE/成长）。**历史日不得用 clist 快照**——那给的是「今天」的估值＝偷未来；`PE/PB ≤ 0 → None`（亏损股返回负数）；前缀只留 60/00/30/68/92（业绩表混入新三板与 B 股）。**取数不完整必须响铃**：产量 < `MIN_EXPECTED_STOCKS`(1000) 即打 WARN，并**单向回退 clist→datacenter**（历史日无合法替代通道，只降级不回退，防偷未来）；两者皆空置 `degraded=True`；**空页不写缓存**（否则一次抖动把故障锁到 TTL 结束） |
 | 数据访问 | `data/multiday.py` | 多日上下文（前 N 交易日数据串联） |
 | 数据访问 | `data/validate.py` | 数据核验，拦截口径异常进 `meta.anomalies`（含 `board_taxonomy_implausible` 板块口径异常——板块成交合计÷两市成交越出可比较区间即判定嵌套、占比指标不可用） |
 | 数据访问 | `data/chains.py` | 产业链图谱加载（**唯一加载点**：`chains/*.json` → `ChainIndex`；`tools/filter_news_signals`、`tools/replay_chain_coverage` 均委托此处，避免两套实现漂移） |
@@ -95,7 +96,7 @@ build_dabanke_from_  │       models.py（统一数据模型）       outputs/<
 | 选股（判断层） | `select/scoring.py` | 横截面 rank 标准化 → 分组加权 → **覆盖率向中性收缩** → tier A/B/C；权重表版本化 |
 | 选股（判断层） | `select/pool.py` | 候选池文档（`pool` 全量 / `top` 全卡 / `unscored` / `counts` / `regime`）与 prompt·终端渲染（纯函数） |
 | 选股（判断层） | `select/ledger.py` | **判卷**（纯函数）：`evaluate_pool` 出分层/@K/单调性/单因子 IC，`build_row` 成账行（含同日自比护栏），`summarize` 分 live/backfill 汇总 |
-| 选股（判断层） | `select/midterm.py` | **中线高潜池**（`MIDTERM_GROUPS` 估值/质量/成长/规模四组）：基础池 = 链内标的 ∪ 当日活跃行业（涨停家数 ≥3），估值做**行业相对化**，打分**委托 `scoring.score_rows` 内核**（与短线池同源，避免第二套实现漂移）；与短线池**并列不替换**，分数**不可比** |
+| 选股（判断层） | `select/midterm.py` | **中线高潜池**（`MIDTERM_GROUPS` 估值/质量/成长/规模四组）：基础池 = **链内标的 ∪ 当日活跃行业**（涨停家数 ≥3），**遍历主体是两边并集**（链内资格来自链图谱，与基本面取数成败无关；缺席者以空基本面入池、按覆盖率收缩为 NA）；估值做**行业相对化**，打分**委托 `scoring.score_rows` 内核**（与短线池同源，避免第二套实现漂移）；与短线池**并列不替换**，分数**不可比** |
 | 选股（判断层） | `select/weights_mid_v0.json` | 中线权重表（**纯先验，`ic` 全 null**）：无回测证据前不得声称分数是收益预期；需 30 个 live 天才能谈校准 |
 | 选股（判断层） | `select/weights_v{0,1}.json` | 权重表（v0 先验 / v1 有回测证据），改权重必须升版本并写 changelog |
 | 跨工具共用 | `stats.py` | 平均秩 / 皮尔逊 / 斯皮尔曼 / IC 描述统计 / t 值（**IC 口径唯一定义点**，回测与判卷账共用） |
@@ -371,7 +372,7 @@ tools/run_tests.sh
 > `python3 -m unittest discover -s tests` 跑会踩两种坑：解释器里没有 pytest 时**直接报 import
 > 错误**；有 pytest 时那 30+ 个用例被 unittest **静默跳过**。统一用
 > `tools/run_tests.sh`（自动在候选解释器里挑带 pytest 的那个，可用 `PYTEST_PY` 覆盖），
-> 当前基线 **545 passed**。
+> 当前基线 **633 passed + 5 subtests**（2026-09-22 实测；此前长期滞留在 `545`，属文档漂移）。
 
 ### 5.1 依赖与环境自检（2026-09-18 起）
 
@@ -690,7 +691,11 @@ dragon.json 缺失时产物不加键，证据链输出 count=0 + 显式标注（
 - `chains/<chain_id>.json`：静态产业链图谱（人工维护）。`nodes` 定义上下游（供事件沿链传导）；
   `stocks` 为 A股映射，**必须含 code 与 purity**（core 主营直接受益 / swing 弹性 / edge 间接），
   否则无法与盘面做程序化交集；`signal_aliases` 把涨停原因标签或事件文本归位到节点；
-  `pending_nodes` 记录暂缓环节。契约见 `chains/_schema.json`。首张图 = `ai_compute`（AI 算力）。
+  `pending_nodes` 记录暂缓环节。契约见 `chains/_schema.json`。
+  **四张图**：`ai_compute`（AI 算力，v0.2，78 标的）、`robot`（人形机器人，v0.1，27 标的）、
+  `satellite`（卫星互联网，v0.1，26 标的）、`advanced_mfg`（先进制造/工业母机，v0.1，26 标的）。
+  跨链的 `code` 与 `signal_aliases` 关键词**均不重复**——重复会让 `by_code` 归属依赖文件加载顺序
+  （`data/chains.py` 用 `setdefault`），行为不可复现。
 - `events/schema.json`：事件最小单元契约（`events/<date>.jsonl` 每行一条，text 留原文摘录、
   url 可回源）；`events/signals.json`：纯规则信号词典（订单 5 / 涨价 4 / 缺货 4 / 扩产 3 /
   政策 2 / 传闻 1，× 信源等级 3/2/1）。
@@ -708,8 +713,11 @@ python3 tools/replay_chain_coverage.py --date 2026-09-07 --date 2026-09-08 \
 农业/周期"的结论互相印证。液冷/服务器电源当日是资金战场但节点未建（已记入 `pending_nodes`）。
 
 **纪律**：别名只收硬件环节专有词——泛词"算力/服务器/液冷"会把蹭概念股（算力租赁、
-液冷硅油、家电复材）大量误判为链内标的；事件写入正式事件流前须二次确认
-（补 entity/confidence/verify_ts）；图谱与事件资产入库，每日复盘产物仍走 `outputs/`（不入库）。
+液冷硅油、家电复材）大量误判为链内标的；同理 `stocks[].name` 本身若是泛词会污染
+`name_match` 的**子串匹配**（如 300024 名称就叫"机器人"，收录后任何含"机器人"的正文都会被
+归到它，实测"工业机器人订单增长"即被误判），**收录前必须评估名称是否够专有**；
+事件写入正式事件流前须二次确认（补 entity/confidence/verify_ts）；
+图谱与事件资产入库，每日复盘产物仍走 `outputs/`（不入库）。
 
 **测试**：`tests/test_chains.py`（契约、枚举、引用完整性，7 项）。
 
