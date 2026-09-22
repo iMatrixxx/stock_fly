@@ -24,15 +24,13 @@ from ..models import (
     PremiumQuote,
 )
 from . import dragon_seats as dragon_seats_mod
-from . import eastmoney, tencent, ths
-from . import events_db
+from . import eastmoney, events_db, northbound, tencent, ths
 from . import industry_intel as industry_intel_mod
 from . import macro_snapshot as macro_mod
-from . import northbound
 from .cache import load_cached_market, save_market_cache
 from .net import fetch_many
-from .validate import BOARD_TAXONOMY_SUM_MAX, BOARD_TAXONOMY_SUM_MIN
 from .sina import stock_flow_history
+from .validate import BOARD_TAXONOMY_SUM_MAX, BOARD_TAXONOMY_SUM_MIN
 
 BOARD_KEEP = 8  # 量化筛选后保留的板块数量（报告取前 3）
 
@@ -496,7 +494,7 @@ def fetch_market(
     top_fallers = list(dedup.values())
 
     # ---------- 7. 沪深股通前十大成交活跃股（外资态度观察；可选，失败不阻断） ----------
-    north_top10: Optional[dict] = None
+    north_top10: dict | None = None
     try:
         north_top10 = northbound.fetch_top10_deal(date_str)
         if north_top10:
@@ -513,7 +511,7 @@ def fetch_market(
         print(f"  [warn] 北向十大活跃股抓取失败（{str(e)[:100]}），本次不注入", flush=True)
 
     # ---------- 8. 龙虎榜买卖前五席位（机构 vs 游资结构；可选，失败不阻断） ----------
-    dragon_seats: Optional[dict] = None
+    dragon_seats: dict | None = None
     try:
         dragon_seats = dragon_seats_mod.fetch_dragon_seats(date_str)
         if dragon_seats:
@@ -528,7 +526,7 @@ def fetch_market(
         print(f"  [warn] 龙虎榜席位抓取失败（{str(e)[:100]}），本次不注入", flush=True)
 
     # ---------- 9. 当日宏观行情快照（国内商品期货主连；可选，失败不阻断） ----------
-    macro_snap: Optional[dict] = None
+    macro_snap: dict | None = None
     try:
         macro_snap = macro_mod.fetch_macro_snapshot(date_str)
         if macro_snap:
@@ -544,7 +542,7 @@ def fetch_market(
         print(f"  [warn] 宏观快照抓取失败（{str(e)[:100]}），本次不注入", flush=True)
 
     # ---------- 10. 产业情报事件流（P1 L1 产物 events/<date>.jsonl；可选，缺失不阻断） ----------
-    industry_intel: Optional[dict] = None
+    industry_intel: dict | None = None
     try:
         industry_intel = industry_intel_mod.build_industry_intel(date_str)
         if industry_intel:
@@ -564,7 +562,7 @@ def fetch_market(
     # ---------- 11. 事件验证（独立源核对；可选，缺失不阻断） ----------
     # 放在取数期而非 evidence 组装期：价格侧要联网取期货序列、公告侧要读当日账本，
     # 都是**数据**动作；放进纯格式化的 evidence 会让"组装证据链"变成联网操作。
-    event_verification: Optional[dict] = None
+    event_verification: dict | None = None
     try:
         event_verification = events_db.build_verification(date_str)
         if event_verification:

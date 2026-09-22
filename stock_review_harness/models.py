@@ -7,8 +7,6 @@ harness 只负责数据收集与确定性聚合（现象层），不做交易判
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import Optional
-
 
 # ========== 输入数据 ==========
 
@@ -26,8 +24,8 @@ class LimitPoolData:
     blasted: list[dict]
     concepts: list[dict]
     url: str = ""
-    fetched_at: Optional[str] = None
-    dragon_top: Optional[dict] = None  # 龙虎榜异动股资金聚合（fuyao raw/dragon.json 桥接，可选）
+    fetched_at: str | None = None
+    dragon_top: dict | None = None  # 龙虎榜异动股资金聚合（fuyao raw/dragon.json 桥接，可选）
 
     def industry_concentration(self, top: int = 8) -> list[tuple[str, int]]:
         """涨停池按行业标签聚合（拆 "+" 到标签级：国企改革、数据中心…）。"""
@@ -61,10 +59,10 @@ DabankeData = LimitPoolData
 class IndexQuote:
     name: str
     code: str
-    close: Optional[float] = None
-    change_pct: Optional[float] = None
-    turnover: Optional[float] = None  # 亿元
-    ma5: Optional[float] = None        # 5 日均线（含当日，供"跌破5日线"等条件）
+    close: float | None = None
+    change_pct: float | None = None
+    turnover: float | None = None  # 亿元
+    ma5: float | None = None        # 5 日均线（含当日，供"跌破5日线"等条件）
 
 
 @dataclass
@@ -72,15 +70,15 @@ class BoardQuote:
     """板块行情：成交额占比与涨跌幅用于量化初选，主力/北向净流入用于资金属性推导。"""
 
     name: str
-    turnover: Optional[float] = None       # 亿元
-    market_turnover: Optional[float] = None  # 参考的全市场成交额（亿元）
-    change_pct: Optional[float] = None
-    main_flow: Optional[float] = None      # 主力净流入（亿元）
-    limit_ups: Optional[int] = None
-    north_flow: Optional[float] = None     # 北向净买入（亿元，仅当数据源提供）
+    turnover: float | None = None       # 亿元
+    market_turnover: float | None = None  # 参考的全市场成交额（亿元）
+    change_pct: float | None = None
+    main_flow: float | None = None      # 主力净流入（亿元）
+    limit_ups: int | None = None
+    north_flow: float | None = None     # 北向净买入（亿元，仅当数据源提供）
 
     @property
-    def turnover_ratio(self) -> Optional[float]:
+    def turnover_ratio(self) -> float | None:
         if self.turnover is None or not self.market_turnover:
             return None
         return self.turnover / self.market_turnover * 100
@@ -92,13 +90,13 @@ class LeaderQuote:
 
     code: str
     name: str
-    market_cap: Optional[float] = None   # 亿元
-    turnover: Optional[float] = None     # 亿元
-    close: Optional[float] = None
-    ma5: Optional[float] = None
-    ma10: Optional[float] = None
-    tail_behavior: Optional[str] = None  # "尾盘企稳" / "尾盘放量跳水" / None
-    main_flow: Optional[float] = None    # 主力净流入（亿元）
+    market_cap: float | None = None   # 亿元
+    turnover: float | None = None     # 亿元
+    close: float | None = None
+    ma5: float | None = None
+    ma10: float | None = None
+    tail_behavior: str | None = None  # "尾盘企稳" / "尾盘放量跳水" / None
+    main_flow: float | None = None    # 主力净流入（亿元）
     industry: str = ""
     note: str = ""
 
@@ -109,7 +107,7 @@ class PremiumQuote:
 
     code: str
     name: str = ""
-    open_premium_pct: Optional[float] = None
+    open_premium_pct: float | None = None
 
 
 @dataclass
@@ -118,8 +116,8 @@ class MarketData:
 
     date: str = ""
     indices: list[IndexQuote] = field(default_factory=list)
-    total_turnover: Optional[float] = None          # 两市成交额（亿元）
-    prev_total_turnover: Optional[float] = None     # 前一交易日成交额（亿元）
+    total_turnover: float | None = None          # 两市成交额（亿元）
+    prev_total_turnover: float | None = None     # 前一交易日成交额（亿元）
     boards: list[BoardQuote] = field(default_factory=list)
     leaders: list[LeaderQuote] = field(default_factory=list)
     yesterday_premiums: list[PremiumQuote] = field(default_factory=list)
@@ -127,11 +125,11 @@ class MarketData:
     zt_pool: list[dict] = field(default_factory=list)       # 东财涨停池（含市值/成交额/连板）
     dt_pool: list[dict] = field(default_factory=list)       # 东财跌停池
     yesterday_zt_pool: list[dict] = field(default_factory=list)
-    northbound_top10: Optional[dict] = None  # 沪深股通十大活跃股 {date, sh[], sz[], note}（可选）
-    dragon_seats: Optional[dict] = None  # 龙虎榜买卖前五席位 {date, stocks[], note}，机构/北向/游资结构（可选）
-    macro: Optional[dict] = None  # 当日宏观行情快照 {date, items[], note}，国内商品期货主连日K（可选）
-    industry_intel: Optional[dict] = None  # 产业事件聚合 {summary, node_signals[], chain_level[], stock_watchlist[], industry_counts[]}，源 events/<date>.jsonl（可选）
-    event_verification: Optional[dict] = None  # 事件验证（独立源核对）{counts, price_checks[], order_checks[], no_source_nodes[], note}；价格侧=期货序列、公告侧=巨潮账本（可选）
+    northbound_top10: dict | None = None  # 沪深股通十大活跃股 {date, sh[], sz[], note}（可选）
+    dragon_seats: dict | None = None  # 龙虎榜买卖前五席位 {date, stocks[], note}，机构/北向/游资结构（可选）
+    macro: dict | None = None  # 当日宏观行情快照 {date, items[], note}，国内商品期货主连日K（可选）
+    industry_intel: dict | None = None  # 产业事件聚合 {summary, node_signals[], chain_level[], stock_watchlist[], industry_counts[]}，源 events/<date>.jsonl（可选）
+    event_verification: dict | None = None  # 事件验证（独立源核对）{counts, price_checks[], order_checks[], no_source_nodes[], note}；价格侧=期货序列、公告侧=巨潮账本（可选）
     notes: list[str] = field(default_factory=list)
 
 

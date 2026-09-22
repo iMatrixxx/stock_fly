@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 """
 hithink-finance A 股市场快照研究脚本
 =====================================
@@ -623,7 +622,7 @@ def render_report(
     L.append("## 六、数据说明与限制")
     L.append("")
     L.append("- 数据来源：同花顺金融数据服务（hithink-finance），统一 API Key 认证，接口为官方 REST 端点，经官方 Python SDK（`fuyao_client`）调用。")
-    L.append(f"- 指数/板块快照与个股快照接口**不返回中文名**；指数名称由脚本本地映射，板块/成分股名称取自目录与成分接口。")
+    L.append("- 指数/板块快照与个股快照接口**不返回中文名**；指数名称由脚本本地映射，板块/成分股名称取自目录与成分接口。")
     L.append("- 指数无复权概念；个股历史 K 线支持 `none/forward/backward` 复权（本脚本未使用个股历史接口）。")
     L.append("- 涨停/跌停/炸板池的 `date_ms` 为上海时区交易日 00:00 毫秒戳；非交易日返回空集属正常行为。")
     L.append("- 龙虎榜省略 `date` 时取**最新可用交易日**（非交易日取前一交易日），不一定是今天。")
@@ -713,7 +712,7 @@ def main() -> int:
     # dry-run：不校验 Key、不调 API
     if args.dry_run:
         md = render_dry_run_template()
-        out = outdir / f"report_template.md"
+        out = outdir / "report_template.md"
         out.write_text(md, encoding="utf-8")
         print(f"[dry-run] 字段结构模板已生成: {out}")
         print("[dry-run] 提示: 设置 HITHINK_FINANCE_API_KEY 后运行本脚本(不带 --dry-run)即拉取真实数据。")

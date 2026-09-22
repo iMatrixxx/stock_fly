@@ -20,7 +20,6 @@ from __future__ import annotations
 import json
 from collections import Counter
 from pathlib import Path
-from typing import Optional
 
 from ..artifact_paths import REPO_ROOT, confirm_result_path
 
@@ -88,7 +87,7 @@ def load_events(events_dir: Path | None, date_str: str) -> list[dict]:
     return out
 
 
-def load_confirmation(date_str: str, result_path: Path | None = None) -> Optional[dict]:
+def load_confirmation(date_str: str, result_path: Path | None = None) -> dict | None:
     """读 ④.55 的裁定结果 → 漏斗计数块；文件不存在或不可解析返回 None（诚实标注缺失）。
 
     为什么要把这份计数并进证据链：报告 1.1 讲"机器预筛 → LLM 二次确认"的收口时，
@@ -134,7 +133,7 @@ def build_industry_intel(
     date_str: str,
     events_dir: Path | None = None,
     confirm_result: Path | None = None,
-) -> Optional[dict]:
+) -> dict | None:
     """聚合当日事件流为 evidence.industry_intel；无事件流返回 None（诚实标注缺失）。"""
     events = load_events(events_dir, date_str)
     if not events:

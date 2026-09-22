@@ -73,7 +73,6 @@ def _capital_type(board, cfg=C) -> tuple[str, list[str]]:
     """资金属性定性：外资定价型 / 游资抱团型 / 机构合力型。"""
     main = board.main_flow
     chg = board.change_pct or 0.0
-    r: list[str] = []
     if board.north_flow is not None and board.north_flow > 0 and chg > 2:
         return "外资定价型", [
             f"北向净买入 {board.north_flow:.1f} 亿且板块涨幅 {chg:.2f}%，"

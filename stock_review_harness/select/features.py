@@ -24,7 +24,6 @@
 from __future__ import annotations
 
 import math
-from typing import Optional
 
 # 五组个股特征（顺序即报告展示顺序）
 FEATURE_GROUPS: dict[str, list[str]] = {
@@ -63,7 +62,7 @@ FEATURE_LABELS: dict[str, str] = {
 _OPEN_MIN = 9 * 60 + 30
 
 
-def first_seal_minutes(first_seal: Optional[str]) -> Optional[float]:
+def first_seal_minutes(first_seal: str | None) -> float | None:
     """`HH:MM:SS` → 距 09:30 的分钟数；09:25 的集合竞价一字板得 -5。
 
     越小越早、越强，故打分时 sign=-1。解析失败返回 None（不臆测时间）。
@@ -82,7 +81,7 @@ def first_seal_minutes(first_seal: Optional[str]) -> Optional[float]:
     return float(h * 60 + m - _OPEN_MIN)
 
 
-def _safe_ratio(numer: Optional[float], denom: Optional[float]) -> Optional[float]:
+def _safe_ratio(numer: float | None, denom: float | None) -> float | None:
     """百分比比值；分母缺失/非正一律 None（不用 0 兜底，0 会被 rank 当成最小值）。"""
     if numer is None or denom is None:
         return None
@@ -91,7 +90,7 @@ def _safe_ratio(numer: Optional[float], denom: Optional[float]) -> Optional[floa
     return numer / denom * 100.0
 
 
-def compute_row_features(row: dict) -> dict[str, Optional[float]]:
+def compute_row_features(row: dict) -> dict[str, float | None]:
     """单只候选 → 特征字典（键与 FEATURE_GROUPS 展平后一致，缺失为 None）。"""
     f = row.get("facts") or {}
     amount = f.get("amount")
@@ -138,7 +137,7 @@ def compute_features(candidates: list[dict]) -> list[dict]:
 REGIMES = ("expansion", "neutral", "contraction")
 
 
-def market_regime(context: Optional[dict]) -> dict:
+def market_regime(context: dict | None) -> dict:
     """由情绪聚合判定市场阶段，供**分组报 IC** 与后续版本的权重调节使用。
 
     context 全部键可选（缺失即不参与判定）：
@@ -189,7 +188,7 @@ def context_from_evidence(evidence: dict) -> dict:
     strength = (ev.get("quantified") or {}).get("index_ma5_state")
 
     zt_total = market.get("zt_pool_count") or emotion.get("sealed_total")
-    zt_prev: Optional[int] = None
+    zt_prev: int | None = None
     days = cycle.get("days") or []
     if isinstance(days, list) and len(days) >= 2:
         prev = days[-2] if isinstance(days[-1], dict) else None

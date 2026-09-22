@@ -421,7 +421,7 @@ class MidtermDisciplineTest(unittest.TestCase):
 
     def test_in_pool_passes(self):
         r = check_midterm_discipline(
-            f"### 5.2 中线高潜池\n\n- 600003 链内丙｜A｜PE 30\n",
+            "### 5.2 中线高潜池\n\n- 600003 链内丙｜A｜PE 30\n",
             self._candidates([{"code": "600003", "name": "链内丙"}]))
         self.assertTrue(r["ok"], r)
         self.assertEqual(r["pool_hits"], ["600003", "链内丙"])   # 代码与名字都算命中

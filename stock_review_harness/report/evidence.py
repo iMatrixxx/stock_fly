@@ -13,8 +13,8 @@ from datetime import datetime
 
 from ..data.validate import validate_bundle
 from ..logic.chain_map import build_chain_map
-from ..logic.conditions import leader_ma_distances, quantify
 from ..logic.concentration import board_taxonomy_guard, build_capital_concentration
+from ..logic.conditions import leader_ma_distances, quantify
 from ..logic.cycle import build_cycle_context
 from ..logic.diagnostics import diagnose
 from ..logic.forecast import forecast_capital_migration

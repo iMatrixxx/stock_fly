@@ -29,6 +29,7 @@ if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 from stock_review_harness import runtime  # noqa: E402
+
 HITHINK_VENV = Path(runtime.HITHINK_VENV_PY)
 DEFAULT_VENV = Path(runtime.DEFAULT_VENV_PY)
 CHROME = Path(runtime.CHROME)

@@ -24,7 +24,8 @@
 
 from __future__ import annotations
 
-from typing import Any, Iterable, Optional
+from collections.abc import Iterable
+from typing import Any
 
 # ---------- 角色标签 ----------
 
@@ -74,7 +75,7 @@ FACT_KEYS = (
 )
 
 
-def to_number(v) -> Optional[float]:
+def to_number(v) -> float | None:
     """宽松数值归一：None/空串/bool → None（bool 混入数值会造成隐性 0/1 偏差）。
 
     **全仓唯一的数值归一口**（方向层也从这里 import）。各模块自写一份 `float(str(v))`

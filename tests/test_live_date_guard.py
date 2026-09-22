@@ -159,8 +159,8 @@ class PatchMarketFromTencentTest(unittest.TestCase):
     def _market_file(self, date_str: str) -> Path:
         p = self.tmp / f"market_{date_str}.json"
         p.write_text(
-            '{"date": "%s", "indices": [{"name": "深证成指", "close": 1.0}],'
-            ' "notes": []}' % date_str,
+            '{"date": "' + date_str + '", "indices": [{"name": "深证成指", "close": 1.0}],'
+            ' "notes": []}',
             encoding="utf-8",
         )
         return p

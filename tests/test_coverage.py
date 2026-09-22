@@ -226,7 +226,10 @@ _MULTI_BOARDS = ["半导体", "通信设备", "元件", "通用设备",
 def _bundle_with_boards(missing: list[str]):
     """只带板块行情的 DataBundle：其余字段保持默认，避免别的缺口干扰断言。"""
     from stock_review_harness.models import (
-        BoardQuote, DataBundle, LimitPoolData, MarketData,
+        BoardQuote,
+        DataBundle,
+        LimitPoolData,
+        MarketData,
     )
     boards = [BoardQuote(name=n, turnover=100.0, main_flow=None) for n in missing]
     return DataBundle(

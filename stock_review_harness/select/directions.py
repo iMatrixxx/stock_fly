@@ -29,7 +29,6 @@
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Optional
 
 from .scoring import load_weights, score_rows, weights_file
 from .universe import to_number
@@ -174,7 +173,7 @@ def score_directions(rows: list[dict], weights: dict | None = None) -> list[dict
 # ---------- 分级 ----------
 
 
-def grade_of(tier: Optional[str], score: Optional[float]) -> str:
+def grade_of(tier: str | None, score: float | None) -> str:
     """tier + score → 分级名。无分即"数据不足"，**不降级成"观察"**。
 
     把"没给分"写成"观察"是实质性误导：观察意味着"我们看过、只是不够强"，
@@ -185,7 +184,7 @@ def grade_of(tier: Optional[str], score: Optional[float]) -> str:
     return _TIER_TO_GRADE.get(str(tier), "数据不足")
 
 
-def stars_of(rank: Optional[int], total: int) -> int:
+def stars_of(rank: int | None, total: int) -> int:
     """名次分位 → 1..5 星（无分或空榜给 0）。"""
     if rank is None or total <= 0:
         return 0
@@ -199,7 +198,7 @@ def stars_of(rank: Optional[int], total: int) -> int:
 # ---------- 方向内龙头 ----------
 
 
-def board_of(row: dict) -> Optional[str]:
+def board_of(row: dict) -> str | None:
     """候选行 → 所属板块名（`facts.board` 优先，回退 `industry`）。"""
     f = row.get("facts") or {}
     return str(f.get("board") or row.get("industry") or "").strip() or None

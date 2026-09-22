@@ -48,7 +48,6 @@ from stock_review_harness.data.snapshots import load_snapshot, snapshot_dates  #
 from stock_review_harness.replay import offline_pool_document  # noqa: E402
 from stock_review_harness.select import load_weights  # noqa: E402
 from stock_review_harness.select.ledger import (  # noqa: E402
-    AT_KS,
     build_row,
     format_summary,
     label_codes,

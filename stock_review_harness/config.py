@@ -2,7 +2,6 @@
 配置模块：所有阈值常量与全局配置
 """
 
-from datetime import datetime, timedelta
 
 # ========== 日期配置 ==========
 # 默认分析日期（可覆盖）

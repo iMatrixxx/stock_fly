@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 """
 A 股情报系统 · 触发式新闻/公告增量采集（幂等去重）
 ==================================================
@@ -49,7 +48,8 @@ import os
 import re
 import sys
 import time
-from datetime import datetime, time as dtime, timedelta
+from datetime import datetime, timedelta
+from datetime import time as dtime
 from pathlib import Path
 from typing import Any
 from urllib.parse import urljoin
@@ -130,7 +130,7 @@ def gov_date_in(text: str) -> str:
 # 官方部委数据源抓取（csrc / miit / ndrc，归一化记录与 AkShare 源一致）
 # ---------------------------------------------------------------------------
 
-def fetch_csrc(state: "State") -> list[dict[str, Any]]:
+def fetch_csrc(state: State) -> list[dict[str, Any]]:
     """证监会要闻：首页要闻区块标题+链接；新条目逐个抓详情页 PubDate 补发布时间。
 
     说明: 要闻栏目列表由 JS 异步加载（searchList 接口经实测返回空），
@@ -173,7 +173,7 @@ def fetch_csrc(state: "State") -> list[dict[str, Any]]:
     return out
 
 
-def fetch_miit(_state: "State") -> list[dict[str, Any]]:
+def fetch_miit(_state: State) -> list[dict[str, Any]]:
     """工信部动态：首页 art 新闻条目（排除纯时政 szyw 栏目，保留部领导/工信动态/发布会等）。"""
     html = gov_get(MIIT_HOME)
     soup = BeautifulSoup(html, "html.parser")
@@ -200,7 +200,7 @@ def fetch_miit(_state: "State") -> list[dict[str, Any]]:
     return out
 
 
-def fetch_ndrc(_state: "State") -> list[dict[str, Any]]:
+def fetch_ndrc(_state: State) -> list[dict[str, Any]]:
     """发改委新闻发布：xwdt/xwfb 栏目静态列表（li 含标题+日期）。"""
     html = gov_get(NDRC_LIST)
     soup = BeautifulSoup(html, "html.parser")

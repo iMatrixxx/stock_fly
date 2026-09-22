@@ -55,8 +55,8 @@
 from __future__ import annotations
 
 import re
+from collections.abc import Iterable
 from pathlib import Path
-from typing import Iterable, Optional
 
 from .scoring import load_weights, score_rows, weights_file
 from .universe import to_number
@@ -300,7 +300,7 @@ def _apply_industry_relative(rows: list[dict],
         for i, v in enumerate(vals):
             if v is not None:
                 buckets.setdefault(inds[i], []).append(i)
-        local_pct: dict[int, Optional[float]] = {}
+        local_pct: dict[int, float | None] = {}
         for idxs in buckets.values():
             if len(idxs) < min_peers:
                 continue

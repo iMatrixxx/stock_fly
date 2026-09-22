@@ -31,7 +31,6 @@ import sys
 import tempfile
 import time
 from datetime import date as _date
-from datetime import datetime
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from pathlib import Path
@@ -40,15 +39,14 @@ ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
+from stock_review_harness import runtime  # noqa: E402
 from stock_review_harness.artifact_paths import (  # noqa: E402
     evidence_path,
     prompt_path,
     report_md_path,
 )
 from stock_review_harness.data.net import post_json  # noqa: E402
-from stock_review_harness.report.prompt import build_prompt  # noqa: E402
 from stock_review_harness.trading_calendar import load_calendar  # noqa: E402
-from stock_review_harness import runtime  # noqa: E402
 
 DEFAULT_SKILL_DIR = Path("/Users/imatrix/.codex/skills/review-a-share-market")
 DEFAULT_TEMPLATE = ROOT / "assets" / "llm_report_prompt.md"
@@ -426,7 +424,7 @@ def main(argv=None) -> None:
     workdir.mkdir(parents=True, exist_ok=True)
 
     # 1) 大盘快照（fetch_market_snapshot.py，fuyao API；替代原大班客）
-    with tempfile.TemporaryDirectory(prefix="daily_review_") as td:
+    with tempfile.TemporaryDirectory(prefix="daily_review_"):
         try:
             date_str, limit_pool = fetch_snapshot_limit_pool(
                 date_str, outdir=workdir / "hithink_out")

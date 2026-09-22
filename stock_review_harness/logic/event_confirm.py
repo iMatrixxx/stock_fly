@@ -48,7 +48,7 @@ import json
 import re
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Optional
+from typing import Any
 
 from ..artifact_paths import REPO_ROOT
 
@@ -117,7 +117,7 @@ def max_overrides(rules: dict) -> int:
 
 # ---------- 单条筛选 ----------
 
-def _company_only_veto(cand: dict) -> Optional[str]:
+def _company_only_veto(cand: dict) -> str | None:
     """『关键词只出现在公司名里』判定 → 命中返回被遮蔽的关键词（逗号连接）。
 
     公司名与事件词同形（`电投产融` 含 `投产`）是**结构性**问题，任何词表都拦不住：

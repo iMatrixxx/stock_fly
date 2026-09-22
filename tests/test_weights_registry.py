@@ -16,7 +16,8 @@ ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
-from stock_review_harness.select import ledger, registry as reg, scoring  # noqa: E402
+from stock_review_harness.select import ledger, scoring  # noqa: E402
+from stock_review_harness.select import registry as reg
 from tools import weights_status as ws  # noqa: E402
 
 SELECT_DIR = ROOT / "stock_review_harness" / "select"

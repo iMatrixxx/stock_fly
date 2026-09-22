@@ -12,13 +12,12 @@ from __future__ import annotations
 
 import json
 from pathlib import Path
-from typing import Optional
 
 from ..models import (
     BoardQuote,
-    LimitPoolData,
     IndexQuote,
     LeaderQuote,
+    LimitPoolData,
     MarketData,
     PremiumQuote,
 )
@@ -100,7 +99,7 @@ def _to_premium(q: dict) -> PremiumQuote:
     )
 
 
-def load_market_json(path: Optional[str | Path]) -> Optional[MarketData]:
+def load_market_json(path: str | Path | None) -> MarketData | None:
     """加载行情补充 JSON；未提供时返回 None（分析层按全缺失处理）。"""
     if not path:
         return None

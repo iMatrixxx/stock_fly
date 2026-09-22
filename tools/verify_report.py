@@ -140,7 +140,7 @@ def main(argv=None) -> None:
     print(format_gate_report(bundle))
     if scope_note:
         print(f"  · {scope_note}")
-    print(("放行 ✅" if bundle["ok"] else "未通过 ⛔（阻断项见上）"))
+    print("放行 ✅" if bundle["ok"] else "未通过 ⛔（阻断项见上）")
 
 
 if __name__ == "__main__":

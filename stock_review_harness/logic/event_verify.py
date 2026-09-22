@@ -49,7 +49,6 @@ from __future__ import annotations
 import json
 import re
 from pathlib import Path
-from typing import Optional
 
 from ..artifact_paths import REPO_ROOT
 from ..data import futures as _futures
@@ -575,7 +574,7 @@ def build_event_verification(
     cmap: dict | None = None,
     futures_mod=_futures,
     resolver=None,
-) -> Optional[dict]:
+) -> dict | None:
     """便捷入口：从磁盘读事件流（events 未给出时）并完成验证。
 
     事件流缺失返回 None（与 industry_intel 一致：诚实标注"无事件流"，不产空节）。

@@ -168,7 +168,7 @@ def resolve_metric(evidence: dict, subject: str):
                 if names is None:
                     return None, False, f"次日 industry_zt_groups 无『{name}』"
                 return float(len(names)), True, ""
-            return None, False, f"industry 字段仅支持 count|names"
+            return None, False, "industry 字段仅支持 count|names"
         return None, False, f"未知查询类型 {kind}"
 
     # 点路径：逐段下沉取数

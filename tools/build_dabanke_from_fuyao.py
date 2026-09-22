@@ -54,8 +54,6 @@ def build_limit_pool_json(date: str, pools: dict) -> dict:
     up = (pools.get("up") or {}).get("item") or []
     zb = (pools.get("break") or {}).get("item") or []
     prev_up = (pools.get("up_prev") or {}).get("item") or []
-    ladder0 = (pools.get("ladder") or {}).get("item") or []
-    ladder_today = ladder0[0] if ladder0 else {}
 
     sealed = len(up)
     blast = len(zb)
@@ -75,7 +73,6 @@ def build_limit_pool_json(date: str, pools: dict) -> dict:
 
     # 晋级率 levels：今日 X+1 板数 / 昨日 X 板数（需 up_prev）
     levels: list[dict] = []
-    today_zt_tickers = {_ticker(x.get("thscode")) for x in up}
     if prev_up:
         max_prev = max(prev_cnt) if prev_cnt else 0
         for x in range(1, max_prev + 1):

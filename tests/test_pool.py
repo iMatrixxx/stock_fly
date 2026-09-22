@@ -364,7 +364,7 @@ class PickCandidatesIOTest(unittest.TestCase):
         self.assertEqual(prompt.count(POOL_SECTION_TITLE), 1)
 
     def test_injection_is_replacement_not_append(self):
-        from tools.pick_candidates import append_pool_to_prompt, run_for_date
+        from tools.pick_candidates import run_for_date
         run_for_date("2026-09-11", TMP, quiet=True, midterm=False)
         prompt_file = TMP / "outputs" / "2026-09-11" / "prompt.md"
         old = prompt_file.read_text(encoding="utf-8")

@@ -27,7 +27,6 @@ evidence.json 里，在候选池里重复一遍只会把文件撑大。故分层
 from __future__ import annotations
 
 from datetime import datetime
-from typing import Optional
 
 from .directions import (
     DEFAULT_LEADER_N,
@@ -37,7 +36,8 @@ from .directions import (
     stars_of,
 )
 from .features import FEATURE_GROUPS
-from .midterm import MIDTERM_GROUPS, REPORT_SECTION_TITLE as MIDTERM_REPORT_SECTION
+from .midterm import MIDTERM_GROUPS
+from .midterm import REPORT_SECTION_TITLE as MIDTERM_REPORT_SECTION
 
 # prompt 注入节的标题（幂等替换的锚点，改动必须同步 tools/pick_candidates.py 的注释）
 POOL_SECTION_TITLE = "## 选股候选池（机器打分，判断层输入）"
@@ -132,7 +132,7 @@ def build_direction_document(
     pool_rows: list[dict],
     weights: dict,
     leader_n: int = DEFAULT_LEADER_N,
-    generated_at: Optional[str] = None,
+    generated_at: str | None = None,
 ) -> dict:
     """打分后的方向表 + 个股候选 → `candidates.json` 的 `directions` 段（纯函数）。
 
@@ -228,10 +228,10 @@ def build_midterm_document(
     date_str: str,
     rows: list[dict],
     weights: dict,
-    universe_meta: Optional[dict] = None,
+    universe_meta: dict | None = None,
     top_k: int = DEFAULT_MIDTERM_TOP_K,
     chain_top_n: int = DEFAULT_MIDTERM_CHAIN_TOP_N,
-    generated_at: Optional[str] = None,
+    generated_at: str | None = None,
 ) -> dict:
     """打分后的中线表 → `candidates.json` 的 `midterm` 段（纯函数）。
 
@@ -317,11 +317,11 @@ def build_pool_document(
     date_str: str,
     rows: list[dict],
     weights: dict,
-    regime: Optional[dict] = None,
+    regime: dict | None = None,
     top_k: int = DEFAULT_TOP_K,
-    generated_at: Optional[str] = None,
-    directions: Optional[dict] = None,
-    midterm: Optional[dict] = None,
+    generated_at: str | None = None,
+    directions: dict | None = None,
+    midterm: dict | None = None,
 ) -> dict:
     """打分后的候选表 → `candidates.json` 文档（纯函数）。
 
@@ -397,7 +397,7 @@ def _fmt(v, nd: int = 2) -> str:
     return str(v)
 
 
-def _fmt_seal_time(minutes: Optional[float]) -> str:
+def _fmt_seal_time(minutes: float | None) -> str:
     """首封特征的分钟数 → 时钟时间（报告里写"首封 09:25"而不是"-5 分钟"）。
 
     这个特征是派生量（距 09:30 的分钟数），对交易员没有意义；还原成时间才可读，

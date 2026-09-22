@@ -39,7 +39,6 @@ from __future__ import annotations
 
 import logging
 from datetime import date, datetime
-from typing import Optional
 
 from . import futures
 from .net import fetch_many
@@ -60,7 +59,7 @@ _ITEMS: list[tuple[str, str, str]] = [
 ]
 
 
-def _fetch_one(args: tuple[str, str, str], target: date) -> Optional[dict]:
+def _fetch_one(args: tuple[str, str, str], target: date) -> dict | None:
     """拉单个品种全量日K，取 target 行（缺失回退最近行）并算 chg。"""
     symbol, name, group = args
     rows = futures.kline(symbol, end_date=target.isoformat())
@@ -87,7 +86,7 @@ def _fetch_one(args: tuple[str, str, str], target: date) -> Optional[dict]:
     }
 
 
-def fetch_macro_snapshot(date_str: str) -> Optional[dict]:
+def fetch_macro_snapshot(date_str: str) -> dict | None:
     """抓取指定交易日国内商品期货主连日K快照；失败返回 None（不抛异常）。"""
     try:
         target = date.fromisoformat(date_str)

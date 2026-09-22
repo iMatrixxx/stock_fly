@@ -23,7 +23,6 @@ from __future__ import annotations
 
 import json
 import logging
-from typing import Optional
 from urllib.parse import urlencode
 
 from .net import fetch_text
@@ -82,7 +81,7 @@ def _fetch_type(date_str: str, mutual_type: str) -> list[dict]:
     return sorted(rows, key=lambda x: x["rank"])[:10]
 
 
-def fetch_top10_deal(date_str: str) -> Optional[dict]:
+def fetch_top10_deal(date_str: str) -> dict | None:
     """抓取指定交易日的沪深股通前十大成交活跃股；失败返回 None（不抛异常）。"""
     try:
         sh = _fetch_type(date_str, _TYPE_SH)

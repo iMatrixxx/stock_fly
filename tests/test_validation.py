@@ -10,8 +10,8 @@ from stock_review_harness.logic.diagnostics import diagnose
 from stock_review_harness.models import (
     BoardQuote,
     DataBundle,
-    LimitPoolData,
     LeaderQuote,
+    LimitPoolData,
     MarketData,
 )
 

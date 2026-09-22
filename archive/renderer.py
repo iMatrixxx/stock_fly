@@ -90,7 +90,6 @@ def _render_anchors(a) -> str:
     sent = a.sentiment_leader
     if sent:
         earliest = a.earliest_sealer
-        seal_info = sent.get("first_seal_time") or ""
         src = sent.get("source", "")
         follower_note = (
             f"带动同题材跟风 {len(a.followers)} 只（{', '.join(s['name'] for s in a.followers[:3])}{'…' if len(a.followers) > 3 else ''}）"

@@ -17,7 +17,6 @@ from pathlib import Path
 from stock_review_harness.select import (
     FEATURE_GROUPS,
     build_universe,
-    compute_features,
     compute_row_features,
     context_from_evidence,
     feature_flat,
@@ -419,7 +418,6 @@ class WeightsTest(unittest.TestCase):
 
     def test_unknown_feature_rejected(self):
         """权重表与 FEATURE_GROUPS 不同步时必须报错，不能静默忽略。"""
-        import tempfile
         w = json.loads(WEIGHTS_V0.read_text(encoding="utf-8"))
         w["features"]["made_up_feature"] = {"sign": 1, "weight": 1}
         tmp = REPO / "tests" / "_tmp_weights_bad.json"

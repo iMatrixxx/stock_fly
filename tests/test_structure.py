@@ -7,8 +7,8 @@ import unittest
 from stock_review_harness.models import (
     BoardQuote,
     DataBundle,
-    LimitPoolData,
     IndexQuote,
+    LimitPoolData,
     MarketData,
 )
 from stock_review_harness.report.evidence import (

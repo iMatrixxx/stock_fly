@@ -61,10 +61,7 @@ A 股代码口径（沪深京三市，唯一真源）：沪主 `60` / 科创 `68
 
 from __future__ import annotations
 
-import json
-from datetime import date as _date
 from datetime import datetime
-from typing import Optional
 
 from .. import config as C
 from .cache import cache_get_json, cache_put_json
@@ -83,7 +80,7 @@ MARKETS = {"hs": FS_HS, "bj": FS_BJ}
 A_PREFIXES = ("60", "00", "30", "68", "92")
 
 
-def is_a_share(code: Optional[str]) -> bool:
+def is_a_share(code: str | None) -> bool:
     """6 位代码且前缀属 A 股（沪主/科创/深主/创业/北交所）。"""
     return bool(code) and len(code) == 6 and code[:2] in A_PREFIXES
 
@@ -151,7 +148,7 @@ MIN_EXPECTED_STOCKS = 1000
 
 # ---------- 归一 ----------
 
-def _num(v) -> Optional[float]:
+def _num(v) -> float | None:
     """宽松数值归一；`-` / `--` / 空串 / bool → None（与 `select.universe.to_number` 同源语义）。"""
     if v is None or isinstance(v, bool):
         return None
@@ -166,7 +163,7 @@ def _num(v) -> Optional[float]:
         return None
 
 
-def _positive(v) -> Optional[float]:
+def _positive(v) -> float | None:
     """只保留 > 0 的比值（PE/PB）；≤0 视为不可比 → None。
 
     语义说明：负 PE 不是"很便宜"而是"净利润为负、比值无意义"；PB≤0 同理（净资产为负）。
@@ -176,14 +173,14 @@ def _positive(v) -> Optional[float]:
     return x if (x is not None and x > 0) else None
 
 
-def _text(v) -> Optional[str]:
+def _text(v) -> str | None:
     if v is None:
         return None
     s = str(v).strip()
     return s or None
 
 
-def _iso_date(v) -> Optional[str]:
+def _iso_date(v) -> str | None:
     """`20010827` / `2026-09-16 00:00:00` → `2001-08-27` / `2026-09-16`。"""
     if v is None:
         return None

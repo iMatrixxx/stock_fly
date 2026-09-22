@@ -56,16 +56,6 @@ ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
-from tools.daily_review import (  # noqa: E402
-    DEFAULT_MAIL_TO,
-    DEFAULT_SKILL_DIR,
-    SNAPSHOT_PY,
-    _load_env_file,
-    append_news_brief_to_prompt,
-    fetch_news_incremental,
-    fetch_snapshot_limit_pool,
-    write_report_with_llm,
-)
 from stock_review_harness import runtime  # noqa: E402
 from stock_review_harness.artifact_paths import (  # noqa: E402
     candidates_path,
@@ -83,6 +73,16 @@ from stock_review_harness.report.checklist import (  # noqa: E402
 from stock_review_harness.trading_calendar import (  # noqa: E402
     calendar_freshness,
     load_calendar,
+)
+from tools.daily_review import (  # noqa: E402
+    DEFAULT_MAIL_TO,
+    DEFAULT_SKILL_DIR,
+    SNAPSHOT_PY,
+    _load_env_file,
+    append_news_brief_to_prompt,
+    fetch_news_incremental,
+    fetch_snapshot_limit_pool,
+    write_report_with_llm,
 )
 from tools.md2html import md_to_html  # noqa: E402
 
@@ -378,8 +378,8 @@ def run_verify_gate(
     # 不并入就会被数字核对判成"证据链外数字"（见 forecast_cards.verification_number_view）
     extra_sources = []
     try:
-        from tools.forecast_card import load_verification_rows
         from stock_review_harness.report.forecast_cards import verification_number_view
+        from tools.forecast_card import load_verification_rows
         rows = load_verification_rows(date_str, ROOT)
         if rows:
             extra_sources.append(verification_number_view(rows))
@@ -519,10 +519,14 @@ def run_confirm_step(date_str: str, skip: bool = False) -> bool:
               flush=True)
         return False
     try:
-        from tools.confirm_events import (
-            build_packet_for, candidate_path, events_path, read_jsonl, write_packet,
-        )
         from stock_review_harness import artifact_paths as AP
+        from tools.confirm_events import (
+            build_packet_for,
+            candidate_path,
+            events_path,
+            read_jsonl,
+            write_packet,
+        )
 
         cands = read_jsonl(candidate_path(date_str))
         if not cands:
@@ -604,10 +608,10 @@ def run_events_db_step(date_str: str, skip: bool = False) -> bool:
         print("[INFO] --no-events-db：跳过事件验证建库（1.1 将标注无验证数据）", flush=True)
         return False
     try:
-        from stock_review_harness.data import cninfo
-        from stock_review_harness.logic import event_verify as EV
-        from stock_review_harness.data import events_db
         from datetime import timedelta
+
+        from stock_review_harness.data import cninfo, events_db
+        from stock_review_harness.logic import event_verify as EV
 
         d0 = _date.fromisoformat(date_str)
         start = (d0 - timedelta(days=EV.ORDER_WINDOW_DAYS)).isoformat()
@@ -748,7 +752,8 @@ def main(argv=None) -> None:
         pool_doc = None
         if not args.skip_candidates:
             try:
-                from tools.pick_candidates import PoolUnavailable, run_for_date as pick_pool
+                from tools.pick_candidates import PoolUnavailable
+                from tools.pick_candidates import run_for_date as pick_pool
                 pool_doc = pick_pool(date_str, ROOT, inject_prompt=False,
                                      midterm=not args.no_midterm)
                 _mid = pool_doc.get("midterm")

@@ -280,7 +280,7 @@ class OutlineContractTest(unittest.TestCase):
 
     def test_midterm_anchors_do_not_collide_with_pool(self):
         """5.1「次日高潜池」与 5.2「中线高潜池」共享"高潜池"——锚点必须互不命中。"""
-        from stock_review_harness.report.outline import _locate, _norm, _headings
+        from stock_review_harness.report.outline import _headings, _locate, _norm
         pool = next(s for s in REPORT_OUTLINE if s.no == "5.1")
         mid = next(s for s in REPORT_OUTLINE if s.no == "5.2")
         self.assertFalse(any(_norm(a) in _norm(pool.title) for a in mid.anchors))
@@ -305,7 +305,7 @@ class OutlineContractTest(unittest.TestCase):
 
     def test_concentration_anchors_do_not_collide(self):
         """3.4「题材集中度」与 3.5「资金集中度」共享"集中度"——锚点必须互不命中。"""
-        from stock_review_harness.report.outline import _locate, _norm
+        from stock_review_harness.report.outline import _norm
         topic = next(s for s in REPORT_OUTLINE if s.title == "题材集中度")
         money = next(s for s in REPORT_OUTLINE if s.title == "资金集中度")
         self.assertFalse(any(_norm(a) in _norm(topic.title) for a in money.anchors))

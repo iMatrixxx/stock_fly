@@ -38,15 +38,6 @@
 
 from __future__ import annotations
 
-from .features import (
-    FEATURE_GROUPS,
-    FEATURE_LABELS,
-    compute_features,
-    compute_row_features,
-    context_from_evidence,
-    first_seal_minutes,
-    market_regime,
-)
 from .directions import (
     DEFAULT_DIRECTION_WEIGHTS,
     DIRECTION_GROUPS,
@@ -60,6 +51,15 @@ from .directions import (
     load_direction_weights,
     score_directions,
     stars_of,
+)
+from .features import (
+    FEATURE_GROUPS,
+    FEATURE_LABELS,
+    compute_features,
+    compute_row_features,
+    context_from_evidence,
+    first_seal_minutes,
+    market_regime,
 )
 from .ledger import (
     AT_KS,

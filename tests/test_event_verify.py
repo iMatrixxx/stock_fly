@@ -22,7 +22,6 @@ from stock_review_harness.data import events_db as EDB
 from stock_review_harness.data import futures as F
 from stock_review_harness.logic import event_verify as EV
 
-
 # --------------------------------------------------------------------------- 工具
 
 def _rows(pairs: list[tuple[str, float, float]]) -> list[dict]:

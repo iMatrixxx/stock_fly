@@ -41,7 +41,6 @@ from __future__ import annotations
 
 import json
 from pathlib import Path
-from typing import Optional
 
 from .features import FEATURE_GROUPS
 
@@ -121,13 +120,13 @@ def load_weights(
     return w
 
 
-def rank_normalize(values: list[Optional[float]]) -> list[Optional[float]]:
+def rank_normalize(values: list[float | None]) -> list[float | None]:
     """横截面百分位标准化 → 0..1（None 原地透出）。
 
     同值取平均秩；只有一个有效值时不臆造区分度，统一给 0.5。
     """
     idx = [i for i, v in enumerate(values) if v is not None]
-    out: list[Optional[float]] = [None] * len(values)
+    out: list[float | None] = [None] * len(values)
     n = len(idx)
     if n == 0:
         return out
@@ -148,7 +147,7 @@ def rank_normalize(values: list[Optional[float]]) -> list[Optional[float]]:
     return out
 
 
-def _group_score(zs: dict[str, Optional[float]], feats: list[str], fw: dict) -> Optional[float]:
+def _group_score(zs: dict[str, float | None], feats: list[str], fw: dict) -> float | None:
     """组内按特征权重求均值，只计可用特征；全不可用返回 None。"""
     num = 0.0
     den = 0.0
@@ -194,7 +193,7 @@ def score_rows(
     cuts: dict = weights["tier_cuts"]
 
     # 1) 每个特征独立做横截面标准化，再按 sign 翻成"得分向"
-    z_columns: dict[str, list[Optional[float]]] = {}
+    z_columns: dict[str, list[float | None]] = {}
     for feats in feature_groups.values():
         for f in feats:
             col = rank_normalize([(row.get("features") or {}).get(f) for row in rows])
@@ -211,7 +210,7 @@ def score_rows(
     for i, row in enumerate(rows):
         zs = {f: z_columns[f][i] for f in z_columns}
         row["feature_z"] = zs
-        parts: dict[str, Optional[float]] = {}
+        parts: dict[str, float | None] = {}
         for g, feats in feature_groups.items():
             parts[g] = _group_score(zs, feats, fw)
         row["score_parts"] = parts

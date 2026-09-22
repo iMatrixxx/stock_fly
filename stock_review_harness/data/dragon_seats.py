@@ -39,7 +39,6 @@ from __future__ import annotations
 import json
 import logging
 from concurrent.futures import ThreadPoolExecutor
-from typing import Optional
 from urllib.parse import urlencode
 
 from .net import fetch_text
@@ -137,7 +136,7 @@ def _top_seat(seats: list[dict]) -> dict | None:
     return {"name": best["name"], "net_yi": best["net_yi"], "kind": best["kind"]}
 
 
-def fetch_dragon_seats(date_str: str, top_n: int = 12) -> Optional[dict]:
+def fetch_dragon_seats(date_str: str, top_n: int = 12) -> dict | None:
     """抓指定交易日龙虎榜净买前 top_n 的买卖前五席位结构；失败返回 None。"""
     global _DATE_CACHE  # noqa: PLW0603 —— 模块级缓存仅作并发 filter 一致
     try:

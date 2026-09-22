@@ -3,11 +3,11 @@
 from __future__ import annotations
 
 import json
-import time
 import threading
+import time
 import urllib.request
+from collections.abc import Callable, Iterable
 from concurrent.futures import ThreadPoolExecutor, wait
-from typing import Callable, Iterable
 
 from .cache import cache_get_text, cache_put_text
 

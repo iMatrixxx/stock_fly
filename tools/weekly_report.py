@@ -237,7 +237,11 @@ def render(data: dict) -> str:
     L.append("## 三、权重治理")
     L.append("")
     wl = data["weights"]["ledger"]
-    L.append(f"- 生效权重：{', '.join(f'{p}=`{m.get('active')}`' for p, m in data['weights']['pools'].items())}")
+    # 注意：内层 f-string 的定界符必须用双引号（外层表达式用单引号）。
+    # pre-3.12 不允许在 f-string 内重用外层引号（PEP 701 才放开），
+    # 写成 f'{p}={m.get('active')}' 会在 3.10/3.11 直接 SyntaxError。
+    pools_txt = ", ".join(f"{p}=`{m.get('active')}`" for p, m in data["weights"]["pools"].items())
+    L.append(f"- 生效权重：{pools_txt}")
     L.append(
         f"- live 干净样本 {wl['clean_live_days']} / 门槛 {data['weights']['policy']['min_clean_days_for_v2']} 天；"
         f"能否动权重：{'可以' if wl['ready_for_weights_v2'] else '不可以'}"

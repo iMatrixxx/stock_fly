@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 """④ 事件验证库 · 公开源落盘（订单验证的数据底座）
 ==================================================
 
@@ -23,15 +22,17 @@ from __future__ import annotations
 
 import argparse
 import sys
-from pathlib import Path
 from datetime import date, timedelta
+from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from stock_review_harness.artifact_paths import REPO_ROOT  # noqa: E402
-from stock_review_harness.data import cninfo  # noqa: E402
-from stock_review_harness.data import events_db  # noqa: E402
-from stock_review_harness.data import futures  # noqa: E402
+from stock_review_harness.data import (
+    cninfo,  # noqa: E402
+    events_db,  # noqa: E402
+    futures,  # noqa: E402
+)
 from stock_review_harness.data.industry_intel import load_events  # noqa: E402
 from stock_review_harness.logic import event_verify as EV  # noqa: E402
 

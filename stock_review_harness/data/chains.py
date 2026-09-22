@@ -15,9 +15,9 @@
 from __future__ import annotations
 
 import json
+from collections.abc import Iterable
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Iterable, Optional
 
 from ..artifact_paths import REPO_ROOT
 
@@ -179,7 +179,7 @@ def enumerate_nodes(chains: list[dict]) -> list[dict]:
     return out
 
 
-def purity_of(code: str, idx: Optional[ChainIndex] = None) -> Optional[str]:
+def purity_of(code: str, idx: ChainIndex | None = None) -> str | None:
     """个股纯度（core/swing/edge）；未映射返回 None。"""
     use = idx or load_chain_index()
     rec = use.by_code.get(str(code))

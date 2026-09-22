@@ -5,7 +5,6 @@
 
 from __future__ import annotations
 
-import json
 import unittest
 
 from stock_review_harness.report.forecast_cards import (

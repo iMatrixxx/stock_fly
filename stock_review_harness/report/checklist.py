@@ -19,7 +19,7 @@
 from __future__ import annotations
 
 import re
-from typing import Iterable
+from collections.abc import Iterable
 
 from .outline import STRUCTURE_FROM, check_structure  # noqa: F401  (对外转出，供工具层引用)
 

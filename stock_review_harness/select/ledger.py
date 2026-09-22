@@ -28,7 +28,6 @@ from __future__ import annotations
 
 from collections import Counter
 from datetime import datetime
-from typing import Optional
 
 from ..stats import DEFAULT_MIN_IC_DAYS, describe_ic, mean, spearman, t_stat
 from .features import FEATURE_GROUPS
@@ -51,7 +50,7 @@ TIER_ORDER = ("A", "B", "C")
 # ---------------------------------------------------------------------------
 
 
-def label_codes(snapshot: Optional[dict]) -> set[str]:
+def label_codes(snapshot: dict | None) -> set[str]:
     """判卷标签源：某日快照的涨停代码集合。
 
     传 None 或空快照 → 空集合（调用方据此跳过，不要退化成"全都不是涨停"）。
@@ -60,7 +59,7 @@ def label_codes(snapshot: Optional[dict]) -> set[str]:
     return {str(r.get("code")) for r in (snap.get("zt_pool") or []) if r.get("code")}
 
 
-def rows_from_document(doc: Optional[dict]) -> list[dict]:
+def rows_from_document(doc: dict | None) -> list[dict]:
     """`candidates.json` → 判卷用的候选行（取 `pool` 全量，**含无分票**）。
 
     取 `pool` 而不是 `top`：分层命中率要 A/B/C 三层全量，@K 要名次序，
@@ -168,8 +167,8 @@ def build_row(
     label_date: str,
     gap: int,
     source: str = "live",
-    label_source: Optional[str] = None,
-    scored_at: Optional[str] = None,
+    label_source: str | None = None,
+    scored_at: str | None = None,
     ks: tuple[int, ...] = AT_KS,
 ) -> dict:
     """候选池文档 + 次日标签 → 一行判卷账（纯函数）。
