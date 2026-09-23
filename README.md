@@ -90,7 +90,7 @@ build_dabanke_from_  │       models.py（统一数据模型）       outputs/<
 | 确定性分析 | `logic/event_verify.py` | **④ 事件外部验证层**：把 `events/<date>.jsonl` 的事件分别对**期货价（价格类）**与**巨潮公告（订单/扩产类）**做独立源交叉核对，出**四态结论** `confirmed/not_confirmed/ambiguous/no_data`（`no_data`≠`not_confirmed`）；`match_commodities` 用**最长优先 + 区间遮蔽**防子串双配（"铝价"不得在"氧化铝价"里再命中）；`strength` 分 direct/upstream/weak（只证上游成本侧，不得替环节产品涨价背书） |
 | 输出组装 | `report/evidence.py` | 证据链 JSON 组装（含 data_gaps/anomalies/diagnostics/quantified；`board_pools` 板块内领涨标的池——涨停股按行业归组落到个股，供报告写板块必落标的；题材浓度 ratio_pct+mainline(≥20%)；`dragon_seats` 龙虎榜席位结构；`macro` 当日宏观快照——国内商品期货主连涨跌，供"当日宏观催化"小节对照板块切换有无期货端印证；**v2 新增 `capital_concentration` 资金集中度 + `chain_map` 产业链当日映射 + `event_verification` 事件外部验证**（纯透传 `bundle.market.event_verification`，不在组装期联网），供养第 3.5 / 1.1 / 1.2 段） |
 | 输出组装 | `report/prompt.py` | LLM prompt 模板（数字纪律 / 独立判断要求） |
-| 输出组装 | `report/checklist.py` | 报告核对：`verify_report_numbers` 数字比对（防编造）+ `check_coverage` 覆盖检查（防漏写，含**事件验证纪律**——说了 confirmed/价格上行却引不到证据、`no_data` 不声明来源、验证结果整段不引用，均告警）+ **选股层纪律**（`check_pool_discipline` 短线池 / `check_midterm_discipline` 中线池，**分账核对、两池互不包含**）；`verify_bundle` 把四路合成放行判定（⑧ 门禁用） |
+| 输出组装 | `report/checklist.py` | 报告核对：`verify_report_numbers` 数字比对（防编造）+ `check_coverage` 覆盖检查（防漏写，含**事件验证纪律**——说了 confirmed/价格上行却引不到证据、`no_data` 不声明来源、验证结果整段不引用，均告警）+ **选股层纪律**（`check_pool_discipline` 短线池 / `check_midterm_discipline` 中线池，**分账核对、两池互不包含**）；`verify_bundle` 把五路合成放行判定（⑧ 门禁用） |
 | 输出组装 | `report/outline.py` | **报告结构契约**：`REPORT_OUTLINE` **v3** 大纲（0~10 共 **11 段 / 30 小节**，唯一真源）+ `check_structure`（缺节/乱序阻断，层级/🔑 只告警）；`STRUCTURE_FROM` 为生效日。v2 灵魂是"顺序即因果"（产业情报前置，资金/情绪退居验证位）；v3 = v2 + 一处——`### 5.2 中线高潜池`（与 5.1 并列、**分数不可比**） |
 | 输出组装 | `report/forecast_cards.py` | M2 次日预测卡：subject 白名单解析、judge 纯代码判卷、报告内预测卡区块提取、候选清单 |
 | 选股（判断层） | `select/universe.py` | 八源合并去重 → 候选表（`roles` 角色标签 + `facts` 客观事实 + `sources` 来源回溯），单位统一，缺失保持 None |
@@ -119,7 +119,7 @@ build_dabanke_from_  │       models.py（统一数据模型）       outputs/<
 | `confirm_events.py` | **④.55 事件二次确认**（裁定归属 = 写报告的 LLM）：`packet`（预筛 + 出裁定包 `outputs/<date>/confirm_packet.md/.json`）/ `apply`（读裁定书 → **fail-closed 校验** → 打勾回候选池 → `promote` 提升为 `events/<date>.jsonl`；`--dry-run` 只校验）/ `status`（候选池·裁定书·事件流三态 + 按确认归属计数）。**幂等**：可重复执行，候选池每天重建后按裁定书重新打勾 |
 | `fetch_events_db.py` | **④.6 事件库构建**：`--date`（默认前一交易日）抓取**巨潮公告台账**落盘 `hithink_out/raw/cninfo/<date>.jsonl`（**不可重建，必须存**）并预热期货日K缓存；`--no-ledger`/`--no-futures`/`--dry-run` 可选。**公开源、先定源后建库**，源决策见 `assets/data_source_decision_d.md` |
 | `md2html.py` | Markdown → 自包含 HTML（⑨ PDF 前置） |
-| `verify_report.py` | ⑧ 报告核对：数字比对（证据外可疑数字）+ 覆盖检查（该覆盖未覆盖清单）+ 报告结构契约 + 选股层纪律，`--no-coverage` 只跑数字、`--no-structure` 跳过结构、`--structure-from` 覆盖生效日。**已接入 `daily_review_pdf` 门禁——不通过不渲染 PDF** |
+| `verify_report.py` | ⑧ 报告核对（五路）：数字比对（证据外可疑数字）+ 覆盖检查（该覆盖未覆盖清单）+ 报告结构契约 + 短线池纪律 + 中线池纪律（两池**分账**），`--no-coverage` 只跑数字、`--no-structure` 跳过结构、`--structure-from` 覆盖生效日。**已接入 `daily_review_pdf` 门禁——不通过不渲染 PDF** |
 | `forecast_card.py` | M2 生成侧：把报告第 8 段 `## 8. 次日预测卡（JSON）` fenced json 冻结为 `outputs/<date>/forecast.json`；`hint` 子命令打印当日候选；`append_forecast_verification_to_prompt` 把 T-1 判卷结果注入 prompt（报告第 9 段的数据源） |
 | `score_predictions.py` | M2 判卷侧：**补判**所有未计分预测卡（hit/miss/na，带 gap 标记），追加 `outputs/scorecard.jsonl`（幂等）；`summary` 子命令出命中率汇总 |
 | `refresh_trading_calendar.py` | 交易日历：从 fuyao 官方日历拉全量交易日 → `data_cache/trading_calendar.json`（需 hithink venv；供默认复盘日与判卷判定） |
@@ -148,8 +148,8 @@ build_dabanke_from_  │       models.py（统一数据模型）       outputs/<
                                     能生效的时点；--no-confirm）
         │
         ├─▶ ⑦.6 候选池判卷 ─▶ ⑧ verify_report 门禁 ─▶ ⑨ md2html + Chrome headless ─▶ ⑩ SMTP 邮件
-        │   （补判历史候选池 →   （四路校验：数字比对 + 覆盖检查 +        （Markdown → HTML → PDF）    （PDF 附件 + Markdown
-        │    candidate_scorecard  选股层纪律 + 报告结构；**不过即中止**：                                  原文，--no-email 跳过）
+        │   （补判历史候选池 →   （五路校验：数字比对 + 覆盖检查 +        （Markdown → HTML → PDF）    （PDF 附件 + Markdown
+        │    candidate_scorecard  选股层两池 + 报告结构；**不过即中止**：                                  原文，--no-email 跳过）
         │    .jsonl，独立账本）   不渲染 PDF、不发邮件）
 ```
 
@@ -170,7 +170,7 @@ build_dabanke_from_  │       models.py（统一数据模型）       outputs/<
 | ⑦ | 报告撰写 | LLM / 人 | `outputs/<date>/复盘报告.md`；**按 v3 契约撰写（0~10 共 11 段）**（`report/outline.py`，缺节/乱序会被 ⑧ 拦下；因果链为 产业情报→供需推演→A股映射→资金验证→情绪验证→个股→计划），含 `5.1 次日高潜池`（**池内取舍，池外须标 `池外补充`**）与 `5.2 中线高潜池`（**标题字面均不可改**——门禁按标题定位小节，改词会让对应纪律检查静默失效）；无既有 md 时需配置 `LLM_API_URL/MODEL/KEY` 自动生成。**写报告前先做前置作业：读裁定包 → 逐条裁定 → `confirm_events.py apply`**（见 ④.55 与 §12.1） |
 | ⑦.5 | M2 预测卡冻结 + 判卷 | 全链自动 | **补判**所有未计分卡片 → `outputs/scorecard.jsonl`（隔日补判的行带 `gap_trading_days`/`clean` 标记，不混入校准样本）；报告含 `## 8. 次日预测卡（JSON）` fenced json 则冻结 `outputs/<date>/forecast.json`；随后把**当日应开奖的判卷行**注入 prompt 的「昨日预测卡验证」节（报告第 9 段的数据源，均失败不阻断，见 §2.1） |
 | ⑦.6 | 选股段**判卷** | `score_candidates.py` | **补判**已具备真值的历史候选池 → `outputs/candidate_scorecard.jsonl`（**独立账本，不混 M2 的 scorecard.jsonl**）：分层命中率 / @K / 分层单调性 / 单因子 IC；判的是**历史某天**的池（真值是"次日"，今天的池今天判不了）。`backfill` 子命令用快照回放冷启动，`summary` 出汇总（见 §13.6） |
-| ⑧ | 报告校验**门禁** | `verify_report.py` 四路 | ① 数字核对——报告每个数字与证据链比对（**candidates.json 为第二证据源**，否则候选分数一律判链外，防编造；第 9 段的判卷阈值/实测值经 `verification_number_view` 并入）；② 覆盖检查——证据链点名的高标/锚点/首封名字、diagnostics 调和、risk_matrix 触发→动作、data_gaps 免责措辞、**chain_map 链名点名**是否被覆盖（防漏写）；③ **报告结构**——v3 契约（0~10 共 11 段 / 30 小节，`report/outline.py`）是否齐备且按序，缺节/乱序阻断，层级偏差与 🔑 条数只告警（复盘日 < 生效日 `2026-09-17` 自动跳过）；④ **选股层纪律**——「5.1 次日高潜池」与「5.2 中线高潜池」**分账**核对（缺节 / 池外代码未标注 / 未落到对应池内标的；两池互不包含，**不可交叉引用**；复盘日 < 上线日 `2026-09-12` / `2026-09-17` 自动跳过）。**任一有待处理项即中止：不渲染 PDF、不发邮件**，打印清单待改 md 后重跑；`--skip-verify` 显式放行 |
+| ⑧ | 报告校验**门禁** | `verify_report.py` 五路 | ① 数字核对——报告每个数字与证据链比对（**candidates.json 为第二证据源**，否则候选分数一律判链外，防编造；第 9 段的判卷阈值/实测值经 `verification_number_view` 并入）；② 覆盖检查——证据链点名的高标/锚点/首封名字、diagnostics 调和、risk_matrix 触发→动作、data_gaps 免责措辞、**chain_map 链名点名**是否被覆盖（防漏写）；③ **报告结构**——v3 契约（0~10 共 11 段 / 30 小节，`report/outline.py`）是否齐备且按序，缺节/乱序阻断，层级偏差与 🔑 条数只告警（复盘日 < 生效日 `2026-09-17` 自动跳过）；④ **短线池纪律**——「5.1 次日高潜池」缺节 / 池外代码未标注 / 未落到池内标的（复盘日 < 上线日 `2026-09-12` 自动跳过）；⑤ **中线池纪律**——「5.2 中线高潜池」同样三条（复盘日 < 上线日 `2026-09-17` 自动跳过）。两池**分账**核对、互不包含、**不可交叉引用**。**任一有待处理项即中止：不渲染 PDF、不发邮件**，打印清单待改 md 后重跑；`--skip-verify` 显式放行 |
 | ⑨ | PDF 渲染 | md2html + Chrome headless | `outputs/<date>/复盘报告.pdf`（本机需装 Google Chrome） |
 | ⑩ | 邮件 | SMTP（gmail 465 SSL） | 发送 PDF + Markdown 至 `MAIL_TO`（默认 imatrixxxlee@gmail.com） |
 
@@ -193,9 +193,9 @@ python3 tools/daily_review_pdf.py --date 2026-09-04 --no-email --skip-verify
 python3 tools/daily_review_pdf.py --date 2026-09-04 --no-email --refresh
 ```
 
-> **⑧ 门禁行为（2026-09-11 起；09-12 扩为三路选股段；09-17 扩为四路加报告结构）**：
-> `daily_review_pdf.py` 在渲染 PDF 前自动跑四路校验（数字核对 + 覆盖检查 + 报告结构 +
-> 选股层纪律），任一路有待处理项即**中止**（不打 PDF、不发邮件），并打印清单。修正
+> **⑧ 门禁行为（2026-09-11 起；09-12 扩为三路选股段；09-17 扩为五路——加报告结构与中线池）**：
+> `daily_review_pdf.py` 在渲染 PDF 前自动跑五路校验（数字核对 + 覆盖检查 + 报告结构 +
+> 短线池纪律 + 中线池纪律），任一路有待处理项即**中止**（不打 PDF、不发邮件），并打印清单。修正
 > `outputs/<date>/复盘报告.md` 后**重跑即可**（⑨ 只读 md，不会覆盖你的修改）；
 > 确需放行加 `--skip-verify`（会在日志里留痕）。
 >
@@ -335,7 +335,7 @@ hithink 项目侧（`/Users/imatrix/data/hithink/scripts/`）的同名脚本已�
    自查是隐性的，报告不出现任何校验/辩论过程文字。不采用多角色"对抗式辩论"
    （易引发输出污染）；
 2. **确定性报告校验**：`python3 tools/verify_report.py 复盘报告.md evidence.json
-   --candidates outputs/<date>/candidates.json` 四路把关，数据正确性由代码裁决，不依赖 LLM——
+   --candidates outputs/<date>/candidates.json` 五路把关，数据正确性由代码裁决，不依赖 LLM——
    - **数字比对**：报告数字与证据链比对，输出"证据外可疑数字"清单（防编造：只查报告里
      "多出来的"）。三处**自动豁免**（无需人工确认）：① fenced ```json 代码块（M2 预测卡
      工具结构数字）整块剥离；② 数字后标注 `（计划参数）`/`(计划参数)`（半角括号亦可）的
@@ -349,6 +349,10 @@ hithink 项目侧（`/Users/imatrix/data/hithink/scripts/`）的同名脚本已�
    - **报告结构**：按 v3 契约（0 摘要与行动卡 → 10 附录，共十一段；5 段下含 5.1 短线池与 5.2 中线池）核对小节是否齐备且按序，
      缺节/乱序阻断；标题层级偏差与 🔑 条数不足只告警。复盘日早于生效日 `2026-09-17`
      自动跳过（历史日重渲染 PDF 不被新契约误拦）。
+   - **短线池纪律**（需 `--candidates`）：「5.1 次日高潜池」是否缺节、是否出现未标注的池外
+     代码、是否落到池内标的；复盘日早于上线日 `2026-09-12` 自动跳过（那天作者没见过候选池）。
+   - **中线池纪律**（需 `--candidates`）：「5.2 中线高潜池」同样三条。两池**分账**核对、
+     互不包含、**不可交叉引用**；复盘日早于上线日 `2026-09-17` 自动跳过。
 
 ---
 
@@ -487,27 +491,31 @@ $PY tools/refresh_trading_calendar.py     # 刷新 data_cache/trading_calendar.j
 `fetch_snapshot_limit_pool` 以快照侧的官方日历为准，非交易日（rc=3）自动按日历逐日向
 过去回退重试（≤12 次）——即便本地缓存过期，长假后也不会跑错日子，且会把校正结果写进日志。
 
-### 6.5 报告校验门禁（2026-09-11 起；09-12 扩选股层；09-17 扩报告结构）
+### 6.5 报告校验门禁（2026-09-11 起；09-12 扩选股层；09-17 扩报告结构与中线池）
 
-`daily_review_pdf` 在 ⑨ 渲染前强制执行 ⑧ **四路**校验（`verify_bundle`）：
+### 6.5 报告校验门禁（2026-09-11 起；09-12 扩选股层；09-17 扩报告结构与中线池）
+
+`daily_review_pdf` 在 ⑨ 渲染前强制执行 ⑧ **五路**校验（`verify_bundle`）：
 
 | 路 | 查什么 | 证据源 |
 |---|---|---|
 | 数字核对 | 报告数字是否可回溯（防编造） | `evidence.json` + **`candidates.json`** + **判卷行 target/actual** |
 | 覆盖检查 | 该覆盖的必答项是否漏写 | `evidence.json` |
 | 报告结构 | v3 契约（0~10 段 / 30 小节）是否缺节 / 乱序（层级与 🔑 只告警） | `report/outline.REPORT_OUTLINE` |
-| 选股层纪律 | 「5.1 次日高潜池」与「5.2 中线高潜池」是否缺节 / 越池未标注 / 未落标的（分账核对） | `candidates.json`（`pool` / `midterm.pool`） |
+| 短线池纪律 | 「5.1 次日高潜池」是否缺节 / 越池未标注 / 未落标的 | `candidates.json`（`pool`） |
+| 中线池纪律 | 「5.2 中线高潜池」同上三条；与短线池**分账**核对、互不包含、**不可交叉引用** | `candidates.json`（`midterm.pool`） |
 
 任一路非空 → 打印清单并**中止**（不打 PDF、不发邮件）。修正报告 md 后重跑即可（⑨ 只读
 md 不覆盖）；`--skip-verify` 可显式放行（日志留痕）。校验读不到文件时同样中止——不允许
 "未校验产出"静默流出。
 
-两条**生效日豁免**（判据都是"复盘日 vs 上线日"，不是 mtime）：
+三条**生效日豁免**（判据都是"复盘日 vs 上线日"，不是 mtime）：
 
 | 路 | 生效日常量 | 早于生效日的报告 |
 |---|---|---|
 | 报告结构 | `report/outline.STRUCTURE_FROM = 2026-09-17` | 跳过结构检查（旧骨架是历史事实，不是违规） |
-| 选股层纪律 | `report/checklist.POOL_FEATURE_FROM = 2026-09-12` | 跳过选股层纪律（那天作者没见过候选池） |
+| 短线池纪律 | `report/checklist.POOL_FEATURE_FROM = 2026-09-12` | 跳过短线池纪律（那天作者没见过候选池） |
+| 中线池纪律 | `report/checklist.MIDTERM_FEATURE_FROM = 2026-09-17` | 跳过中线池纪律（中线段 09-17 才上线） |
 
 `verify_report.py` 单机复查时用 `--candidates outputs/<date>/candidates.json` 把第二证据源
 接上；`--no-structure` / `--structure-from` 可单独调整结构这一路。

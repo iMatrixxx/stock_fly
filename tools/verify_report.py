@@ -4,15 +4,17 @@
 **主链 ⑧ 门禁的单机等价物**——两者共用 `checklist.verify_bundle`，所以结论必然一致
 （不同的只是入口：主链在渲染 PDF 前自动跑，本脚本供人工复查/排查）。
 
-四路检查（默认全开，`--no-coverage` 只跑数字核对）：
+五路检查（默认全开，`--no-coverage` 只跑数字核对）：
 1. **数字核对**：报告每个数字必须能在证据链中找到（fenced json 与时间戳自动豁免）
    ——防"编造"；
 2. **覆盖检查**：证据链点名的非数字对象（高标/锚点/首封名字、diagnostics 调和、
    risk_matrix triggered→动作、data_gaps 免责措辞）须被报告覆盖——防"漏写"，纯规则；
-3. **报告结构**：0~10 v2 规范大纲是否齐备且按序（见 `report/outline.py`）——防"骨架缺节"；
-   复盘日早于结构契约生效日时自动跳过；层级偏差与 🔑 条数只告警不阻断；
-4. **选股层纪律**（需 `--candidates`）：报告「次日高潜池」小节是否缺节、是否出现未标注
-   的池外代码、是否落到池内标的。
+3. **报告结构**：0~10 v3 契约大纲（11 段 / 30 小节）是否齐备且按序（见 `report/outline.py`）
+   ——防"骨架缺节"；复盘日早于结构契约生效日时自动跳过；层级偏差与 🔑 条数只告警不阻断；
+4. **短线池纪律**（需 `--candidates`）：报告「5.1 次日高潜池」小节是否缺节、是否出现未标注
+   的池外代码、是否落到池内标的；复盘日早于 `2026-09-12` 时自动跳过；
+5. **中线池纪律**（需 `--candidates`）：报告「5.2 中线高潜池」同样三条；与短线池**分账**
+   核对、互不包含、**不可交叉引用**；复盘日早于 `2026-09-17` 时自动跳过。
 
 用法：
   python3 tools/verify_report.py outputs/2026-09-08/复盘报告.md outputs/2026-09-08/evidence.json
@@ -21,9 +23,10 @@
   python3 tools/verify_report.py report.md evidence.json --json   # 机器可读
 
 `--candidates` 传入时，候选分数/覆盖率/派生特征并入数字白名单（否则报告里的候选分数
-一律被判编造）。**复盘日早于选股段上线日（2026-09-12）时自动跳过选股层纪律**——那天
-报告作者没见过候选池，缺节是伪义务；复盘日默认从 `evidence.meta.date` 推断，可 `--date`
-覆盖（推断不到就不豁免，宁可多查一次）。`--structure-from` 同理用于结构契约生效日。
+一律被判编造）。**复盘日早于上线日时自动跳过对应池的纪律检查**：短线池 `2026-09-12`、
+中线池 `2026-09-17`——那天报告作者没见过该池，缺节是伪义务；复盘日默认从
+`evidence.meta.date` 推断，可 `--date` 覆盖（推断不到就不豁免，宁可多查一次）。
+`--structure-from` 同理用于结构契约生效日。
 """
 
 from __future__ import annotations
@@ -60,7 +63,7 @@ def _infer_date(evidence: dict, evidence_path: str) -> str:
 
 
 def main(argv=None) -> None:
-    ap = argparse.ArgumentParser(description="报告 vs 证据链核对（数字 + 覆盖 + 选股层纪律）")
+    ap = argparse.ArgumentParser(description="报告 vs 证据链核对（数字 + 覆盖 + 结构 + 短线池 + 中线池）")
     ap.add_argument("report", help="LLM 产出的复盘报告 Markdown")
     ap.add_argument("evidence", help="harness --json 导出的证据链 JSON")
     ap.add_argument("--json", dest="as_json", action="store_true", help="输出 JSON")
@@ -71,12 +74,12 @@ def main(argv=None) -> None:
     )
     ap.add_argument(
         "--candidates",
-        help="选股段候选池 JSON（第二证据源；不传则跳过选股层纪律检查）",
+        help="选股段候选池 JSON（第二证据源；不传则跳过两个池的纪律检查）",
     )
     ap.add_argument(
         "--date",
         dest="date_str",
-        help="复盘日 YYYY-MM-DD（选股段上线日豁免判定用；默认从 evidence.meta.date 推断）",
+        help="复盘日 YYYY-MM-DD（各路面生效日豁免判定用；默认从 evidence.meta.date 推断）",
     )
     ap.add_argument(
         "--no-structure",
