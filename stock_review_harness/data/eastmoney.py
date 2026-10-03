@@ -115,12 +115,24 @@ def dt_pool(date: str) -> list[dict]:
     return _fetch(DT_URL, date, f"eastmoney_dt_{date.replace('-', '')}")
 
 
-def board_flows() -> dict[str, dict]:
-    """东财行业板块（m:90+t:2）今日主力净流入：{板块名: {code, main_flow_yi, change_pct}}。
+def board_flows(for_date: str) -> dict[str, dict]:
+    """东财行业板块（m:90+t:2）主力净流入：{板块名: {code, main_flow_yi, change_pct}}。
+
+    **该接口只有"当前"快照、没有日期参数**（URL 不接受日期，缓存键也用
+    `datetime.now()`），故 `for_date` 非当日时**直接返回 {}**：
+
+    隔天给历史日补跑会取到**最近交易日**的主力净流入（2026-09-11 实测：给 09-10
+    补跑，半导体被写成 -87.99 亿，真值 -23.25 亿）；下游 `fetch_market` 还会把结果
+    **无条件回写快照缓存**，而 `cache_gc` 又专门保护 `market_*.json` 不被淘汰 ——
+    错值一旦落盘就永久固化，此后每次复跑都命中它。宁可缺失不可错值。
+
+    `for_date` 刻意**不设默认值**：漏传应当显式报错，而不是静默按"今天"取值。
 
     push2 偶发 RemoteDisconnected，首选 push2delay 延迟主机，失败回退 push2；
     分页取完（约 5 页 × 100），按当日做 1 小时磁盘缓存。
     """
+    if not is_today(for_date):
+        return {}
     out: dict[str, dict] = {}
     ymd = datetime.now().strftime("%Y%m%d")
     for pn in range(1, 6):

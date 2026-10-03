@@ -11,12 +11,16 @@
 随后 ⑧ 门禁据此把报告里 24 个正确数字判为"证据链外"而中止（门禁本身工作正常，
 坏的是上游数据）。
 
-本测试锁死三件事：
+本测试锁死四件事：
   1) 腾讯快照的日期字段能被正确解析（取不到就视为不可用）；
   2) 快照日期 ≠ 复盘日时，绝不覆盖同花顺当日行；
-  3) 快照日期 == 复盘日时，覆盖照常生效（不误伤正常同日流程）。
+  3) 快照日期 == 复盘日时，覆盖照常生效（不误伤正常同日流程）；
+  4) 东财板块主力净流入（2026-10-03 补护栏）**非当日连请求都不发**——该源同样只有
+     "当前"快照、没有日期参数，而它的错值比腾讯那两处更难清除：`fetch_market` 末尾
+     `save_market_cache` 会**无条件回写**快照缓存，`cache_gc` 又专门保护
+     `market_*.json` 不被淘汰 → 一旦落盘就永久固化，此后每次复跑都命中它。
 
-不联网：urlopen 被打桩。
+不联网：`urllib.request.urlopen` 与 `eastmoney.fetch_json` 均被打桩。
 """
 
 from __future__ import annotations
@@ -31,6 +35,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
+from stock_review_harness.data import eastmoney  # noqa: E402
 from stock_review_harness.data.fetch_market import (  # noqa: E402
     _patch_index_close_from_tencent,
     _tencent_snapshot_date,
@@ -191,6 +196,59 @@ class PatchMarketFromTencentTest(unittest.TestCase):
         self.assertEqual(q["sh000300"]["date"], "20260911")
         self.assertEqual(q["sh000300"]["name"], "沪深300")
         self.assertAlmostEqual(q["sh000300"]["amount_yi"], 5222.07, places=2)
+
+
+class BoardFlowsDateGuardTest(unittest.TestCase):
+    """东财板块主力净流入：非当日必须直接置空（回归 §E 的隔日补跑污染）。
+
+    该源的错值比腾讯那两处更难清除：`fetch_market` 末尾会**无条件**把它回写进
+    `market_<date>.json`，而 `cache_gc` 又专门保护 `market_*.json` 不被淘汰，
+    错值因此永久固化、此后每次复跑都命中它。护栏必须挡在**发请求之前**。
+    """
+
+    def setUp(self):
+        self._orig = eastmoney.fetch_json
+
+    def tearDown(self):
+        eastmoney.fetch_json = self._orig
+
+    def test_history_does_not_fetch(self):
+        """距今 5 个自然日 → 直接返回 {}，一次请求都不发。"""
+        called: list[int] = []
+
+        def _stub(*a, **kw):
+            called.append(1)
+            return {"data": {"total": 1, "diff": [
+                {"f12": "BK1", "f14": "半导体", "f62": 1.0, "f3": 0.0, "f6": 1.0}]}}
+
+        eastmoney.fetch_json = _stub
+        past = (_date.today() - timedelta(days=5)).isoformat()
+        self.assertEqual(eastmoney.board_flows(past), {})
+        self.assertEqual(called, [], "非当日必须直接置空，不得联网")
+
+    def test_today_fetches_and_maps(self):
+        """当日照常取数（不误伤正常流程）：字段映射与缓存键都带当日日期。"""
+        keys: list[str] = []
+
+        def _ok(*a, **kw):
+            keys.append(str(kw.get("cache_key")))
+            return {"data": {"total": 1, "diff": [
+                {"f12": "BK1036", "f14": "半导体", "f62": 1234000000.0,
+                 "f3": 1.23, "f6": 5e9}]}}
+
+        eastmoney.fetch_json = _ok
+        today = _date.today().isoformat()
+        out = eastmoney.board_flows(today)
+        self.assertEqual(list(out), ["半导体"])
+        self.assertAlmostEqual(out["半导体"]["main_flow_yi"], 12.34, places=2)
+        self.assertAlmostEqual(out["半导体"]["turnover_yi"], 50.0, places=2)
+        self.assertEqual(len(keys), 1, "total=1 → 取完首页即终止")
+        self.assertIn(today.replace("-", ""), keys[0], "缓存键须带当日日期")
+
+    def test_requires_explicit_date(self):
+        """漏传日期须显式报错，不得静默按「今天」取值——那正是事故的成因。"""
+        with self.assertRaises(TypeError):
+            eastmoney.board_flows()
 
 
 if __name__ == "__main__":

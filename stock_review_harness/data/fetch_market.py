@@ -6,7 +6,9 @@
 - 腾讯 web.ifzq.gtimg.cn：个股前复权日 K（均线、开盘溢价）
 - 新浪 vip.stock.finance.sina.com.cn：个股主力净流入历史
 
-北向日频净买入已停止披露；板块级主力净流入无免费历史源，按方法论标注缺失。
+北向日频净买入已停止披露；板块级主力净流入无免费历史源——该源只有"当前"快照、
+不接受日期参数，故**非当日一律不取**（见 `eastmoney.board_flows` 的日期护栏），
+按方法论标注缺失。
 """
 
 from __future__ import annotations
@@ -27,7 +29,7 @@ from . import dragon_seats as dragon_seats_mod
 from . import eastmoney, events_db, northbound, tencent, ths
 from . import industry_intel as industry_intel_mod
 from . import macro_snapshot as macro_mod
-from .cache import load_cached_market, save_market_cache
+from .cache import is_today, load_cached_market, save_market_cache
 from .net import fetch_many
 from .sina import stock_flow_history
 from .validate import BOARD_TAXONOMY_SUM_MAX, BOARD_TAXONOMY_SUM_MIN
@@ -373,13 +375,28 @@ def fetch_market(
     # + logic/concentration.board_taxonomy_guard。
     board_ok, board_note = _board_set_usable(boards, total)
     # 东财行业板块今日主力净流入（填补 THS 板块无资金流的口径缺口）
+    #
+    # ⚠️ 这个源**没有日期参数**，只能取"当前"快照（`eastmoney.board_flows` 内部已按
+    # `for_date` 拒绝非当日调用）。这里不要再判一次的理由是把两种"空"区分开：
+    # 「历史日主动跳过」是纪律（本日整体未采信），「源不可达」是故障——两者的
+    # flow_note 与 report/evidence._data_gaps 的措辞不同，混为一谈会误导排查。
+    #
+    # 后果链（见 MEMORY-detail §E，2026-09-11 实测）：历史日照取 → 把最近交易日的
+    # 板块资金流写进复盘日 → 末尾 `save_market_cache` **无条件回写**快照 →
+    # `cache_gc` 又专门保护 `market_*.json` → 错值永久固化，此后复跑都命中它。
     flow_hit = 0
-    try:
-        em_flows = eastmoney.board_flows()
-        flow_hit = attach_board_flows(boards, em_flows)
-    except Exception:  # noqa: BLE001 - 资金流属补充数据，失败按缺失降级
-        em_flows = {}
-    if not em_flows:
+    em_flows: dict = {}
+    flow_skipped = not is_today(date_str)
+    if not flow_skipped:
+        try:
+            em_flows = eastmoney.board_flows(date_str)
+            flow_hit = attach_board_flows(boards, em_flows)
+        except Exception:  # noqa: BLE001 - 资金流属补充数据，失败按缺失降级
+            em_flows = {}
+    if flow_skipped:
+        flow_note = ("板块主力净流入仅当日实时可取（接口无日期参数），"
+                     "历史日不可回补，本次整体未采信")
+    elif not em_flows:
         flow_note = "东财板块资金流不可达，板块主力净流入数据缺失"
     elif flow_hit == 0:
         flow_note = "东财板块资金流可用但板块名称未匹配，板块主力净流入数据缺失"
