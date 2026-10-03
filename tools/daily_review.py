@@ -337,12 +337,25 @@ def append_news_brief_to_prompt(prompt_path: Path, date_str: str) -> bool:
     return True
 
 
+# 显式给足输出预算：报告实测约 2 万字符（09-23 实测 20160 字符 ≈ 16K~24K 输出 token），
+# 而多数 OpenAI 兼容端点在未传 max_tokens 时默认只给 8K（非思考模式）→ 报告会被腰斩，
+# v3 结构契约（11 段 / 30 小节）必挂。故不再依赖端点默认值。
+# 若换成输出上限更低的端点，该参数可能被拒（400），此时下面的 try/except 会降级为 WARN。
+LLM_MAX_TOKENS = 65536
+
+
 def write_report_with_llm(date_str: str, prompt_path: Path, out: Path) -> bool:
     url = os.environ.get("LLM_API_URL")
     model = os.environ.get("LLM_MODEL")
     key = os.environ.get("LLM_API_KEY")
-    if not (url and model):
-        missing = [k for k, v in (("LLM_API_URL", url), ("LLM_MODEL", model)) if not v]
+    # 三键齐备才成稿：只配 URL+MODEL 而 KEY 为空时，不带认证头必然 401，
+    # 那比"优雅跳过"更糟（会连累预测卡冻结/判卷/门禁/PDF/邮件）。
+    if not (url and model and key):
+        missing = [
+            k
+            for k, v in (("LLM_API_URL", url), ("LLM_MODEL", model), ("LLM_API_KEY", key))
+            if not v
+        ]
         print(
             f"[WARN] 未配置 {'/'.join(missing)}，跳过自动写报告（只出证据链+prompt）；"
             f"补全 {ENV_FILE}（LLM_API_URL/LLM_MODEL/LLM_API_KEY）后可自动成稿",
@@ -350,7 +363,7 @@ def write_report_with_llm(date_str: str, prompt_path: Path, out: Path) -> bool:
         )
         return False
     prompt = prompt_path.read_text(encoding="utf-8")
-    headers = {"Authorization": f"Bearer {key}"} if key else {}
+    headers = {"Authorization": f"Bearer {key}"}
     payload = {
         "model": model,
         "messages": [
@@ -358,9 +371,20 @@ def write_report_with_llm(date_str: str, prompt_path: Path, out: Path) -> bool:
             {"role": "user", "content": prompt},
         ],
         "temperature": 0.3,
+        "max_tokens": LLM_MAX_TOKENS,
     }
-    data = post_json(url, payload, headers=headers, timeout=300)
-    report = data["choices"][0]["message"]["content"]
+    # 请求失败（网络/401/402 余额/限流/端点参数不支持）不抛穿主链：
+    # 降级为 WARN 后返回 False，让预测卡冻结、判卷、门禁、PDF 照常走完。
+    try:
+        data = post_json(url, payload, headers=headers, timeout=300)
+        report = data["choices"][0]["message"]["content"]
+    except Exception as e:  # noqa: BLE001
+        print(
+            f"[WARN] LLM 成稿失败（{type(e).__name__}: {str(e)[:160]}），"
+            f"跳过自动写报告，继续出证据链+prompt；请检查 {ENV_FILE} 的端点/型号/余额",
+            flush=True,
+        )
+        return False
     out.write_text(report, encoding="utf-8")
     print(f"[OK] LLM 报告已生成: {out}", flush=True)
     return True

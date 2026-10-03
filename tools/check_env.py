@@ -150,18 +150,27 @@ def collect() -> dict:
 
     # 5.5) LLM 自动成稿（可选能力：缺失 → 主链只出证据链+prompt，不写报告）
     # 读法与 daily_review._load_env_file 一致：os.environ 优先，其次 env 文件。
-    # 注意判据是 url+model（与 daily_review.write_report_with_llm 的 `if not (url and model)`
-    # 严格对齐）；KEY 在云端端点通常必填，但代码允许为空，故此处只作提示、不参与 ok 判定。
+    # 判据是**三键齐备**（与 daily_review.write_report_with_llm 的
+    # `if not (url and model and key)` 严格对齐）：只配 URL+MODEL 而 KEY 为空时，
+    # 请求不带认证头必然 401，故那也算"未配置"——此处如实报出来，
+    # 免得人跑到成稿那一步才发现（首版只查 url+model，会误报可用）。
     llm_url = os.environ.get("LLM_API_URL") or env_file.get("LLM_API_URL")
     llm_model = os.environ.get("LLM_MODEL") or env_file.get("LLM_MODEL")
     llm_key = os.environ.get("LLM_API_KEY") or env_file.get("LLM_API_KEY")
-    llm_missing = [k for k, v in (("LLM_API_URL", llm_url), ("LLM_MODEL", llm_model)) if not v]
+    llm_missing = [
+        k
+        for k, v in (
+            ("LLM_API_URL", llm_url),
+            ("LLM_MODEL", llm_model),
+            ("LLM_API_KEY", llm_key),
+        )
+        if not v
+    ]
     add(
         "LLM 自动成稿（可选）",
         not llm_missing,
         (
-            f"{llm_model} @ {llm_url}；LLM_API_KEY "
-            + ("已配置" if llm_key else "缺失（云端端点必填，否则请求会 401）")
+            f"{llm_model} @ {llm_url}；LLM_API_KEY 已配置"
         )
         if not llm_missing
         else f"未配置 {', '.join(llm_missing)} → 跳过自动写报告，只出证据链+prompt（补在 {ENV_FILE}）",
