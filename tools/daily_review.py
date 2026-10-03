@@ -7,7 +7,7 @@
   3. build_dabanke_from_fuyao.py 桥接 pools → 涨停池 JSON（产物名 limit_pool_<date>.json）
   4. harness 联网补行情 → 证据链 JSON + LLM prompt
   5. 资讯增量采集 fetch_news + 当日摘要注入 prompt
-  6. 若配置 LLM_API_URL / LLM_MODEL / LLM_API_KEY → 生成 复盘报告_<date>.md
+  6. 若配置 LLM_API_URL / LLM_MODEL / LLM_API_KEY → 生成 outputs/<date>/复盘报告.md
   7. SMTP 邮件发送（SMTP_* 配置）；未配置则仅落盘
 
 环境变量：
@@ -342,7 +342,12 @@ def write_report_with_llm(date_str: str, prompt_path: Path, out: Path) -> bool:
     model = os.environ.get("LLM_MODEL")
     key = os.environ.get("LLM_API_KEY")
     if not (url and model):
-        print("[WARN] 未配置 LLM_API_URL/LLM_MODEL，跳过自动写报告（只出证据链+prompt）", flush=True)
+        missing = [k for k, v in (("LLM_API_URL", url), ("LLM_MODEL", model)) if not v]
+        print(
+            f"[WARN] 未配置 {'/'.join(missing)}，跳过自动写报告（只出证据链+prompt）；"
+            f"补全 {ENV_FILE}（LLM_API_URL/LLM_MODEL/LLM_API_KEY）后可自动成稿",
+            flush=True,
+        )
         return False
     prompt = prompt_path.read_text(encoding="utf-8")
     headers = {"Authorization": f"Bearer {key}"} if key else {}

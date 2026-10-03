@@ -800,9 +800,10 @@ def main(argv=None) -> None:
                     print(f"[WARN] 候选池注入 prompt 失败: {str(e)[:100]}", flush=True)
             wrote = write_report_with_llm(date_str, arts["prompt"], report_md)
             if not wrote:
+                # 具体缺哪个键已由 write_report_with_llm 打印，这里只补本入口特有的后果。
                 print(
-                    "[WARN] 未配置 LLM_API_URL/LLM_MODEL/LLM_API_KEY 且无现成报告，"
-                    "本次只生成证据链+prompt；补全 ~/.stockfly_review.env 后可自动成稿",
+                    "[WARN] 本次只生成证据链+prompt（不写报告、不渲染 PDF、不发邮件）；"
+                    "补全 ~/.stockfly_review.env 后可自动成稿",
                     flush=True,
                 )
                 return

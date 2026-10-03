@@ -7,13 +7,15 @@
   3. fuyao SDK（vendor/Financial-API，hithink 取数）
   4. Chrome（PDF 渲染）
   5. 凭据：HITHINK_FINANCE_API_KEY / SMTP_*（~/.stockfly_review.env）
-  6. 关键目录与产物规模
+  6. LLM 自动成稿：LLM_API_URL / LLM_MODEL / LLM_API_KEY（可选；缺失则只出证据链+prompt）
+  7. 关键目录与产物规模
 
 用法：
     python3 tools/check_env.py            # 人类可读
     python3 tools/check_env.py --json     # 机器可读
 
-退出码：0 核心链路可用；1 核心缺项（缺解释器/目录）；2 仅可选能力缺项。
+退出码：0 核心链路可用；1 核心缺项（缺解释器/目录）；2 仅可选能力缺项
+（LLM 缺项也算在这一档——主链照跑，只是不自动写报告）。
 """
 from __future__ import annotations
 
@@ -146,6 +148,26 @@ def collect() -> dict:
     smtp = bool(env_file.get("SMTP_PASSWORD"))
     add("SMTP 凭据（发邮件）", smtp, f"{ENV_FILE}（SMTP_PASSWORD {'已配置' if smtp else '缺失'}）", group="mail")
 
+    # 5.5) LLM 自动成稿（可选能力：缺失 → 主链只出证据链+prompt，不写报告）
+    # 读法与 daily_review._load_env_file 一致：os.environ 优先，其次 env 文件。
+    # 注意判据是 url+model（与 daily_review.write_report_with_llm 的 `if not (url and model)`
+    # 严格对齐）；KEY 在云端端点通常必填，但代码允许为空，故此处只作提示、不参与 ok 判定。
+    llm_url = os.environ.get("LLM_API_URL") or env_file.get("LLM_API_URL")
+    llm_model = os.environ.get("LLM_MODEL") or env_file.get("LLM_MODEL")
+    llm_key = os.environ.get("LLM_API_KEY") or env_file.get("LLM_API_KEY")
+    llm_missing = [k for k, v in (("LLM_API_URL", llm_url), ("LLM_MODEL", llm_model)) if not v]
+    add(
+        "LLM 自动成稿（可选）",
+        not llm_missing,
+        (
+            f"{llm_model} @ {llm_url}；LLM_API_KEY "
+            + ("已配置" if llm_key else "缺失（云端端点必填，否则请求会 401）")
+        )
+        if not llm_missing
+        else f"未配置 {', '.join(llm_missing)} → 跳过自动写报告，只出证据链+prompt（补在 {ENV_FILE}）",
+        group="llm",
+    )
+
     # 6) 目录
     for rel in ("chains", "events", "tests", "outputs", "hithink_out", "data_cache"):
         p = ROOT / rel
@@ -165,9 +187,9 @@ def collect() -> dict:
 
 
 def render(data: dict) -> str:
-    groups = {"core": "核心", "test": "测试", "intel": "取数/资讯", "pdf": "PDF", "mail": "邮件"}
+    groups = {"core": "核心", "test": "测试", "intel": "取数/资讯", "pdf": "PDF", "mail": "邮件", "llm": "自动成稿"}
     lines = [f"# 环境自检 · {data['root']}", ""]
-    for g in ("core", "test", "intel", "pdf", "mail"):
+    for g in ("core", "test", "intel", "pdf", "mail", "llm"):
         rows = [c for c in data["checks"] if c["group"] == g]
         if not rows:
             continue
