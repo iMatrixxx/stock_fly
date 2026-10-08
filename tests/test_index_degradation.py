@@ -14,9 +14,11 @@
 证据链"看起来完整"（每个指数都有收盘价），data_gaps 却毫不知情——
 这是最危险的一类降级：报告会把"没算出来"当成"没这项"。
 
-本测试锁死两件事：
+本测试锁死三件事：
   1) `_data_gaps` 必须把"指数涨跌幅/MA5 缺失"与"两市成交环比缺失"显式声明；
-  2) 该降级的成因链条（None → 只含当日行的字典 → 前收查不到）不被改回去。
+  2) 该降级的成因链条（None → 只含当日行的字典 → 前收查不到）不被改回去；
+  3) **`_prev_trade_date` 的回退窗口必须跨得过长假**（2026-10-08 实测：国庆后首日
+     的前一交易日相隔 8 个自然日，写死 6 天 → 找不到 → 涨跌幅/环比全 null）。
 
 不联网。
 """
@@ -32,6 +34,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
+from stock_review_harness.data.fetch_market import _prev_trade_date  # noqa: E402
 from stock_review_harness.models import (  # noqa: E402
     DataBundle,
     IndexQuote,
@@ -157,6 +160,45 @@ class RootCauseMechanismTest(unittest.TestCase):
                          "补出来的行只有当日，历史行仍然缺失")
         self.assertIsNone(rows["沪深300"].get(prev_ymd),
                           "前收查不到 → 涨跌幅/MA5 无法计算（这正是要声明的降级）")
+
+
+class PrevTradeDateHolidayGapTest(unittest.TestCase):
+    """长假后 `_prev_trade_date` 必须能找到前一交易日（2026-10-08 实测踩过）。
+
+    2026-10-08 是国庆后首个交易日，前一交易日 09-30 相隔 **8 个自然日**。原实现
+    `for _ in range(6)` 只回退 6 天 → 探测不到 09-30 → 落到 `return cur - 1 day`
+    = '2026-10-01'（一个没有数据的日期）→ 5 大指数 `change_pct` 与两市
+    `prev_total_turnover` 静默变 null。**与上面 09-11 的超时降级同型**：证据链
+    "看起来完整"，报告把"没算出来"当成"没这项"。
+
+    用例刻意不依赖真实日历：probe 只认自己那张"交易日表"，无论日历层是否命中，
+    都应收敛到同一个答案。
+    """
+
+    # 模拟国庆安排：09-30 之后到 10-08 之间没有任何交易日
+    _TRADING = ("2026-09-28", "2026-09-29", "2026-09-30", "2026-10-08")
+
+    @staticmethod
+    def _probe(dates):
+        return lambda d: d in dates
+
+    def test_long_holiday_gap_finds_prev_trading_day(self):
+        got = _prev_trade_date("2026-10-08", self._probe(self._TRADING))
+        self.assertEqual(
+            got, "2026-09-30",
+            f"长假后应回溯到 09-30（相隔 8 个自然日），实际={got}",
+        )
+
+    def test_window_reaches_beyond_holiday_scale(self):
+        """唯一有数据日在 22 天外时也要走得到（兜底窗口须 ≥ 春节/国庆级）。"""
+        got = _prev_trade_date("2026-10-08", self._probe({"2026-09-16"}))
+        self.assertEqual(got, "2026-09-16")
+
+    def test_no_data_returns_str_without_raising(self):
+        """全窗口无数据时不得抛异常——取数层崩溃会拖垮整条复盘链。"""
+        got = _prev_trade_date("2026-10-08", lambda d: False)
+        self.assertIsInstance(got, str)
+        self.assertLess(got, "2026-10-08")
 
 
 if __name__ == "__main__":

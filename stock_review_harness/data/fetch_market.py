@@ -25,6 +25,7 @@ from ..models import (
     MarketData,
     PremiumQuote,
 )
+from ..trading_calendar import prev_trading_day
 from . import dragon_seats as dragon_seats_mod
 from . import eastmoney, events_db, northbound, tencent, ths
 from . import industry_intel as industry_intel_mod
@@ -35,6 +36,11 @@ from .sina import stock_flow_history
 from .validate import BOARD_TAXONOMY_SUM_MAX, BOARD_TAXONOMY_SUM_MIN
 
 BOARD_KEEP = 8  # 量化筛选后保留的板块数量（报告取前 3）
+
+# 前一交易日回退窗口（自然日）。必须跨得过春节/国庆级长假并留余量：
+# 2026-10-08（国庆后首日）的前一交易日 09-30 相隔 8 个自然日，原实现写死 6 天
+# → 找不到 → 5 大指数 change_pct 与两市环比静默变 null（见 `_prev_trade_date`）。
+_PREV_LOOKBACK_DAYS = 30
 
 
 def _load_fuyao_premiums(source: str | Path | None, date_str: str) -> tuple[list[PremiumQuote], list[dict], str | None]:
@@ -84,9 +90,26 @@ def _load_fuyao_premiums(source: str | Path | None, date_str: str) -> tuple[list
 
 
 def _prev_trade_date(d: str, probe) -> str:
-    """从 d 向前找最近一个有数据的交易日。"""
+    """从 d 向前找最近一个**有数据的**交易日。
+
+    **回退窗口必须能跨过长假**。2026-10-08（国庆后首个交易日）的前一交易日是
+    09-30，相隔 **8 个自然日**；原实现写死 `for _ in range(6)`，探测不到 09-30，
+    落到 `return cur - 1 day` = '2026-10-01'（一个没有数据的日期）→ 5 大指数
+    `change_pct` 与两市环比**静默变 null**，而 `data_gaps` 只会写"该数据不可得"，
+    报告看不出根因是回退窗口不够长。长假后首个交易日必踩（春节、国庆各一次）。
+
+    优先用 `trading_calendar` 取上一交易日——与快照侧 `cal.prev()`、判卷侧
+    `prev_trading_day()` 共用同一个"交易日判定唯一定义点"；若日历给的日子 probe
+    不到数据（日历未覆盖该窗口 / 该日行情尚未发布），再按 probe 逐日回退兜底。
+    """
+    try:
+        cand = prev_trading_day(d)
+    except Exception:  # noqa: BLE001 - 日历不可用不应阻断行情取数
+        cand = None
+    if cand and probe(cand):
+        return cand
     cur = _date.fromisoformat(d)
-    for _ in range(6):
+    for _ in range(_PREV_LOOKBACK_DAYS):
         cur -= timedelta(days=1)
         if probe(cur.isoformat()):
             return cur.isoformat()
