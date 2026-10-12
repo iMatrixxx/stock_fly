@@ -1,19 +1,24 @@
 """每日复盘产物路径约定（2026-09-09 起集中 outputs/<date>/，不入库不 push）。
 
-历史沿革：早期产物散落仓库根目录（evidence_<date>.json / prompt_<date>.md /
-复盘报告_<date>.md/.pdf / forecast_<date>.json）。2026-09-09 起统一迁移至
-`outputs/<date>/` 专用目录，文件名去掉日期前缀；`outputs/` 已由 `.gitignore`
-排除，任何 push 都不会携带复盘产物。
+历史沿革：
+- 早期产物散落仓库根目录（evidence_<date>.json / prompt_<date>.md /
+  复盘报告_<date>.md/.pdf / forecast_<date>.json）。
+- 2026-09-09 起统一迁移至 `outputs/<date>/` 专用目录，文件名**去掉**日期后缀。
+- 2026-10-09 起**报告类产物恢复日期后缀**（`复盘报告_<date>.md/.pdf/.html`）：
+  分目录虽已按日隔离，但报告是最常被下载/转发的产物，一旦脱离目录（预览面板、
+  邮件、聊天）就既会同名撞车又认不出归属。其余产物仍留在日目录内、不带日期。
+`outputs/` 已由 `.gitignore` 排除，任何 push 都不会携带复盘产物。
 
 单日产物布局（outputs/<date>/ 下）：
-  evidence.json / prompt.md / 复盘报告.md / 复盘报告.pdf / forecast.json / candidates.json
+  evidence.json / prompt.md / forecast.json / candidates.json
+  复盘报告_<date>.md / 复盘报告_<date>.pdf / 复盘报告_<date>.html
   confirm_packet.md / confirm_packet.json / confirm_decisions.json / confirm_result.json
 跨日累积产物：
   outputs/scorecard.jsonl（M2 判卷流水）
   outputs/candidate_scorecard.jsonl（选股段判卷流水，与上者口径不同，禁止混写）
 研究产物：
   outputs/backtest/（回测输出，非每日主链产物）
-变体报告保留后缀：复盘报告_规则引擎版.md、复盘报告_修正前.md 等
+变体报告保留后缀：复盘报告_<date>_规则引擎版.md、复盘报告_<date>_修正前.md 等
 
 本模块是产物路径的唯一定义点；写脚本请统一走这里，勿再手拼路径。
 """
@@ -54,16 +59,28 @@ def prompt_path(root: Path | None, date_str: str) -> Path:
     return day_dir(root, date_str) / "prompt.md"
 
 
+def report_stem(date_str: str) -> str:
+    """报告类产物的文件名主干（不含扩展名）：`复盘报告_<date>`。
+
+    2026-10-09 起报告类产物带日期后缀：分目录已按日隔离，但报告是最常被下载/
+    转发（预览面板、邮件附件、聊天）的产物，脱离目录后无日期名既同名撞车也认不
+    出归属。邮件附件名自始即用 `复盘报告_{date}.pdf`，此处与之一致。
+
+    变体报告在此主干后追加后缀，如 `复盘报告_2026-10-08_规则引擎版.md`。
+    """
+    return f"复盘报告_{date_str}"
+
+
 def report_md_path(root: Path | None, date_str: str) -> Path:
-    return day_dir(root, date_str) / "复盘报告.md"
+    return day_dir(root, date_str) / f"{report_stem(date_str)}.md"
 
 
 def report_pdf_path(root: Path | None, date_str: str) -> Path:
-    return day_dir(root, date_str) / "复盘报告.pdf"
+    return day_dir(root, date_str) / f"{report_stem(date_str)}.pdf"
 
 
 def report_html_path(root: Path | None, date_str: str) -> Path:
-    return day_dir(root, date_str) / "复盘报告.html"
+    return day_dir(root, date_str) / f"{report_stem(date_str)}.html"
 
 
 def forecast_path(root: Path | None, date_str: str) -> Path:

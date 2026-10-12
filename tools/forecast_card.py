@@ -2,8 +2,8 @@
 """次日预测卡落盘（M2 生成侧）：从复盘报告末尾的预测卡区块提取 JSON 冻结。
 
 用法：
-  python3 tools/forecast_card.py extract outputs/2026-09-08/复盘报告.md
-  python3 tools/forecast_card.py extract outputs/2026-09-08/复盘报告.md --outdir <dir>
+  python3 tools/forecast_card.py extract outputs/2026-09-08/复盘报告_2026-09-08.md
+  python3 tools/forecast_card.py extract outputs/2026-09-08/复盘报告_2026-09-08.md --outdir <dir>
   python3 tools/forecast_card.py hint outputs/2026-09-08/evidence.json  # 打印候选清单
 
 产物：outputs/<date>/forecast.json ——
@@ -40,7 +40,7 @@ SECTION_TITLE_STR = "## 8. 次日预测卡（JSON）"
 
 
 def _parse_date(report_path: Path) -> str:
-    # 新约定 outputs/<date>/复盘报告.md → 从父目录名取日期
+    # 新约定 outputs/<date>/复盘报告_<date>.md → 日期取父目录名或文件名均可
     m = _DATE_IN_NAME.search(report_path.parent.name + "/" + report_path.name)
     if m:
         return m.group(1)
@@ -176,8 +176,8 @@ def main(argv=None) -> None:
     sub = ap.add_subparsers(dest="cmd", required=True)
 
     p_extract = sub.add_parser("extract", help="从复盘报告提取预测卡并冻结为 JSON")
-    p_extract.add_argument("report", help="复盘报告 Markdown 路径（outputs/<date>/复盘报告.md）")
-    p_extract.add_argument("--date", help="复盘日期 YYYY-MM-DD（默认从父目录名解析）")
+    p_extract.add_argument("report", help="复盘报告 Markdown 路径（outputs/<date>/复盘报告_<date>.md）")
+    p_extract.add_argument("--date", help="复盘日期 YYYY-MM-DD（默认从父目录名/文件名解析）")
     p_extract.add_argument("--outdir", help="产物目录（默认 outputs/<date>/）")
 
     p_hint = sub.add_parser("hint", help="打印当日可判对象候选清单")

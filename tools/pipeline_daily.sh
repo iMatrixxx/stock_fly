@@ -32,7 +32,7 @@ notify() {  # macOS 通知（失败不影响主流程）
 } 2>&1 | tee -a "$LOG"
 
 rc=${PIPESTATUS[0]}
-out="$ROOT/outputs/$DATE/复盘报告.pdf"
+out="$ROOT/outputs/$DATE/复盘报告_$DATE.pdf"
 if [ "$rc" = "0" ] && [ -f "$out" ]; then
   notify "✅ 复盘完成（PDF 已生成，未发邮件）；日志 $(basename "$LOG")"
 elif [ "$rc" = "3" ]; then

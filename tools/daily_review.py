@@ -7,7 +7,7 @@
   3. build_dabanke_from_fuyao.py 桥接 pools → 涨停池 JSON（产物名 limit_pool_<date>.json）
   4. harness 联网补行情 → 证据链 JSON + LLM prompt
   5. 资讯增量采集 fetch_news + 当日摘要注入 prompt
-  6. 若配置 LLM_API_URL / LLM_MODEL / LLM_API_KEY → 生成 outputs/<date>/复盘报告.md
+  6. 若配置 LLM_API_URL / LLM_MODEL / LLM_API_KEY → 生成 outputs/<date>/复盘报告_<date>.md
   7. SMTP 邮件发送（SMTP_* 配置）；未配置则仅落盘
 
 环境变量：

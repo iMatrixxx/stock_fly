@@ -15,6 +15,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
+from stock_review_harness.artifact_paths import report_md_path  # noqa: E402
 from stock_review_harness.report.checklist import (  # noqa: E402
     format_gate_report,
     verify_bundle,
@@ -116,7 +117,9 @@ class RealReportRegressionTest(unittest.TestCase):
     """
 
     def test_real_report_passes_gate(self):
-        report = ROOT / "outputs" / "2026-09-10" / "复盘报告.md"
+        # 报告文件名带日期（2026-10-09 起）→ 走 artifact_paths 定名，避免日后
+        # 再改约定时本测试悄悄退化成 skip（覆盖静默丢失）。
+        report = report_md_path(ROOT, "2026-09-10")
         ev = ROOT / "outputs" / "2026-09-10" / "evidence.json"
         if not (report.exists() and ev.exists()):
             self.skipTest("09-10 产物不在（outputs/ 不入库），跳过")

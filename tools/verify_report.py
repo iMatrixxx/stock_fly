@@ -17,8 +17,8 @@
    核对、互不包含、**不可交叉引用**；复盘日早于 `2026-09-17` 时自动跳过。
 
 用法：
-  python3 tools/verify_report.py outputs/2026-09-08/复盘报告.md outputs/2026-09-08/evidence.json
-  python3 tools/verify_report.py outputs/2026-09-11/复盘报告.md outputs/2026-09-11/evidence.json \
+  python3 tools/verify_report.py outputs/2026-09-08/复盘报告_2026-09-08.md outputs/2026-09-08/evidence.json
+  python3 tools/verify_report.py outputs/2026-09-11/复盘报告_2026-09-11.md outputs/2026-09-11/evidence.json \
       --candidates outputs/2026-09-11/candidates.json
   python3 tools/verify_report.py report.md evidence.json --json   # 机器可读
 

@@ -44,20 +44,23 @@ build_dabanke_from_  │       models.py（统一数据模型）       outputs/<
   fuyao.py 桥接      │         validate.py（数据核验）        （内嵌证据链 + 数字纪律 +
   等价 schema，失败   │          cache.py / net.py            外部资讯参考）
   回退东财池）         │                                     ↓
-联网补数（可选） ────┼─ data/ │        LLM 独立判断 → outputs/<date>/复盘报告.md
+联网补数（可选） ────┼─ data/ │        LLM 独立判断 → outputs/<date>/复盘报告_<date>.md
   ths/eastmoney/     │        logic/（确定性分析）           ↓ verify_report.py 数字校验
   tencent/sina       │         cycle / migration /          ↓ md2html + Chrome headless
-行情补充 JSON ───────┘         rivalry / forecast /         outputs/<date>/复盘报告.pdf
+行情补充 JSON ───────┘         rivalry / forecast /         outputs/<date>/复盘报告_<date>.pdf
                                diagnostics                     ↓ SMTP（可选）
                                                                邮件（PDF + Markdown）
 ```
 
-> **产物目录约定（2026-09-09 起）**：每日复盘产物（evidence/prompt/复盘报告 md+pdf/
-> forecast 等）一律集中 `outputs/<date>/`（文件名无日期前缀，如 `evidence.json`），
-> 路径唯一定义见 `stock_review_harness/artifact_paths.py`；`outputs/` 已在 `.gitignore`
-> 排除，**任何 git push 都不会携带复盘产物**。跨日累积产物（M2 判卷流水）为
-> `outputs/scorecard.jsonl`。历史散落根目录的产物已全部迁入。`samples/` 仍入库
-> （行情快照/涨停池**样例**，供测试与离线回放），注意与每日产物区分。
+> **产物目录约定（2026-09-09 起；2026-10-09 报告类产物恢复日期后缀）**：每日复盘产物
+> （evidence / prompt / 复盘报告 md+pdf+html / forecast 等）一律集中 `outputs/<date>/`，
+> 路径唯一定义见 `stock_review_harness/artifact_paths.py`。其中**报告类产物文件名带日期**
+> （`复盘报告_<date>.md` / `.pdf` / `.html`）——报告最常被下载/转发（预览面板、邮件、
+> 聊天），脱离目录后无日期名既会撞车又认不出归属；其余产物留在日目录内、不带日期
+> （如 `evidence.json`）。`outputs/` 已在 `.gitignore` 排除，**任何 git push 都不会携带
+> 复盘产物**。跨日累积产物（M2 判卷流水）为 `outputs/scorecard.jsonl`。历史散落根目录的
+> 产物已全部迁入。`samples/` 仍入库（行情快照/涨停池**样例**，供测试与离线回放），
+> 注意与每日产物区分。
 
 ### 1.1 代码地图（四层职责）
 
@@ -167,11 +170,11 @@ build_dabanke_from_  │       models.py（统一数据模型）       outputs/<
 | ④.6 | 事件库构建（④ 验证取数） | `fetch_events_db.py` | ① 抓**巨潮公告台账**落盘 `hithink_out/raw/cninfo/<date>.jsonl`（订单/扩产类事件的外部佐证；**不可重建，必须存**）；② 预热期货日K缓存。**必须先于 ⑤**——`fetch_market` 步骤 11 读台账 + 期货做事件外部验证，产出 `market.event_verification`。`--no-events-db` 可整步跳过（验证节将退化为 `no_data`） |
 | ⑤ | 证据链 + prompt | harness（确定性） | `outputs/<date>/evidence.json`（纯数据：情绪/资金/周期 + **`board_pools` 板块内领涨标的池**——涨停股按行业归组列个股，写板块资金必落标的；无该行业=当日无涨停，子板块资金不编造；**v2 新增 `capital_concentration` 资金集中度 + `chain_map` 产业链当日映射 + `event_verification` 事件外部验证**——⑤ 步骤 11 读 ④.6 落盘台账做交叉核对）+ `outputs/<date>/prompt.md` |
 | ⑤.6 | 选股段（判断层） | `pick_candidates.py`（短线段零联网；中线池需取数） | `outputs/<date>/candidates.json`：八源合并候选池 + 五组特征 + 分组加权打分 + tier 分层，**外加 `directions` 方向榜与 `midterm` 中线池（并列，与 5.1 分数不可比）**；prompt 尾部注入「选股候选池」节（**替换式**）。**必须先于 ⑦**——报告是"在池内取舍"的产物，池子后算就成事后解释（见 §13） |
-| ⑦ | 报告撰写 | LLM / 人 | `outputs/<date>/复盘报告.md`；**按 v3 契约撰写（0~10 共 11 段）**（`report/outline.py`，缺节/乱序会被 ⑧ 拦下；因果链为 产业情报→供需推演→A股映射→资金验证→情绪验证→个股→计划），含 `5.1 次日高潜池`（**池内取舍，池外须标 `池外补充`**）与 `5.2 中线高潜池`（**标题字面均不可改**——门禁按标题定位小节，改词会让对应纪律检查静默失效）；无既有 md 时需配置 `LLM_API_URL/MODEL/KEY` 自动生成。**写报告前先做前置作业：读裁定包 → 逐条裁定 → `confirm_events.py apply`**（见 ④.55 与 §12.1） |
+| ⑦ | 报告撰写 | LLM / 人 | `outputs/<date>/复盘报告_<date>.md`；**按 v3 契约撰写（0~10 共 11 段）**（`report/outline.py`，缺节/乱序会被 ⑧ 拦下；因果链为 产业情报→供需推演→A股映射→资金验证→情绪验证→个股→计划），含 `5.1 次日高潜池`（**池内取舍，池外须标 `池外补充`**）与 `5.2 中线高潜池`（**标题字面均不可改**——门禁按标题定位小节，改词会让对应纪律检查静默失效）；无既有 md 时需配置 `LLM_API_URL/MODEL/KEY` 自动生成。**写报告前先做前置作业：读裁定包 → 逐条裁定 → `confirm_events.py apply`**（见 ④.55 与 §12.1） |
 | ⑦.5 | M2 预测卡冻结 + 判卷 | 全链自动 | **补判**所有未计分卡片 → `outputs/scorecard.jsonl`（隔日补判的行带 `gap_trading_days`/`clean` 标记，不混入校准样本）；报告含 `## 8. 次日预测卡（JSON）` fenced json 则冻结 `outputs/<date>/forecast.json`；随后把**当日应开奖的判卷行**注入 prompt 的「昨日预测卡验证」节（报告第 9 段的数据源，均失败不阻断，见 §2.1） |
 | ⑦.6 | 选股段**判卷** | `score_candidates.py` | **补判**已具备真值的历史候选池 → `outputs/candidate_scorecard.jsonl`（**独立账本，不混 M2 的 scorecard.jsonl**）：分层命中率 / @K / 分层单调性 / 单因子 IC；判的是**历史某天**的池（真值是"次日"，今天的池今天判不了）。`backfill` 子命令用快照回放冷启动，`summary` 出汇总（见 §13.6） |
 | ⑧ | 报告校验**门禁** | `verify_report.py` 五路 | ① 数字核对——报告每个数字与证据链比对（**candidates.json 为第二证据源**，否则候选分数一律判链外，防编造；第 9 段的判卷阈值/实测值经 `verification_number_view` 并入）；② 覆盖检查——证据链点名的高标/锚点/首封名字、diagnostics 调和、risk_matrix 触发→动作、data_gaps 免责措辞、**chain_map 链名点名**是否被覆盖（防漏写）；③ **报告结构**——v3 契约（0~10 共 11 段 / 30 小节，`report/outline.py`）是否齐备且按序，缺节/乱序阻断，层级偏差与 🔑 条数只告警（复盘日 < 生效日 `2026-09-17` 自动跳过）；④ **短线池纪律**——「5.1 次日高潜池」缺节 / 池外代码未标注 / 未落到池内标的（复盘日 < 上线日 `2026-09-12` 自动跳过）；⑤ **中线池纪律**——「5.2 中线高潜池」同样三条（复盘日 < 上线日 `2026-09-17` 自动跳过）。两池**分账**核对、互不包含、**不可交叉引用**。**任一有待处理项即中止：不渲染 PDF、不发邮件**，打印清单待改 md 后重跑；`--skip-verify` 显式放行 |
-| ⑨ | PDF 渲染 | md2html + Chrome headless | `outputs/<date>/复盘报告.pdf`（本机需装 Google Chrome） |
+| ⑨ | PDF 渲染 | md2html + Chrome headless | `outputs/<date>/复盘报告_<date>.pdf`（本机需装 Google Chrome） |
 | ⑩ | 邮件 | SMTP（gmail 465 SSL） | 发送 PDF + Markdown 至 `MAIL_TO`（默认 imatrixxxlee@gmail.com） |
 
 **全链命令（推荐）**：
@@ -196,7 +199,7 @@ python3 tools/daily_review_pdf.py --date 2026-09-04 --no-email --refresh
 > **⑧ 门禁行为（2026-09-11 起；09-12 扩为三路选股段；09-17 扩为五路——加报告结构与中线池）**：
 > `daily_review_pdf.py` 在渲染 PDF 前自动跑五路校验（数字核对 + 覆盖检查 + 报告结构 +
 > 短线池纪律 + 中线池纪律），任一路有待处理项即**中止**（不打 PDF、不发邮件），并打印清单。修正
-> `outputs/<date>/复盘报告.md` 后**重跑即可**（⑨ 只读 md，不会覆盖你的修改）；
+> `outputs/<date>/复盘报告_<date>.md` 后**重跑即可**（⑨ 只读 md，不会覆盖你的修改）；
 > 确需放行加 `--skip-verify`（会在日志里留痕）。
 >
 > **数据复用行为（2026-09-11 起）**：已有 `evidence.json` 时默认**不重抓数据**，只跑
@@ -208,7 +211,7 @@ python3 tools/daily_review_pdf.py --date 2026-09-04 --no-email --refresh
 --limit-pool-json <桥接产物>` → `fetch_news.py` → 人工撰写 → `verify_report.py` → `md2html.py` +
 Chrome headless（详见 §5 离线/底层用法）。
 
-> **⑨ 之前：报告正文优先复用**已存在的 `outputs/<date>/复盘报告.md`（例如由 LLM 网页版撰写、
+> **⑨ 之前：报告正文优先复用**已存在的 `outputs/<date>/复盘报告_<date>.md`（例如由 LLM 网页版撰写、
 > 人工润色后的版本），脚本不会覆盖；不存在时才走 LLM API 自动成稿。⑧ 校验与 ⑨ 渲染
 > 都只读 md，不改写内容。
 
@@ -239,7 +242,7 @@ Chrome headless（详见 §5 离线/底层用法）。
   （逐条判卷流水，累计命中率校准）。
 - 手工命令：
   ```bash
-  python3 tools/forecast_card.py extract outputs/2026-09-08/复盘报告.md   # 冻结
+  python3 tools/forecast_card.py extract outputs/2026-09-08/复盘报告_2026-09-08.md   # 冻结
   python3 tools/forecast_card.py hint outputs/2026-09-08/evidence.json     # 当日候选清单
   python3 tools/score_predictions.py                    # 补判所有未计分卡片（推荐）
   python3 tools/score_predictions.py --date 2026-09-08  # 严格模式：只判该日 T-1 的卡
@@ -334,7 +337,7 @@ hithink 项目侧（`/Users/imatrix/data/hithink/scripts/`）的同名脚本已�
    矛盾诊断是否逐条回应、操作条件是否硬阈值、风险矩阵是否已触发、是否引用内部机制；
    自查是隐性的，报告不出现任何校验/辩论过程文字。不采用多角色"对抗式辩论"
    （易引发输出污染）；
-2. **确定性报告校验**：`python3 tools/verify_report.py 复盘报告.md evidence.json
+2. **确定性报告校验**：`python3 tools/verify_report.py 复盘报告_<date>.md evidence.json
    --candidates outputs/<date>/candidates.json` 五路把关，数据正确性由代码裁决，不依赖 LLM——
    - **数字比对**：报告数字与证据链比对，输出"证据外可疑数字"清单（防编造：只查报告里
      "多出来的"）。三处**自动豁免**（无需人工确认）：① fenced ```json 代码块（M2 预测卡
@@ -641,8 +644,8 @@ dragon.json 缺失时产物不加键，证据链输出 count=0 + 显式标注（
   **默认不安装**——是否启用由使用者拍板；`tools/launchd/install.sh status` 可查状态。
 - **每日例行**（收盘后）：`python3 tools/daily_review_pdf.py --date <当日> --no-email` 出 PDF，
   人工审阅数字校验输出后决定是否补发邮件（`去掉 --no-email` 即发送）。
-- **报告正文**：脚本优先复用已存在的 `outputs/<date>/复盘报告.md`；若由 LLM 网页版撰写，
-  直接另存为 `outputs/<date>/复盘报告.md`，再跑 ⑧⑨ 即可（verify + PDF 只读 md 不覆盖）。
+- **报告正文**：脚本优先复用已存在的 `outputs/<date>/复盘报告_<date>.md`；若由 LLM 网页版撰写，
+  直接另存为 `outputs/<date>/复盘报告_<date>.md`，再跑 ⑧⑨ 即可（verify + PDF 只读 md 不覆盖）。
 - **LLM 自动成稿**（无既有 md 时）需配置环境变量：`LLM_API_URL` / `LLM_MODEL` /
   `LLM_API_KEY`；凭据文件可放 `_load_env_file()` 约定路径（见 `tools/daily_review.py`）。
 - **PDF 渲染**依赖本机 Chrome：`/Applications/Google Chrome.app/Contents/MacOS/Google Chrome

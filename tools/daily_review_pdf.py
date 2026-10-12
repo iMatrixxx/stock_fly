@@ -16,7 +16,7 @@
      d. 同花顺缺行时用腾讯行情补两市成交/沪深300（快照日期不符则跳过）
   5.5 M2 判卷：**补判**所有未计分预测卡（含历史断链的），带 gap 标记 → scorecard.jsonl
   5.6 选股段：evidence + 本地快照 → 候选池打分 → candidates.json（零联网、可重算）
-  6. 报告正文：优先复用已生成的 复盘报告.md；否则需配置
+  6. 报告正文：优先复用已生成的 复盘报告_<date>.md；否则需配置
      LLM_API_URL / LLM_MODEL / LLM_API_KEY 自动生成（候选池节在写报告前注入 prompt）
   5.7 M2 预测卡冻结：报告末尾如含 `## 次日预测卡` fenced json → forecast.json
   5.8 选股段判卷：**补判**全部已具备真值的候选池 → candidate_scorecard.jsonl
@@ -403,7 +403,7 @@ def run_verify_gate(
           flush=True)
     for b in bundle["blocking"]:
         print(f"[verify]   · {b}", flush=True)
-    print("[verify] 修正 复盘报告.md 后重跑即可；确需放行加 --skip-verify", flush=True)
+    print(f"[verify] 修正 {report_md.name} 后重跑即可；确需放行加 --skip-verify", flush=True)
     return False
 
 
