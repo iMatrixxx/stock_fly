@@ -1,0 +1,4889 @@
+{
+  "date": "2026-10-13",
+  "total_turnover": 16759.08,
+  "prev_total_turnover": 15378.21,
+  "indices": [
+    {
+      "name": "科创50",
+      "code": "1B0688",
+      "close": 1427.18,
+      "change_pct": 0.03,
+      "turnover": 769.8,
+      "ma5": 1459.5
+    },
+    {
+      "name": "沪深300",
+      "code": "1B0300",
+      "close": 4275.68,
+      "change_pct": -0.29,
+      "turnover": 4420.38,
+      "ma5": 4309.76
+    },
+    {
+      "name": "上证指数",
+      "code": "1A0001",
+      "close": 3800.86,
+      "change_pct": 0.1,
+      "turnover": 7793.02,
+      "ma5": 3813.2
+    },
+    {
+      "name": "创业板指",
+      "code": "399006",
+      "close": 2958.34,
+      "change_pct": -0.18,
+      "turnover": 4497.38,
+      "ma5": 3027.49
+    },
+    {
+      "name": "深证成指",
+      "code": "399001",
+      "close": 12353.7,
+      "change_pct": -0.25,
+      "turnover": 8966.16,
+      "ma5": 12577.79
+    }
+  ],
+  "boards": [
+    {
+      "name": "半导体",
+      "turnover": 1991.74,
+      "market_turnover": 16759.08,
+      "change_pct": 0.01,
+      "main_flow": 2.14,
+      "limit_ups": null,
+      "north_flow": null
+    },
+    {
+      "name": "元件",
+      "turnover": 982.77,
+      "market_turnover": 16759.08,
+      "change_pct": 5.03,
+      "main_flow": 13.67,
+      "limit_ups": null,
+      "north_flow": null
+    },
+    {
+      "name": "电池",
+      "turnover": 730.89,
+      "market_turnover": 16759.08,
+      "change_pct": -2.7,
+      "main_flow": -38.46,
+      "limit_ups": null,
+      "north_flow": null
+    },
+    {
+      "name": "通用设备",
+      "turnover": 466.28,
+      "market_turnover": 16759.08,
+      "change_pct": 0.61,
+      "main_flow": 4.9,
+      "limit_ups": null,
+      "north_flow": null
+    },
+    {
+      "name": "化学制品",
+      "turnover": 423.76,
+      "market_turnover": 16759.08,
+      "change_pct": 0.94,
+      "main_flow": 2.1,
+      "limit_ups": null,
+      "north_flow": null
+    },
+    {
+      "name": "化学制药",
+      "turnover": 381.81,
+      "market_turnover": 16759.08,
+      "change_pct": -0.78,
+      "main_flow": -8.06,
+      "limit_ups": null,
+      "north_flow": null
+    },
+    {
+      "name": "汽车零部件",
+      "turnover": 359.53,
+      "market_turnover": 16759.08,
+      "change_pct": -0.3,
+      "main_flow": -0.83,
+      "limit_ups": null,
+      "north_flow": null
+    },
+    {
+      "name": "光学光电子",
+      "turnover": 353.33,
+      "market_turnover": 16759.08,
+      "change_pct": 1.18,
+      "main_flow": 3.97,
+      "limit_ups": null,
+      "north_flow": null
+    },
+    {
+      "name": "软件开发",
+      "turnover": 350.5,
+      "market_turnover": 16759.08,
+      "change_pct": 0.66,
+      "main_flow": -0.19,
+      "limit_ups": null,
+      "north_flow": null
+    },
+    {
+      "name": "军工装备",
+      "turnover": 323.2,
+      "market_turnover": 16759.08,
+      "change_pct": 3.24,
+      "main_flow": null,
+      "limit_ups": null,
+      "north_flow": null
+    },
+    {
+      "name": "专用设备",
+      "turnover": 294.28,
+      "market_turnover": 16759.08,
+      "change_pct": 0.35,
+      "main_flow": -0.23,
+      "limit_ups": null,
+      "north_flow": null
+    },
+    {
+      "name": "IT服务",
+      "turnover": 289.63,
+      "market_turnover": 16759.08,
+      "change_pct": 0.65,
+      "main_flow": -2.88,
+      "limit_ups": null,
+      "north_flow": null
+    },
+    {
+      "name": "电网设备",
+      "turnover": 285.47,
+      "market_turnover": 16759.08,
+      "change_pct": -0.13,
+      "main_flow": -2.08,
+      "limit_ups": null,
+      "north_flow": null
+    },
+    {
+      "name": "电子化学品",
+      "turnover": 270.1,
+      "market_turnover": 16759.08,
+      "change_pct": 0.76,
+      "main_flow": 12.84,
+      "limit_ups": null,
+      "north_flow": null
+    },
+    {
+      "name": "医疗服务",
+      "turnover": 269.99,
+      "market_turnover": 16759.08,
+      "change_pct": -1.36,
+      "main_flow": -10.53,
+      "limit_ups": null,
+      "north_flow": null
+    },
+    {
+      "name": "电力",
+      "turnover": 259.87,
+      "market_turnover": 16759.08,
+      "change_pct": -0.61,
+      "main_flow": -8.9,
+      "limit_ups": null,
+      "north_flow": null
+    },
+    {
+      "name": "光伏设备",
+      "turnover": 217.76,
+      "market_turnover": 16759.08,
+      "change_pct": -0.98,
+      "main_flow": -2.34,
+      "limit_ups": null,
+      "north_flow": null
+    },
+    {
+      "name": "计算机设备",
+      "turnover": 206.97,
+      "market_turnover": 16759.08,
+      "change_pct": 0.75,
+      "main_flow": 0.17,
+      "limit_ups": null,
+      "north_flow": null
+    },
+    {
+      "name": "建筑装饰",
+      "turnover": 195.93,
+      "market_turnover": 16759.08,
+      "change_pct": 0.92,
+      "main_flow": -3.73,
+      "limit_ups": null,
+      "north_flow": null
+    },
+    {
+      "name": "建筑材料",
+      "turnover": 194.17,
+      "market_turnover": 16759.08,
+      "change_pct": 1.11,
+      "main_flow": -0.1,
+      "limit_ups": null,
+      "north_flow": null
+    },
+    {
+      "name": "汽车整车",
+      "turnover": 185.89,
+      "market_turnover": 16759.08,
+      "change_pct": -0.48,
+      "main_flow": -8.77,
+      "limit_ups": null,
+      "north_flow": null
+    },
+    {
+      "name": "工业金属",
+      "turnover": 178.35,
+      "market_turnover": 16759.08,
+      "change_pct": 0.34,
+      "main_flow": 2.26,
+      "limit_ups": null,
+      "north_flow": null
+    },
+    {
+      "name": "医疗器械",
+      "turnover": 158.85,
+      "market_turnover": 16759.08,
+      "change_pct": -0.84,
+      "main_flow": -3.36,
+      "limit_ups": null,
+      "north_flow": null
+    },
+    {
+      "name": "房地产",
+      "turnover": 154.89,
+      "market_turnover": 16759.08,
+      "change_pct": -0.16,
+      "main_flow": -4.86,
+      "limit_ups": null,
+      "north_flow": null
+    },
+    {
+      "name": "贵金属",
+      "turnover": 154.69,
+      "market_turnover": 16759.08,
+      "change_pct": 1.3,
+      "main_flow": 2.61,
+      "limit_ups": null,
+      "north_flow": null
+    },
+    {
+      "name": "风电设备",
+      "turnover": 146.47,
+      "market_turnover": 16759.08,
+      "change_pct": -2.57,
+      "main_flow": -9.19,
+      "limit_ups": null,
+      "north_flow": null
+    },
+    {
+      "name": "零售",
+      "turnover": 137.27,
+      "market_turnover": 16759.08,
+      "change_pct": 1.77,
+      "main_flow": 6.48,
+      "limit_ups": null,
+      "north_flow": null
+    },
+    {
+      "name": "港口航运",
+      "turnover": 136.28,
+      "market_turnover": 16759.08,
+      "change_pct": 1.19,
+      "main_flow": 4.33,
+      "limit_ups": null,
+      "north_flow": null
+    },
+    {
+      "name": "影视院线",
+      "turnover": 129.7,
+      "market_turnover": 16759.08,
+      "change_pct": 0.82,
+      "main_flow": -0.61,
+      "limit_ups": null,
+      "north_flow": null
+    },
+    {
+      "name": "环境治理",
+      "turnover": 125.27,
+      "market_turnover": 16759.08,
+      "change_pct": 0.17,
+      "main_flow": -3.81,
+      "limit_ups": null,
+      "north_flow": null
+    },
+    {
+      "name": "军工电子",
+      "turnover": 124.62,
+      "market_turnover": 16759.08,
+      "change_pct": 1.42,
+      "main_flow": 12.84,
+      "limit_ups": null,
+      "north_flow": null
+    },
+    {
+      "name": "其他电子",
+      "turnover": 122.25,
+      "market_turnover": 16759.08,
+      "change_pct": 0.84,
+      "main_flow": 12.84,
+      "limit_ups": null,
+      "north_flow": null
+    },
+    {
+      "name": "能源金属",
+      "turnover": 117.86,
+      "market_turnover": 16759.08,
+      "change_pct": -1.41,
+      "main_flow": -8.4,
+      "limit_ups": null,
+      "north_flow": null
+    },
+    {
+      "name": "家居用品",
+      "turnover": 104.31,
+      "market_turnover": 16759.08,
+      "change_pct": 0.35,
+      "main_flow": -1.6,
+      "limit_ups": null,
+      "north_flow": null
+    },
+    {
+      "name": "农化制品",
+      "turnover": 103.59,
+      "market_turnover": 16759.08,
+      "change_pct": 0.34,
+      "main_flow": -0.86,
+      "limit_ups": null,
+      "north_flow": null
+    },
+    {
+      "name": "白色家电",
+      "turnover": 101.0,
+      "market_turnover": 16759.08,
+      "change_pct": 0.12,
+      "main_flow": 0.05,
+      "limit_ups": null,
+      "north_flow": null
+    },
+    {
+      "name": "其他电源设备",
+      "turnover": 100.4,
+      "market_turnover": 16759.08,
+      "change_pct": -0.32,
+      "main_flow": -2.22,
+      "limit_ups": null,
+      "north_flow": null
+    },
+    {
+      "name": "保险",
+      "turnover": 100.0,
+      "market_turnover": 16759.08,
+      "change_pct": -3.12,
+      "main_flow": -8.56,
+      "limit_ups": null,
+      "north_flow": null
+    },
+    {
+      "name": "白酒",
+      "turnover": 99.96,
+      "market_turnover": 16759.08,
+      "change_pct": 0.99,
+      "main_flow": 1.66,
+      "limit_ups": null,
+      "north_flow": null
+    },
+    {
+      "name": "中药",
+      "turnover": 92.13,
+      "market_turnover": 16759.08,
+      "change_pct": -0.13,
+      "main_flow": -1.68,
+      "limit_ups": null,
+      "north_flow": null
+    },
+    {
+      "name": "饮料制造",
+      "turnover": 91.8,
+      "market_turnover": 16759.08,
+      "change_pct": 0.61,
+      "main_flow": null,
+      "limit_ups": null,
+      "north_flow": null
+    },
+    {
+      "name": "游戏",
+      "turnover": 78.47,
+      "market_turnover": 16759.08,
+      "change_pct": 1.16,
+      "main_flow": 0.41,
+      "limit_ups": null,
+      "north_flow": null
+    },
+    {
+      "name": "服装家纺",
+      "turnover": 73.56,
+      "market_turnover": 16759.08,
+      "change_pct": 0.8,
+      "main_flow": -1.98,
+      "limit_ups": null,
+      "north_flow": null
+    },
+    {
+      "name": "石油加工贸易",
+      "turnover": 69.88,
+      "market_turnover": 16759.08,
+      "change_pct": 1.74,
+      "main_flow": null,
+      "limit_ups": null,
+      "north_flow": null
+    },
+    {
+      "name": "互联网电商",
+      "turnover": 67.69,
+      "market_turnover": 16759.08,
+      "change_pct": 3.38,
+      "main_flow": 3.83,
+      "limit_ups": null,
+      "north_flow": null
+    },
+    {
+      "name": "工程机械",
+      "turnover": 66.98,
+      "market_turnover": 16759.08,
+      "change_pct": 0.03,
+      "main_flow": 1.44,
+      "limit_ups": null,
+      "north_flow": null
+    },
+    {
+      "name": "包装印刷",
+      "turnover": 63.56,
+      "market_turnover": 16759.08,
+      "change_pct": 0.28,
+      "main_flow": -0.75,
+      "limit_ups": null,
+      "north_flow": null
+    },
+    {
+      "name": "多元金融",
+      "turnover": 59.66,
+      "market_turnover": 16759.08,
+      "change_pct": 1.09,
+      "main_flow": 2.41,
+      "limit_ups": null,
+      "north_flow": null
+    },
+    {
+      "name": "钢铁",
+      "turnover": 58.32,
+      "market_turnover": 16759.08,
+      "change_pct": 0.28,
+      "main_flow": 0.24,
+      "limit_ups": null,
+      "north_flow": null
+    },
+    {
+      "name": "化学纤维",
+      "turnover": 54.48,
+      "market_turnover": 16759.08,
+      "change_pct": 0.51,
+      "main_flow": -0.44,
+      "limit_ups": null,
+      "north_flow": null
+    },
+    {
+      "name": "医药商业",
+      "turnover": 51.47,
+      "market_turnover": 16759.08,
+      "change_pct": 0.29,
+      "main_flow": -0.75,
+      "limit_ups": null,
+      "north_flow": null
+    },
+    {
+      "name": "金属新材料",
+      "turnover": 51.26,
+      "market_turnover": 16759.08,
+      "change_pct": 0.1,
+      "main_flow": -0.18,
+      "limit_ups": null,
+      "north_flow": null
+    },
+    {
+      "name": "美容护理",
+      "turnover": 47.32,
+      "market_turnover": 16759.08,
+      "change_pct": 0.18,
+      "main_flow": 1.95,
+      "limit_ups": null,
+      "north_flow": null
+    },
+    {
+      "name": "公路铁路运输",
+      "turnover": 46.02,
+      "market_turnover": 16759.08,
+      "change_pct": 0.79,
+      "main_flow": -0.84,
+      "limit_ups": null,
+      "north_flow": null
+    },
+    {
+      "name": "非金属材料",
+      "turnover": 45.35,
+      "market_turnover": 16759.08,
+      "change_pct": 0.99,
+      "main_flow": -1.45,
+      "limit_ups": null,
+      "north_flow": null
+    },
+    {
+      "name": "油气开采及服务",
+      "turnover": 44.74,
+      "market_turnover": 16759.08,
+      "change_pct": 0.88,
+      "main_flow": null,
+      "limit_ups": null,
+      "north_flow": null
+    },
+    {
+      "name": "旅游及酒店",
+      "turnover": 43.69,
+      "market_turnover": 16759.08,
+      "change_pct": 2.55,
+      "main_flow": -0.09,
+      "limit_ups": null,
+      "north_flow": null
+    },
+    {
+      "name": "其他社会服务",
+      "turnover": 38.01,
+      "market_turnover": 16759.08,
+      "change_pct": -0.19,
+      "main_flow": 1.2,
+      "limit_ups": null,
+      "north_flow": null
+    },
+    {
+      "name": "环保设备",
+      "turnover": 34.57,
+      "market_turnover": 16759.08,
+      "change_pct": 0.69,
+      "main_flow": -4.89,
+      "limit_ups": null,
+      "north_flow": null
+    },
+    {
+      "name": "综合",
+      "turnover": 31.99,
+      "market_turnover": 16759.08,
+      "change_pct": 0.86,
+      "main_flow": 2.7,
+      "limit_ups": null,
+      "north_flow": null
+    },
+    {
+      "name": "养殖业",
+      "turnover": 31.58,
+      "market_turnover": 16759.08,
+      "change_pct": -0.28,
+      "main_flow": -1.52,
+      "limit_ups": null,
+      "north_flow": null
+    },
+    {
+      "name": "轨交设备",
+      "turnover": 30.81,
+      "market_turnover": 16759.08,
+      "change_pct": 1.05,
+      "main_flow": -0.15,
+      "limit_ups": null,
+      "north_flow": null
+    },
+    {
+      "name": "汽车服务及其他",
+      "turnover": 28.92,
+      "market_turnover": 16759.08,
+      "change_pct": -0.16,
+      "main_flow": -8.77,
+      "limit_ups": null,
+      "north_flow": null
+    },
+    {
+      "name": "电机",
+      "turnover": 28.1,
+      "market_turnover": 16759.08,
+      "change_pct": -0.6,
+      "main_flow": -1.25,
+      "limit_ups": null,
+      "north_flow": null
+    },
+    {
+      "name": "机场航运",
+      "turnover": 26.44,
+      "market_turnover": 16759.08,
+      "change_pct": -0.15,
+      "main_flow": 4.33,
+      "limit_ups": null,
+      "north_flow": null
+    },
+    {
+      "name": "教育",
+      "turnover": 24.34,
+      "market_turnover": 16759.08,
+      "change_pct": -0.1,
+      "main_flow": -1.01,
+      "limit_ups": null,
+      "north_flow": null
+    },
+    {
+      "name": "造纸",
+      "turnover": 23.5,
+      "market_turnover": 16759.08,
+      "change_pct": 0.44,
+      "main_flow": 0.2,
+      "limit_ups": null,
+      "north_flow": null
+    },
+    {
+      "name": "橡胶制品",
+      "turnover": 22.2,
+      "market_turnover": 16759.08,
+      "change_pct": 0.49,
+      "main_flow": -0.2,
+      "limit_ups": null,
+      "north_flow": null
+    },
+    {
+      "name": "贸易",
+      "turnover": 11.95,
+      "market_turnover": 16759.08,
+      "change_pct": 1.4,
+      "main_flow": 2.08,
+      "limit_ups": null,
+      "north_flow": null
+    },
+    {
+      "name": "厨卫电器",
+      "turnover": 8.05,
+      "market_turnover": 16759.08,
+      "change_pct": 0.13,
+      "main_flow": -0.09,
+      "limit_ups": null,
+      "north_flow": null
+    }
+  ],
+  "leaders": [
+    {
+      "code": "600693",
+      "name": "东百集团",
+      "market_cap": 106.99,
+      "turnover": 20.58,
+      "close": 12.3,
+      "ma5": 10.49,
+      "ma10": 9.98,
+      "tail_behavior": "涨停封板",
+      "main_flow": 4.18,
+      "industry": "一般零售",
+      "note": "东财涨停池口径（一般零售，2 连板，首封 09:25:01，炸板 4 次）"
+    }
+  ],
+  "yesterday_premiums": [
+    {
+      "code": "002242",
+      "name": "九阳股份",
+      "open_premium_pct": -4.93
+    },
+    {
+      "code": "600241",
+      "name": "时代万恒",
+      "open_premium_pct": 0.0
+    },
+    {
+      "code": "600812",
+      "name": "华北制药",
+      "open_premium_pct": -1.06
+    },
+    {
+      "code": "000892",
+      "name": "欢瑞世纪",
+      "open_premium_pct": -0.37
+    },
+    {
+      "code": "001330",
+      "name": "博纳影业",
+      "open_premium_pct": 1.04
+    },
+    {
+      "code": "002343",
+      "name": "慈文传媒",
+      "open_premium_pct": 10.01
+    },
+    {
+      "code": "002692",
+      "name": "远程股份",
+      "open_premium_pct": 9.92
+    },
+    {
+      "code": "002696",
+      "name": "百洋股份",
+      "open_premium_pct": 6.09
+    },
+    {
+      "code": "601595",
+      "name": "上海电影",
+      "open_premium_pct": -0.99
+    },
+    {
+      "code": "601811",
+      "name": "新华文轩",
+      "open_premium_pct": 0.09
+    },
+    {
+      "code": "601929",
+      "name": "吉视传媒",
+      "open_premium_pct": 1.09
+    },
+    {
+      "code": "603096",
+      "name": "新经典",
+      "open_premium_pct": 10.02
+    },
+    {
+      "code": "603232",
+      "name": "格尔软件",
+      "open_premium_pct": -4.71
+    },
+    {
+      "code": "603533",
+      "name": "掌阅科技",
+      "open_premium_pct": -3.86
+    },
+    {
+      "code": "605136",
+      "name": "丽人丽妆",
+      "open_premium_pct": 9.92
+    },
+    {
+      "code": "605287",
+      "name": "德才股份",
+      "open_premium_pct": 10.0
+    },
+    {
+      "code": "605577",
+      "name": "龙版传媒",
+      "open_premium_pct": 9.99
+    },
+    {
+      "code": "001231",
+      "name": "农心科技",
+      "open_premium_pct": 4.88
+    },
+    {
+      "code": "002264",
+      "name": "新华都",
+      "open_premium_pct": 1.97
+    },
+    {
+      "code": "002441",
+      "name": "众业达",
+      "open_premium_pct": -0.98
+    },
+    {
+      "code": "002531",
+      "name": "天顺风能",
+      "open_premium_pct": -0.97
+    },
+    {
+      "code": "002576",
+      "name": "通达动力",
+      "open_premium_pct": -1.99
+    },
+    {
+      "code": "002591",
+      "name": "恒大高新",
+      "open_premium_pct": -5.45
+    },
+    {
+      "code": "002667",
+      "name": "*ST威领",
+      "open_premium_pct": 10.0
+    },
+    {
+      "code": "002908",
+      "name": "德生科技",
+      "open_premium_pct": -4.24
+    },
+    {
+      "code": "002990",
+      "name": "盛视科技",
+      "open_premium_pct": -1.39
+    },
+    {
+      "code": "300006",
+      "name": "莱美药业",
+      "open_premium_pct": 3.66
+    },
+    {
+      "code": "300829",
+      "name": "金丹科技",
+      "open_premium_pct": -5.14
+    },
+    {
+      "code": "301030",
+      "name": "*ST仕净",
+      "open_premium_pct": 2.22
+    },
+    {
+      "code": "301052",
+      "name": "果麦文化",
+      "open_premium_pct": 2.53
+    },
+    {
+      "code": "301419",
+      "name": "阿莱德",
+      "open_premium_pct": -1.01
+    },
+    {
+      "code": "301658",
+      "name": "首航新能",
+      "open_premium_pct": -7.63
+    },
+    {
+      "code": "600192",
+      "name": "长城电工",
+      "open_premium_pct": 0.0
+    },
+    {
+      "code": "600560",
+      "name": "金自天正",
+      "open_premium_pct": 0.0
+    },
+    {
+      "code": "600693",
+      "name": "东百集团",
+      "open_premium_pct": 10.02
+    },
+    {
+      "code": "600831",
+      "name": "广电网络",
+      "open_premium_pct": 1.02
+    },
+    {
+      "code": "600851",
+      "name": "海欣股份",
+      "open_premium_pct": 1.05
+    },
+    {
+      "code": "601127",
+      "name": "赛力斯",
+      "open_premium_pct": -0.47
+    },
+    {
+      "code": "603032",
+      "name": "德新科技",
+      "open_premium_pct": -3.04
+    },
+    {
+      "code": "603230",
+      "name": "内蒙新华",
+      "open_premium_pct": -4.24
+    },
+    {
+      "code": "603336",
+      "name": "宏辉果蔬",
+      "open_premium_pct": -2.39
+    },
+    {
+      "code": "603500",
+      "name": "祥和实业",
+      "open_premium_pct": -0.09
+    },
+    {
+      "code": "603528",
+      "name": "多伦科技",
+      "open_premium_pct": 3.55
+    },
+    {
+      "code": "603968",
+      "name": "醋化股份",
+      "open_premium_pct": -0.38
+    },
+    {
+      "code": "603992",
+      "name": "松霖科技",
+      "open_premium_pct": -0.05
+    },
+    {
+      "code": "688004",
+      "name": "博汇科技",
+      "open_premium_pct": -1.69
+    },
+    {
+      "code": "688517",
+      "name": "金冠电气",
+      "open_premium_pct": -5.1
+    }
+  ],
+  "top_fallers": [
+    {
+      "code": "002487",
+      "name": "大金重工",
+      "change_pct": -10.0,
+      "note": "跌停（风电设备，连续跌停 1 天）"
+    },
+    {
+      "code": "002058",
+      "name": "紫竹高科",
+      "change_pct": -10.0,
+      "note": "跌停（电池，连续跌停 1 天）"
+    },
+    {
+      "code": "002768",
+      "name": "国恩股份",
+      "change_pct": -10.0,
+      "note": "跌停（塑料，连续跌停 1 天）"
+    },
+    {
+      "code": "603668",
+      "name": "天马科技",
+      "change_pct": -9.99,
+      "note": "跌停（饲料，连续跌停 2 天）"
+    },
+    {
+      "code": "603230",
+      "name": "内蒙新华",
+      "change_pct": -9.98,
+      "note": "跌停（出版，连续跌停 1 天）"
+    },
+    {
+      "code": "001336",
+      "name": "楚环科技",
+      "change_pct": -9.98,
+      "note": "跌停（环保设备，连续跌停 1 天）"
+    },
+    {
+      "code": "002866",
+      "name": "传艺科技",
+      "change_pct": -9.97,
+      "note": "跌停（消费电子，连续跌停 1 天）"
+    },
+    {
+      "code": "600812",
+      "name": "华北制药",
+      "change_pct": -9.95,
+      "note": "昨日3连板今日大跌（A杀嫌疑，fuyao 口径）"
+    },
+    {
+      "code": "601811",
+      "name": "新华文轩",
+      "change_pct": -8.09,
+      "note": "昨日2连板今日大跌（A杀嫌疑，fuyao 口径）"
+    }
+  ],
+  "zt_pool": [
+    {
+      "code": "000668",
+      "name": "荣丰控股",
+      "price": 20.56,
+      "change_pct": 10.01,
+      "amount": 18497832,
+      "float_mv": 3019069258.3999996,
+      "total_mv": 3089974098.64,
+      "turnover_rate": 0.61,
+      "ladder": 1,
+      "first_seal": "09:25:00",
+      "last_seal": "09:25:00",
+      "seal_fund": 87682232,
+      "blast_count": 0,
+      "industry": "房地产开",
+      "zt_days": 1,
+      "zt_count": 1
+    },
+    {
+      "code": "002343",
+      "name": "慈文传媒",
+      "price": 7.36,
+      "change_pct": 10.01,
+      "amount": 117455149,
+      "float_mv": 3486286904.96,
+      "total_mv": 3486286919.6800003,
+      "turnover_rate": 3.37,
+      "ladder": 3,
+      "first_seal": "09:25:00",
+      "last_seal": "09:25:00",
+      "seal_fund": 251983289,
+      "blast_count": 0,
+      "industry": "影视院线",
+      "zt_days": 3,
+      "zt_count": 3
+    },
+    {
+      "code": "002917",
+      "name": "金奥博",
+      "price": 11.0,
+      "change_pct": 10.0,
+      "amount": 142022466,
+      "float_mv": 2866014041.0,
+      "total_mv": 3823756112.0,
+      "turnover_rate": 5.0,
+      "ladder": 1,
+      "first_seal": "09:25:00",
+      "last_seal": "09:36:48",
+      "seal_fund": 96902300,
+      "blast_count": 1,
+      "industry": "化学制品",
+      "zt_days": 1,
+      "zt_count": 1
+    },
+    {
+      "code": "603096",
+      "name": "新经典",
+      "price": 20.97,
+      "change_pct": 10.02,
+      "amount": 90108761,
+      "float_mv": 3234300065.2799997,
+      "total_mv": 3234300065.2799997,
+      "turnover_rate": 2.79,
+      "ladder": 3,
+      "first_seal": "09:25:00",
+      "last_seal": "09:25:00",
+      "seal_fund": 216938172,
+      "blast_count": 0,
+      "industry": "出版",
+      "zt_days": 3,
+      "zt_count": 3
+    },
+    {
+      "code": "600693",
+      "name": "东百集团",
+      "price": 12.3,
+      "change_pct": 10.02,
+      "amount": 2058068592,
+      "float_mv": 10688119218.6,
+      "total_mv": 10699108752.0,
+      "turnover_rate": 19.75,
+      "ladder": 2,
+      "first_seal": "09:25:01",
+      "last_seal": "09:57:16",
+      "seal_fund": 129715800,
+      "blast_count": 4,
+      "industry": "一般零售",
+      "zt_days": 2,
+      "zt_count": 2
+    },
+    {
+      "code": "002322",
+      "name": "理工能科",
+      "price": 13.08,
+      "change_pct": 10.01,
+      "amount": 320103296,
+      "float_mv": 4596062551.32,
+      "total_mv": 4781105821.44,
+      "turnover_rate": 7.02,
+      "ladder": 1,
+      "first_seal": "09:30:00",
+      "last_seal": "10:07:03",
+      "seal_fund": 76952256,
+      "blast_count": 1,
+      "industry": "软件开发",
+      "zt_days": 1,
+      "zt_count": 1
+    },
+    {
+      "code": "605577",
+      "name": "龙版传媒",
+      "price": 19.6,
+      "change_pct": 9.99,
+      "amount": 1116260384,
+      "float_mv": 8711111122.0,
+      "total_mv": 8711111180.800001,
+      "turnover_rate": 13.11,
+      "ladder": 3,
+      "first_seal": "09:30:22",
+      "last_seal": "13:01:13",
+      "seal_fund": 51557800,
+      "blast_count": 3,
+      "industry": "出版",
+      "zt_days": 5,
+      "zt_count": 4
+    },
+    {
+      "code": "001231",
+      "name": "农心科技",
+      "price": 28.17,
+      "change_pct": 10.0,
+      "amount": 269440096,
+      "float_mv": 1435625878.95,
+      "total_mv": 2807975317.9500003,
+      "turnover_rate": 19.19,
+      "ladder": 2,
+      "first_seal": "09:30:27",
+      "last_seal": "09:30:27",
+      "seal_fund": 296275045,
+      "blast_count": 0,
+      "industry": "农化制品",
+      "zt_days": 2,
+      "zt_count": 2
+    },
+    {
+      "code": "605136",
+      "name": "丽人丽妆",
+      "price": 11.42,
+      "change_pct": 10.02,
+      "amount": 359252880,
+      "float_mv": 4573236070.0,
+      "total_mv": 4573236024.32,
+      "turnover_rate": 7.9,
+      "ladder": 3,
+      "first_seal": "09:30:46",
+      "last_seal": "09:30:46",
+      "seal_fund": 100856872,
+      "blast_count": 0,
+      "industry": "互联网电",
+      "zt_days": 3,
+      "zt_count": 3
+    },
+    {
+      "code": "000995",
+      "name": "皇台酒业",
+      "price": 12.25,
+      "change_pct": 9.96,
+      "amount": 167291678,
+      "float_mv": 2173248000.0,
+      "total_mv": 2173248000.0,
+      "turnover_rate": 7.78,
+      "ladder": 1,
+      "first_seal": "09:31:21",
+      "last_seal": "09:31:54",
+      "seal_fund": 91654500,
+      "blast_count": 1,
+      "industry": "白酒Ⅱ",
+      "zt_days": 1,
+      "zt_count": 1
+    },
+    {
+      "code": "000823",
+      "name": "超声电子",
+      "price": 22.32,
+      "change_pct": 10.0,
+      "amount": 899091408,
+      "float_mv": 13278885967.44,
+      "total_mv": 13279393635.84,
+      "turnover_rate": 6.94,
+      "ladder": 1,
+      "first_seal": "09:31:54",
+      "last_seal": "09:31:54",
+      "seal_fund": 387691257,
+      "blast_count": 0,
+      "industry": "元件",
+      "zt_days": 1,
+      "zt_count": 1
+    },
+    {
+      "code": "002184",
+      "name": "海得控制",
+      "price": 11.07,
+      "change_pct": 10.04,
+      "amount": 186512812,
+      "float_mv": 2748562794.54,
+      "total_mv": 3895625633.76,
+      "turnover_rate": 6.86,
+      "ladder": 1,
+      "first_seal": "09:32:12",
+      "last_seal": "09:32:48",
+      "seal_fund": 53457749,
+      "blast_count": 1,
+      "industry": "自动化设",
+      "zt_days": 1,
+      "zt_count": 1
+    },
+    {
+      "code": "603188",
+      "name": "亚邦股份",
+      "price": 5.46,
+      "change_pct": 10.08,
+      "amount": 166699377,
+      "float_mv": 3113128200.0,
+      "total_mv": 3113128200.0,
+      "turnover_rate": 5.51,
+      "ladder": 1,
+      "first_seal": "09:32:57",
+      "last_seal": "09:32:57",
+      "seal_fund": 52302432,
+      "blast_count": 0,
+      "industry": "化学制品",
+      "zt_days": 6,
+      "zt_count": 3
+    },
+    {
+      "code": "600802",
+      "name": "福建水泥",
+      "price": 7.16,
+      "change_pct": 9.98,
+      "amount": 692878288,
+      "float_mv": 3281058544.0,
+      "total_mv": 3281058544.0,
+      "turnover_rate": 21.55,
+      "ladder": 1,
+      "first_seal": "09:33:54",
+      "last_seal": "13:03:00",
+      "seal_fund": 11306134,
+      "blast_count": 3,
+      "industry": "水泥",
+      "zt_days": 1,
+      "zt_count": 1
+    },
+    {
+      "code": "002696",
+      "name": "百洋股份",
+      "price": 8.86,
+      "change_pct": 10.06,
+      "amount": 308621376,
+      "float_mv": 2961534013.48,
+      "total_mv": 3063382566.3999996,
+      "turnover_rate": 10.85,
+      "ladder": 3,
+      "first_seal": "09:34:09",
+      "last_seal": "09:34:09",
+      "seal_fund": 67280775,
+      "blast_count": 0,
+      "industry": "饲料",
+      "zt_days": 3,
+      "zt_count": 3
+    },
+    {
+      "code": "000833",
+      "name": "粤桂股份",
+      "price": 20.65,
+      "change_pct": 10.02,
+      "amount": 724083280,
+      "float_mv": 9369042363.8,
+      "total_mv": 17658165884.8,
+      "turnover_rate": 7.81,
+      "ladder": 1,
+      "first_seal": "09:34:12",
+      "last_seal": "09:34:12",
+      "seal_fund": 139304342,
+      "blast_count": 0,
+      "industry": "综合Ⅱ",
+      "zt_days": 1,
+      "zt_count": 1
+    },
+    {
+      "code": "600847",
+      "name": "万里股份",
+      "price": 14.03,
+      "change_pct": 10.04,
+      "amount": 75515922,
+      "float_mv": 2150622222.0,
+      "total_mv": 2150622222.0,
+      "turnover_rate": 3.6,
+      "ladder": 1,
+      "first_seal": "09:34:34",
+      "last_seal": "09:34:34",
+      "seal_fund": 39925002,
+      "blast_count": 0,
+      "industry": "电池",
+      "zt_days": 1,
+      "zt_count": 1
+    },
+    {
+      "code": "603767",
+      "name": "中马传动",
+      "price": 15.72,
+      "change_pct": 10.01,
+      "amount": 206590762,
+      "float_mv": 4851687180.0,
+      "total_mv": 4851687242.88,
+      "turnover_rate": 4.34,
+      "ladder": 1,
+      "first_seal": "09:34:34",
+      "last_seal": "09:35:34",
+      "seal_fund": 83069871,
+      "blast_count": 1,
+      "industry": "汽车零部",
+      "zt_days": 1,
+      "zt_count": 1
+    },
+    {
+      "code": "003037",
+      "name": "三和管桩",
+      "price": 6.45,
+      "change_pct": 10.07,
+      "amount": 75443012,
+      "float_mv": 3864031673.1,
+      "total_mv": 3864031634.4,
+      "turnover_rate": 1.98,
+      "ladder": 1,
+      "first_seal": "09:35:09",
+      "last_seal": "09:35:30",
+      "seal_fund": 56671138,
+      "blast_count": 1,
+      "industry": "水泥",
+      "zt_days": 1,
+      "zt_count": 1
+    },
+    {
+      "code": "603968",
+      "name": "醋化股份",
+      "price": 14.36,
+      "change_pct": 10.04,
+      "amount": 403470992,
+      "float_mv": 2936332800.0,
+      "total_mv": 2936332800.0,
+      "turnover_rate": 14.07,
+      "ladder": 2,
+      "first_seal": "09:36:33",
+      "last_seal": "09:46:09",
+      "seal_fund": 22695477,
+      "blast_count": 2,
+      "industry": "化学制品",
+      "zt_days": 2,
+      "zt_count": 2
+    },
+    {
+      "code": "600831",
+      "name": "广电网络",
+      "price": 4.3,
+      "change_pct": 9.97,
+      "amount": 322793008,
+      "float_mv": 3057072065.6,
+      "total_mv": 3057072065.6,
+      "turnover_rate": 10.87,
+      "ladder": 2,
+      "first_seal": "09:39:06",
+      "last_seal": "09:39:06",
+      "seal_fund": 52693275,
+      "blast_count": 0,
+      "industry": "电视广播",
+      "zt_days": 2,
+      "zt_count": 2
+    },
+    {
+      "code": "600199",
+      "name": "金种子酒",
+      "price": 7.6,
+      "change_pct": 9.99,
+      "amount": 454117968,
+      "float_mv": 4999255862.4,
+      "total_mv": 4999255923.2,
+      "turnover_rate": 9.27,
+      "ladder": 1,
+      "first_seal": "09:45:49",
+      "last_seal": "10:57:28",
+      "seal_fund": 32731680,
+      "blast_count": 3,
+      "industry": "白酒Ⅱ",
+      "zt_days": 1,
+      "zt_count": 1
+    },
+    {
+      "code": "600851",
+      "name": "海欣股份",
+      "price": 9.46,
+      "change_pct": 10.0,
+      "amount": 508799296,
+      "float_mv": 6983429800.6,
+      "total_mv": 11418756268.480001,
+      "turnover_rate": 7.54,
+      "ladder": 2,
+      "first_seal": "09:49:13",
+      "last_seal": "13:24:46",
+      "seal_fund": 20695632,
+      "blast_count": 3,
+      "industry": "化学制药",
+      "zt_days": 2,
+      "zt_count": 2
+    },
+    {
+      "code": "002549",
+      "name": "凯美特气",
+      "price": 14.25,
+      "change_pct": 10.04,
+      "amount": 889935296,
+      "float_mv": 9866123245.5,
+      "total_mv": 9908707632.0,
+      "turnover_rate": 9.4,
+      "ladder": 1,
+      "first_seal": "09:54:06",
+      "last_seal": "10:35:27",
+      "seal_fund": 144781325,
+      "blast_count": 1,
+      "industry": "化学制品",
+      "zt_days": 1,
+      "zt_count": 1
+    },
+    {
+      "code": "002693",
+      "name": "双成药业",
+      "price": 10.32,
+      "change_pct": 10.02,
+      "amount": 316822224,
+      "float_mv": 4241330070.7200003,
+      "total_mv": 4279598158.08,
+      "turnover_rate": 7.77,
+      "ladder": 1,
+      "first_seal": "09:58:03",
+      "last_seal": "09:58:03",
+      "seal_fund": 53892846,
+      "blast_count": 0,
+      "industry": "化学制药",
+      "zt_days": 1,
+      "zt_count": 1
+    },
+    {
+      "code": "300107",
+      "name": "建新股份",
+      "price": 8.63,
+      "change_pct": 20.03,
+      "amount": 591176944,
+      "float_mv": 3001057205.4700003,
+      "total_mv": 4856811007.360001,
+      "turnover_rate": 20.71,
+      "ladder": 1,
+      "first_seal": "09:59:57",
+      "last_seal": "10:03:54",
+      "seal_fund": 64153694,
+      "blast_count": 1,
+      "industry": "化学制品",
+      "zt_days": 1,
+      "zt_count": 1
+    },
+    {
+      "code": "000530",
+      "name": "冰山冷热",
+      "price": 5.73,
+      "change_pct": 9.98,
+      "amount": 288658928,
+      "float_mv": 3438668834.2500005,
+      "total_mv": 4831607693.76,
+      "turnover_rate": 8.53,
+      "ladder": 1,
+      "first_seal": "10:09:06",
+      "last_seal": "10:20:12",
+      "seal_fund": 111305765,
+      "blast_count": 1,
+      "industry": "通用设备",
+      "zt_days": 1,
+      "zt_count": 1
+    },
+    {
+      "code": "002640",
+      "name": "跨境通",
+      "price": 3.89,
+      "change_pct": 9.89,
+      "amount": 990419760,
+      "float_mv": 6022738324.2,
+      "total_mv": 6060780765.92,
+      "turnover_rate": 17.03,
+      "ladder": 1,
+      "first_seal": "10:13:24",
+      "last_seal": "10:53:30",
+      "seal_fund": 83119964,
+      "blast_count": 2,
+      "industry": "互联网电",
+      "zt_days": 1,
+      "zt_count": 1
+    },
+    {
+      "code": "002748",
+      "name": "世龙实业",
+      "price": 13.1,
+      "change_pct": 9.99,
+      "amount": 171376646,
+      "float_mv": 3144000000.0,
+      "total_mv": 3144000000.0,
+      "turnover_rate": 5.66,
+      "ladder": 1,
+      "first_seal": "10:14:06",
+      "last_seal": "10:16:36",
+      "seal_fund": 43721485,
+      "blast_count": 1,
+      "industry": "化学原料",
+      "zt_days": 1,
+      "zt_count": 1
+    },
+    {
+      "code": "605058",
+      "name": "澳弘电子",
+      "price": 60.39,
+      "change_pct": 10.0,
+      "amount": 1071439248,
+      "float_mv": 8631483034.68,
+      "total_mv": 8631483034.68,
+      "turnover_rate": 12.95,
+      "ladder": 1,
+      "first_seal": "10:20:07",
+      "last_seal": "10:36:58",
+      "seal_fund": 84959852,
+      "blast_count": 2,
+      "industry": "元件",
+      "zt_days": 17,
+      "zt_count": 10
+    },
+    {
+      "code": "600202",
+      "name": "哈空调",
+      "price": 5.59,
+      "change_pct": 10.04,
+      "amount": 157008710,
+      "float_mv": 2142874356.48,
+      "total_mv": 2142874356.48,
+      "turnover_rate": 7.49,
+      "ladder": 1,
+      "first_seal": "10:35:30",
+      "last_seal": "10:35:30",
+      "seal_fund": 42115060,
+      "blast_count": 0,
+      "industry": "通用设备",
+      "zt_days": 1,
+      "zt_count": 1
+    },
+    {
+      "code": "605258",
+      "name": "协和电子",
+      "price": 40.55,
+      "change_pct": 10.01,
+      "amount": 209836403,
+      "float_mv": 3568399999.9999995,
+      "total_mv": 3568399999.9999995,
+      "turnover_rate": 6.28,
+      "ladder": 1,
+      "first_seal": "10:39:18",
+      "last_seal": "10:40:27",
+      "seal_fund": 57589110,
+      "blast_count": 1,
+      "industry": "元件",
+      "zt_days": 1,
+      "zt_count": 1
+    },
+    {
+      "code": "601188",
+      "name": "龙江交通",
+      "price": 3.21,
+      "change_pct": 9.93,
+      "amount": 222681868,
+      "float_mv": 4190558427.15,
+      "total_mv": 4190558443.2,
+      "turnover_rate": 5.49,
+      "ladder": 1,
+      "first_seal": "10:48:37",
+      "last_seal": "10:48:37",
+      "seal_fund": 41650558,
+      "blast_count": 0,
+      "industry": "铁路公路",
+      "zt_days": 1,
+      "zt_count": 1
+    },
+    {
+      "code": "000715",
+      "name": "中兴商业",
+      "price": 5.78,
+      "change_pct": 10.1,
+      "amount": 153662345,
+      "float_mv": 2810415497.9,
+      "total_mv": 3123712126.7200003,
+      "turnover_rate": 5.67,
+      "ladder": 1,
+      "first_seal": "10:52:24",
+      "last_seal": "10:52:24",
+      "seal_fund": 46379384,
+      "blast_count": 0,
+      "industry": "一般零售",
+      "zt_days": 1,
+      "zt_count": 1
+    },
+    {
+      "code": "301010",
+      "name": "晶雪节能",
+      "price": 23.7,
+      "change_pct": 20.0,
+      "amount": 333320112,
+      "float_mv": 2559600000.0,
+      "total_mv": 2559600000.0,
+      "turnover_rate": 14.01,
+      "ladder": 1,
+      "first_seal": "10:55:21",
+      "last_seal": "10:55:48",
+      "seal_fund": 28047954,
+      "blast_count": 1,
+      "industry": "装修建材",
+      "zt_days": 1,
+      "zt_count": 1
+    },
+    {
+      "code": "600593",
+      "name": "大连圣亚",
+      "price": 49.83,
+      "change_pct": 10.0,
+      "amount": 560508816,
+      "float_mv": 6418104000.0,
+      "total_mv": 6500074350.0,
+      "turnover_rate": 9.15,
+      "ladder": 1,
+      "first_seal": "10:56:14",
+      "last_seal": "10:56:14",
+      "seal_fund": 161663469,
+      "blast_count": 0,
+      "industry": "旅游及景",
+      "zt_days": 1,
+      "zt_count": 1
+    },
+    {
+      "code": "603328",
+      "name": "依顿电子",
+      "price": 13.34,
+      "change_pct": 9.98,
+      "amount": 703554112,
+      "float_mv": 13319224430.74,
+      "total_mv": 13319224390.72,
+      "turnover_rate": 5.59,
+      "ladder": 1,
+      "first_seal": "11:00:04",
+      "last_seal": "11:00:04",
+      "seal_fund": 62191080,
+      "blast_count": 0,
+      "industry": "元件",
+      "zt_days": 1,
+      "zt_count": 1
+    },
+    {
+      "code": "600853",
+      "name": "龙建股份",
+      "price": 3.65,
+      "change_pct": 9.94,
+      "amount": 248026634,
+      "float_mv": 3700021498.0,
+      "total_mv": 3700021527.2,
+      "turnover_rate": 6.86,
+      "ladder": 1,
+      "first_seal": "11:07:51",
+      "last_seal": "11:17:42",
+      "seal_fund": 40155781,
+      "blast_count": 2,
+      "industry": "基础建设",
+      "zt_days": 1,
+      "zt_count": 1
+    },
+    {
+      "code": "603386",
+      "name": "骏亚科技",
+      "price": 17.47,
+      "change_pct": 10.01,
+      "amount": 189429301,
+      "float_mv": 5700855123.2,
+      "total_mv": 5700855123.2,
+      "turnover_rate": 3.57,
+      "ladder": 1,
+      "first_seal": "11:10:14",
+      "last_seal": "11:10:14",
+      "seal_fund": 61782655,
+      "blast_count": 0,
+      "industry": "元件",
+      "zt_days": 1,
+      "zt_count": 1
+    },
+    {
+      "code": "002639",
+      "name": "雪人集团",
+      "price": 14.59,
+      "change_pct": 10.03,
+      "amount": 1296895584,
+      "float_mv": 9630932767.039999,
+      "total_mv": 11371816936.16,
+      "turnover_rate": 14.13,
+      "ladder": 1,
+      "first_seal": "11:18:06",
+      "last_seal": "11:18:06",
+      "seal_fund": 168385991,
+      "blast_count": 0,
+      "industry": "通用设备",
+      "zt_days": 1,
+      "zt_count": 1
+    },
+    {
+      "code": "001229",
+      "name": "魅视科技",
+      "price": 41.76,
+      "change_pct": 10.01,
+      "amount": 289364592,
+      "float_mv": 3079850362.56,
+      "total_mv": 5989724496.0,
+      "turnover_rate": 9.78,
+      "ladder": 1,
+      "first_seal": "11:18:18",
+      "last_seal": "11:18:18",
+      "seal_fund": 20085056,
+      "blast_count": 0,
+      "industry": "计算机设",
+      "zt_days": 1,
+      "zt_count": 1
+    },
+    {
+      "code": "603956",
+      "name": "威派格",
+      "price": 8.15,
+      "change_pct": 9.99,
+      "amount": 593641456,
+      "float_mv": 4644736230.900001,
+      "total_mv": 4644736247.2,
+      "turnover_rate": 13.52,
+      "ladder": 1,
+      "first_seal": "11:24:06",
+      "last_seal": "15:00:00",
+      "seal_fund": 23985694,
+      "blast_count": 4,
+      "industry": "专用设备",
+      "zt_days": 1,
+      "zt_count": 1
+    },
+    {
+      "code": "301041",
+      "name": "金百泽",
+      "price": 40.14,
+      "change_pct": 20.0,
+      "amount": 410407024,
+      "float_mv": 3171173957.46,
+      "total_mv": 4282135200.0,
+      "turnover_rate": 14.45,
+      "ladder": 1,
+      "first_seal": "11:27:15",
+      "last_seal": "11:27:15",
+      "seal_fund": 31355722,
+      "blast_count": 0,
+      "industry": "元件",
+      "zt_days": 1,
+      "zt_count": 1
+    },
+    {
+      "code": "002579",
+      "name": "中京电子",
+      "price": 16.43,
+      "change_pct": 9.97,
+      "amount": 1263571232,
+      "float_mv": 9585890562.51,
+      "total_mv": 10065323992.32,
+      "turnover_rate": 14.07,
+      "ladder": 1,
+      "first_seal": "11:27:36",
+      "last_seal": "11:27:36",
+      "seal_fund": 104830136,
+      "blast_count": 0,
+      "industry": "元件",
+      "zt_days": 1,
+      "zt_count": 1
+    },
+    {
+      "code": "002949",
+      "name": "华阳国际",
+      "price": 14.32,
+      "change_pct": 9.98,
+      "amount": 173564654,
+      "float_mv": 2175575107.52,
+      "total_mv": 2807978527.52,
+      "turnover_rate": 8.39,
+      "ladder": 1,
+      "first_seal": "11:28:48",
+      "last_seal": "11:28:48",
+      "seal_fund": 27848104,
+      "blast_count": 0,
+      "industry": "工程咨询",
+      "zt_days": 1,
+      "zt_count": 1
+    },
+    {
+      "code": "688655",
+      "name": "迅捷兴",
+      "price": 70.79,
+      "change_pct": 20.0,
+      "amount": 1144112736,
+      "float_mv": 9442678100.0,
+      "total_mv": 9442678100.0,
+      "turnover_rate": 13.31,
+      "ladder": 1,
+      "first_seal": "11:29:31",
+      "last_seal": "14:42:37",
+      "seal_fund": 22600556,
+      "blast_count": 3,
+      "industry": "元件",
+      "zt_days": 1,
+      "zt_count": 1
+    },
+    {
+      "code": "603353",
+      "name": "和顺石油",
+      "price": 37.9,
+      "change_pct": 10.01,
+      "amount": 342433488,
+      "float_mv": 6458842200.0,
+      "total_mv": 6458842200.0,
+      "turnover_rate": 5.64,
+      "ladder": 1,
+      "first_seal": "13:00:10",
+      "last_seal": "13:00:10",
+      "seal_fund": 46435080,
+      "blast_count": 0,
+      "industry": "炼化及贸",
+      "zt_days": 1,
+      "zt_count": 1
+    },
+    {
+      "code": "600237",
+      "name": "铜峰电子",
+      "price": 9.03,
+      "change_pct": 9.99,
+      "amount": 441778128,
+      "float_mv": 5640280628.849999,
+      "total_mv": 5693322532.799999,
+      "turnover_rate": 8.22,
+      "ladder": 1,
+      "first_seal": "13:00:42",
+      "last_seal": "13:00:42",
+      "seal_fund": 26546285,
+      "blast_count": 0,
+      "industry": "元件",
+      "zt_days": 1,
+      "zt_count": 1
+    },
+    {
+      "code": "600228",
+      "name": "返利科技",
+      "price": 10.14,
+      "change_pct": 9.98,
+      "amount": 237987684,
+      "float_mv": 4218616974.78,
+      "total_mv": 4225058460.48,
+      "turnover_rate": 6.01,
+      "ladder": 1,
+      "first_seal": "13:01:36",
+      "last_seal": "13:01:36",
+      "seal_fund": 31483686,
+      "blast_count": 0,
+      "industry": "数字媒体",
+      "zt_days": 1,
+      "zt_count": 1
+    },
+    {
+      "code": "603466",
+      "name": "风语筑",
+      "price": 13.57,
+      "change_pct": 9.97,
+      "amount": 1305658880,
+      "float_mv": 8071869751.4800005,
+      "total_mv": 8071869805.76,
+      "turnover_rate": 17.01,
+      "ladder": 1,
+      "first_seal": "13:01:53",
+      "last_seal": "13:01:53",
+      "seal_fund": 125285866,
+      "blast_count": 0,
+      "industry": "数字媒体",
+      "zt_days": 1,
+      "zt_count": 1
+    },
+    {
+      "code": "002862",
+      "name": "实丰文化",
+      "price": 15.95,
+      "change_pct": 10.0,
+      "amount": 158622485,
+      "float_mv": 2050797774.85,
+      "total_mv": 2703365500.0,
+      "turnover_rate": 8.09,
+      "ladder": 1,
+      "first_seal": "13:02:15",
+      "last_seal": "13:02:15",
+      "seal_fund": 11717189,
+      "blast_count": 0,
+      "industry": "文娱用品",
+      "zt_days": 1,
+      "zt_count": 1
+    },
+    {
+      "code": "603001",
+      "name": "奥康国际",
+      "price": 11.91,
+      "change_pct": 9.97,
+      "amount": 157810634,
+      "float_mv": 4775671800.0,
+      "total_mv": 4775671800.0,
+      "turnover_rate": 3.46,
+      "ladder": 1,
+      "first_seal": "13:03:23",
+      "last_seal": "13:03:23",
+      "seal_fund": 27389427,
+      "blast_count": 0,
+      "industry": "服装家纺",
+      "zt_days": 1,
+      "zt_count": 1
+    },
+    {
+      "code": "603099",
+      "name": "长白山",
+      "price": 45.85,
+      "change_pct": 10.0,
+      "amount": 1065450352,
+      "float_mv": 12487516181.0,
+      "total_mv": 12487515997.6,
+      "turnover_rate": 8.86,
+      "ladder": 1,
+      "first_seal": "13:04:45",
+      "last_seal": "14:46:21",
+      "seal_fund": 34818031,
+      "blast_count": 1,
+      "industry": "旅游及景",
+      "zt_days": 1,
+      "zt_count": 1
+    },
+    {
+      "code": "603980",
+      "name": "吉华集团",
+      "price": 10.67,
+      "change_pct": 10.0,
+      "amount": 1012161440,
+      "float_mv": 7221811951.2,
+      "total_mv": 7221811951.2,
+      "turnover_rate": 14.73,
+      "ladder": 1,
+      "first_seal": "13:05:57",
+      "last_seal": "13:45:06",
+      "seal_fund": 46485135,
+      "blast_count": 1,
+      "industry": "化学制品",
+      "zt_days": 1,
+      "zt_count": 1
+    },
+    {
+      "code": "002980",
+      "name": "华盛昌",
+      "price": 116.05,
+      "change_pct": 10.0,
+      "amount": 1805614144,
+      "float_mv": 11754335344.949999,
+      "total_mv": 21865122545.2,
+      "turnover_rate": 16.1,
+      "ladder": 1,
+      "first_seal": "13:06:15",
+      "last_seal": "13:06:15",
+      "seal_fund": 105535870,
+      "blast_count": 0,
+      "industry": "电网设备",
+      "zt_days": 1,
+      "zt_count": 1
+    },
+    {
+      "code": "002878",
+      "name": "元隆雅图",
+      "price": 14.33,
+      "change_pct": 9.98,
+      "amount": 300729376,
+      "float_mv": 3380895844.26,
+      "total_mv": 3754341447.91,
+      "turnover_rate": 9.32,
+      "ladder": 1,
+      "first_seal": "13:06:39",
+      "last_seal": "13:07:18",
+      "seal_fund": 48985672,
+      "blast_count": 1,
+      "industry": "广告营销",
+      "zt_days": 1,
+      "zt_count": 1
+    },
+    {
+      "code": "001318",
+      "name": "阳光乳业",
+      "price": 14.03,
+      "change_pct": 10.04,
+      "amount": 352543296,
+      "float_mv": 3965719800.0,
+      "total_mv": 3965719800.0,
+      "turnover_rate": 9.37,
+      "ladder": 1,
+      "first_seal": "13:09:03",
+      "last_seal": "13:09:51",
+      "seal_fund": 141947122,
+      "blast_count": 1,
+      "industry": "饮料乳品",
+      "zt_days": 1,
+      "zt_count": 1
+    },
+    {
+      "code": "600391",
+      "name": "航发科技",
+      "price": 38.78,
+      "change_pct": 10.01,
+      "amount": 804911104,
+      "float_mv": 12802416852.26,
+      "total_mv": 12802416580.800001,
+      "turnover_rate": 6.61,
+      "ladder": 1,
+      "first_seal": "13:09:06",
+      "last_seal": "13:13:00",
+      "seal_fund": 75283614,
+      "blast_count": 2,
+      "industry": "航空装备",
+      "zt_days": 1,
+      "zt_count": 1
+    },
+    {
+      "code": "002587",
+      "name": "奥拓电子",
+      "price": 5.76,
+      "change_pct": 9.92,
+      "amount": 347602928,
+      "float_mv": 3068425249.92,
+      "total_mv": 3769943961.6,
+      "turnover_rate": 11.63,
+      "ladder": 1,
+      "first_seal": "13:12:39",
+      "last_seal": "14:52:15",
+      "seal_fund": 11192832,
+      "blast_count": 4,
+      "industry": "光学光电",
+      "zt_days": 1,
+      "zt_count": 1
+    },
+    {
+      "code": "603042",
+      "name": "华脉科技",
+      "price": 16.12,
+      "change_pct": 10.03,
+      "amount": 407590016,
+      "float_mv": 3365320687.0400004,
+      "total_mv": 3365320687.0400004,
+      "turnover_rate": 12.98,
+      "ladder": 1,
+      "first_seal": "13:22:09",
+      "last_seal": "13:22:09",
+      "seal_fund": 39340860,
+      "blast_count": 0,
+      "industry": "通信设备",
+      "zt_days": 1,
+      "zt_count": 1
+    },
+    {
+      "code": "000558",
+      "name": "天府文旅",
+      "price": 3.84,
+      "change_pct": 10.03,
+      "amount": 199945797,
+      "float_mv": 4948530750.72,
+      "total_mv": 4950619975.679999,
+      "turnover_rate": 4.23,
+      "ladder": 1,
+      "first_seal": "13:23:30",
+      "last_seal": "13:23:30",
+      "seal_fund": 22609263,
+      "blast_count": 0,
+      "industry": "旅游及景",
+      "zt_days": 1,
+      "zt_count": 1
+    },
+    {
+      "code": "600712",
+      "name": "南宁百货",
+      "price": 5.91,
+      "change_pct": 10.06,
+      "amount": 155774758,
+      "float_mv": 3183411872.61,
+      "total_mv": 3218913177.6,
+      "turnover_rate": 5.17,
+      "ladder": 1,
+      "first_seal": "13:28:05",
+      "last_seal": "13:28:05",
+      "seal_fund": 43644327,
+      "blast_count": 0,
+      "industry": "一般零售",
+      "zt_days": 1,
+      "zt_count": 1
+    },
+    {
+      "code": "600281",
+      "name": "华阳新材",
+      "price": 4.98,
+      "change_pct": 9.93,
+      "amount": 133774703,
+      "float_mv": 2561722084.5,
+      "total_mv": 2561722119.36,
+      "turnover_rate": 5.4,
+      "ladder": 1,
+      "first_seal": "13:39:37",
+      "last_seal": "13:39:37",
+      "seal_fund": 26143506,
+      "blast_count": 0,
+      "industry": "小金属",
+      "zt_days": 1,
+      "zt_count": 1
+    },
+    {
+      "code": "002430",
+      "name": "杭氧股份",
+      "price": 27.52,
+      "change_pct": 9.99,
+      "amount": 1214131072,
+      "float_mv": 26912849384.32,
+      "total_mv": 26924461475.84,
+      "turnover_rate": 4.71,
+      "ladder": 1,
+      "first_seal": "13:45:12",
+      "last_seal": "14:01:54",
+      "seal_fund": 67781760,
+      "blast_count": 1,
+      "industry": "化学制品",
+      "zt_days": 1,
+      "zt_count": 1
+    },
+    {
+      "code": "002172",
+      "name": "澳洋健康",
+      "price": 5.92,
+      "change_pct": 10.04,
+      "amount": 913642880,
+      "float_mv": 4529633121.6,
+      "total_mv": 4533135618.56,
+      "turnover_rate": 21.15,
+      "ladder": 1,
+      "first_seal": "13:47:27",
+      "last_seal": "13:47:27",
+      "seal_fund": 174091689,
+      "blast_count": 0,
+      "industry": "医疗服务",
+      "zt_days": 1,
+      "zt_count": 1
+    },
+    {
+      "code": "002811",
+      "name": "郑中设计",
+      "price": 20.27,
+      "change_pct": 9.98,
+      "amount": 495051312,
+      "float_mv": 5737692868.03,
+      "total_mv": 6242551900.0,
+      "turnover_rate": 9.1,
+      "ladder": 1,
+      "first_seal": "13:52:51",
+      "last_seal": "13:52:51",
+      "seal_fund": 22813885,
+      "blast_count": 0,
+      "industry": "装修装饰",
+      "zt_days": 3,
+      "zt_count": 2
+    },
+    {
+      "code": "002623",
+      "name": "亚玛顿",
+      "price": 19.23,
+      "change_pct": 10.01,
+      "amount": 227013672,
+      "float_mv": 3704392933.7400002,
+      "total_mv": 3712592124.9900002,
+      "turnover_rate": 6.5,
+      "ladder": 1,
+      "first_seal": "14:28:45",
+      "last_seal": "14:28:45",
+      "seal_fund": 83563965,
+      "blast_count": 0,
+      "industry": "光伏设备",
+      "zt_days": 1,
+      "zt_count": 1
+    }
+  ],
+  "dt_pool": [
+    {
+      "code": "603230",
+      "name": "内蒙新华",
+      "price": 13.17,
+      "change_pct": -9.98,
+      "amount": 671423664,
+      "float_mv": 4655897910.0,
+      "total_mv": 4655898015.36,
+      "turnover_rate": 14.2,
+      "ladder": 1,
+      "first_seal": "",
+      "last_seal": "14:05:28",
+      "seal_fund": 11378893,
+      "blast_count": 0,
+      "industry": "出版",
+      "zt_days": 1,
+      "zt_count": 0
+    },
+    {
+      "code": "001336",
+      "name": "楚环科技",
+      "price": 18.41,
+      "change_pct": -9.98,
+      "amount": 313367936,
+      "float_mv": 1183738385.83,
+      "total_mv": 1923578975.5,
+      "turnover_rate": 26.34,
+      "ladder": 1,
+      "first_seal": "",
+      "last_seal": "14:38:24",
+      "seal_fund": 12088779,
+      "blast_count": 0,
+      "industry": "环保设备",
+      "zt_days": 1,
+      "zt_count": 0
+    },
+    {
+      "code": "002487",
+      "name": "大金重工",
+      "price": 42.39,
+      "change_pct": -10.0,
+      "amount": 3847979728,
+      "float_mv": 26744710075.74,
+      "total_mv": 31372239435.84,
+      "turnover_rate": 13.85,
+      "ladder": 1,
+      "first_seal": "",
+      "last_seal": "14:55:18",
+      "seal_fund": 23290507,
+      "blast_count": 0,
+      "industry": "风电设备",
+      "zt_days": 1,
+      "zt_count": 0
+    },
+    {
+      "code": "002058",
+      "name": "紫竹高科",
+      "price": 22.77,
+      "change_pct": -10.0,
+      "amount": 425645728,
+      "float_mv": 3264439994.64,
+      "total_mv": 3266318519.64,
+      "turnover_rate": 12.93,
+      "ladder": 1,
+      "first_seal": "",
+      "last_seal": "13:53:42",
+      "seal_fund": 31545535,
+      "blast_count": 0,
+      "industry": "电池",
+      "zt_days": 1,
+      "zt_count": 0
+    },
+    {
+      "code": "603668",
+      "name": "天马科技",
+      "price": 8.47,
+      "change_pct": -9.99,
+      "amount": 35144571,
+      "float_mv": 4284098320.0400004,
+      "total_mv": 4284098353.9200006,
+      "turnover_rate": 0.82,
+      "ladder": 1,
+      "first_seal": "",
+      "last_seal": "09:25:02",
+      "seal_fund": 94195488,
+      "blast_count": 0,
+      "industry": "饲料",
+      "zt_days": 2,
+      "zt_count": 0
+    },
+    {
+      "code": "002768",
+      "name": "国恩股份",
+      "price": 61.91,
+      "change_pct": -10.0,
+      "amount": 707450112,
+      "float_mv": 15617309309.97,
+      "total_mv": 27029906000.0,
+      "turnover_rate": 4.49,
+      "ladder": 1,
+      "first_seal": "",
+      "last_seal": "13:28:24",
+      "seal_fund": 95197583,
+      "blast_count": 0,
+      "industry": "塑料",
+      "zt_days": 1,
+      "zt_count": 0
+    },
+    {
+      "code": "600812",
+      "name": "华北制药",
+      "price": 5.97,
+      "change_pct": -9.95,
+      "amount": 1320339296,
+      "float_mv": 10242910308.9,
+      "total_mv": 10242910296.96,
+      "turnover_rate": 12.75,
+      "ladder": 1,
+      "first_seal": "",
+      "last_seal": "13:36:03",
+      "seal_fund": 102746082,
+      "blast_count": 0,
+      "industry": "化学制药",
+      "zt_days": 1,
+      "zt_count": 0
+    },
+    {
+      "code": "002866",
+      "name": "传艺科技",
+      "price": 17.24,
+      "change_pct": -9.97,
+      "amount": 102676860,
+      "float_mv": 3168175732.56,
+      "total_mv": 4991363693.44,
+      "turnover_rate": 3.24,
+      "ladder": 1,
+      "first_seal": "",
+      "last_seal": "09:30:18",
+      "seal_fund": 216749555,
+      "blast_count": 0,
+      "industry": "消费电子",
+      "zt_days": 1,
+      "zt_count": 0
+    }
+  ],
+  "yesterday_zt_pool": [
+    {
+      "code": "002242",
+      "name": "九阳股份",
+      "price": 16.64,
+      "change_pct": 9.98,
+      "amount": 1996903760,
+      "float_mv": 12675780000.0,
+      "total_mv": 12696603013.12,
+      "turnover_rate": 16.07,
+      "ladder": 6,
+      "first_seal": "09:25:00",
+      "last_seal": "10:45:12",
+      "seal_fund": 59186816,
+      "blast_count": 5,
+      "industry": "小家电",
+      "zt_days": 6,
+      "zt_count": 6
+    },
+    {
+      "code": "600812",
+      "name": "华北制药",
+      "price": 6.63,
+      "change_pct": 9.95,
+      "amount": 1002097840,
+      "float_mv": 11375292353.1,
+      "total_mv": 11375292339.84,
+      "turnover_rate": 8.83,
+      "ladder": 3,
+      "first_seal": "09:25:01",
+      "last_seal": "09:37:58",
+      "seal_fund": 143673870,
+      "blast_count": 2,
+      "industry": "化学制药",
+      "zt_days": 3,
+      "zt_count": 3
+    },
+    {
+      "code": "600831",
+      "name": "广电网络",
+      "price": 3.91,
+      "change_pct": 10.14,
+      "amount": 154024936,
+      "float_mv": 2779802738.7200003,
+      "total_mv": 2779802738.7200003,
+      "turnover_rate": 5.6,
+      "ladder": 1,
+      "first_seal": "09:25:01",
+      "last_seal": "10:01:25",
+      "seal_fund": 68117736,
+      "blast_count": 1,
+      "industry": "电视广播",
+      "zt_days": 1,
+      "zt_count": 1
+    },
+    {
+      "code": "603096",
+      "name": "新经典",
+      "price": 19.06,
+      "change_pct": 9.98,
+      "amount": 70752073,
+      "float_mv": 2939711933.4399996,
+      "total_mv": 2939711933.4399996,
+      "turnover_rate": 2.41,
+      "ladder": 2,
+      "first_seal": "09:25:01",
+      "last_seal": "09:25:01",
+      "seal_fund": 131756614,
+      "blast_count": 0,
+      "industry": "出版",
+      "zt_days": 2,
+      "zt_count": 2
+    },
+    {
+      "code": "605136",
+      "name": "丽人丽妆",
+      "price": 10.38,
+      "change_pct": 9.96,
+      "amount": 42697922,
+      "float_mv": 4156759230.0000005,
+      "total_mv": 4156759188.4800005,
+      "turnover_rate": 1.03,
+      "ladder": 2,
+      "first_seal": "09:25:01",
+      "last_seal": "09:25:01",
+      "seal_fund": 183524835,
+      "blast_count": 0,
+      "industry": "互联网电",
+      "zt_days": 2,
+      "zt_count": 2
+    },
+    {
+      "code": "605287",
+      "name": "德才股份",
+      "price": 44.2,
+      "change_pct": 10.0,
+      "amount": 103640160,
+      "float_mv": 6188000000.0,
+      "total_mv": 6188000000.0,
+      "turnover_rate": 1.67,
+      "ladder": 2,
+      "first_seal": "09:25:01",
+      "last_seal": "09:25:01",
+      "seal_fund": 239409300,
+      "blast_count": 0,
+      "industry": "装修装饰",
+      "zt_days": 4,
+      "zt_count": 3
+    },
+    {
+      "code": "600693",
+      "name": "东百集团",
+      "price": 11.18,
+      "change_pct": 10.04,
+      "amount": 302864560,
+      "float_mv": 9714892102.76,
+      "total_mv": 9724880963.199999,
+      "turnover_rate": 3.12,
+      "ladder": 1,
+      "first_seal": "09:25:02",
+      "last_seal": "09:25:02",
+      "seal_fund": 320562015,
+      "blast_count": 0,
+      "industry": "一般零售",
+      "zt_days": 1,
+      "zt_count": 1
+    },
+    {
+      "code": "600825",
+      "name": "新华传媒",
+      "price": 13.78,
+      "change_pct": 9.98,
+      "amount": 487084176,
+      "float_mv": 14398554573.0,
+      "total_mv": 14398554655.679998,
+      "turnover_rate": 3.38,
+      "ladder": 10,
+      "first_seal": "09:25:02",
+      "last_seal": "09:25:02",
+      "seal_fund": 1016510886,
+      "blast_count": 0,
+      "industry": "出版",
+      "zt_days": 10,
+      "zt_count": 10
+    },
+    {
+      "code": "002343",
+      "name": "慈文传媒",
+      "price": 6.69,
+      "change_pct": 10.03,
+      "amount": 189454780,
+      "float_mv": 3168921113.34,
+      "total_mv": 3168921126.7200003,
+      "turnover_rate": 5.99,
+      "ladder": 2,
+      "first_seal": "09:30:00",
+      "last_seal": "09:30:00",
+      "seal_fund": 141656200,
+      "blast_count": 0,
+      "industry": "影视院线",
+      "zt_days": 2,
+      "zt_count": 2
+    },
+    {
+      "code": "300006",
+      "name": "莱美药业",
+      "price": 6.56,
+      "change_pct": 19.93,
+      "amount": 1333525056,
+      "float_mv": 6926185090.879999,
+      "total_mv": 6926777472.0,
+      "turnover_rate": 19.34,
+      "ladder": 1,
+      "first_seal": "09:30:00",
+      "last_seal": "14:08:54",
+      "seal_fund": 67066973,
+      "blast_count": 8,
+      "industry": "化学制药",
+      "zt_days": 1,
+      "zt_count": 1
+    },
+    {
+      "code": "605577",
+      "name": "龙版传媒",
+      "price": 17.82,
+      "change_pct": 10.0,
+      "amount": 252983433,
+      "float_mv": 7920000009.900001,
+      "total_mv": 7920000063.36,
+      "turnover_rate": 3.19,
+      "ladder": 2,
+      "first_seal": "09:30:02",
+      "last_seal": "09:30:02",
+      "seal_fund": 138536154,
+      "blast_count": 0,
+      "industry": "出版",
+      "zt_days": 4,
+      "zt_count": 3
+    },
+    {
+      "code": "001330",
+      "name": "博纳影业",
+      "price": 7.67,
+      "change_pct": 10.04,
+      "amount": 1572119120,
+      "float_mv": 8919038959.74,
+      "total_mv": 10542560668.64,
+      "turnover_rate": 17.8,
+      "ladder": 2,
+      "first_seal": "09:30:09",
+      "last_seal": "09:46:09",
+      "seal_fund": 85265089,
+      "blast_count": 2,
+      "industry": "影视院线",
+      "zt_days": 6,
+      "zt_count": 3
+    },
+    {
+      "code": "002696",
+      "name": "百洋股份",
+      "price": 8.05,
+      "change_pct": 9.97,
+      "amount": 103751651,
+      "float_mv": 2690784289.9,
+      "total_mv": 2783321632.0000005,
+      "turnover_rate": 3.89,
+      "ladder": 2,
+      "first_seal": "09:30:12",
+      "last_seal": "09:30:12",
+      "seal_fund": 42501874,
+      "blast_count": 0,
+      "industry": "饲料",
+      "zt_days": 2,
+      "zt_count": 2
+    },
+    {
+      "code": "600241",
+      "name": "时代万恒",
+      "price": 12.94,
+      "change_pct": 10.03,
+      "amount": 1199299600,
+      "float_mv": 3808269368.1,
+      "total_mv": 3808269329.2799997,
+      "turnover_rate": 32.01,
+      "ladder": 6,
+      "first_seal": "09:30:22",
+      "last_seal": "14:12:01",
+      "seal_fund": 31216947,
+      "blast_count": 3,
+      "industry": "电池",
+      "zt_days": 6,
+      "zt_count": 6
+    },
+    {
+      "code": "600851",
+      "name": "海欣股份",
+      "price": 8.6,
+      "change_pct": 9.97,
+      "amount": 260385601,
+      "float_mv": 6348572546.0,
+      "total_mv": 10380687516.8,
+      "turnover_rate": 4.19,
+      "ladder": 1,
+      "first_seal": "09:31:12",
+      "last_seal": "13:03:30",
+      "seal_fund": 37410851,
+      "blast_count": 1,
+      "industry": "化学制药",
+      "zt_days": 1,
+      "zt_count": 1
+    },
+    {
+      "code": "000892",
+      "name": "欢瑞世纪",
+      "price": 5.34,
+      "change_pct": 10.1,
+      "amount": 1258263824,
+      "float_mv": 3795665613.36,
+      "total_mv": 5238435763.2,
+      "turnover_rate": 33.81,
+      "ladder": 2,
+      "first_seal": "09:31:54",
+      "last_seal": "13:10:27",
+      "seal_fund": 51218610,
+      "blast_count": 3,
+      "industry": "影视院线",
+      "zt_days": 2,
+      "zt_count": 2
+    },
+    {
+      "code": "603528",
+      "name": "多伦科技",
+      "price": 7.05,
+      "change_pct": 9.98,
+      "amount": 106282238,
+      "float_mv": 4976807423.55,
+      "total_mv": 4976807402.4,
+      "turnover_rate": 2.18,
+      "ladder": 1,
+      "first_seal": "09:33:36",
+      "last_seal": "09:33:36",
+      "seal_fund": 46128565,
+      "blast_count": 0,
+      "industry": "软件开发",
+      "zt_days": 1,
+      "zt_count": 1
+    },
+    {
+      "code": "688517",
+      "name": "金冠电气",
+      "price": 21.18,
+      "change_pct": 20.0,
+      "amount": 470683168,
+      "float_mv": 2893467237.12,
+      "total_mv": 2893467237.12,
+      "turnover_rate": 16.71,
+      "ladder": 1,
+      "first_seal": "09:33:47",
+      "last_seal": "13:10:44",
+      "seal_fund": 30846234,
+      "blast_count": 2,
+      "industry": "电网设备",
+      "zt_days": 1,
+      "zt_count": 1
+    },
+    {
+      "code": "601929",
+      "name": "吉视传媒",
+      "price": 2.75,
+      "change_pct": 10.0,
+      "amount": 1396036320,
+      "float_mv": 9596917462.0,
+      "total_mv": 9596917484.0,
+      "turnover_rate": 14.77,
+      "ladder": 2,
+      "first_seal": "09:34:12",
+      "last_seal": "10:15:48",
+      "seal_fund": 98932350,
+      "blast_count": 2,
+      "industry": "电视广播",
+      "zt_days": 2,
+      "zt_count": 2
+    },
+    {
+      "code": "600192",
+      "name": "长城电工",
+      "price": 7.93,
+      "change_pct": 9.99,
+      "amount": 150851604,
+      "float_mv": 3503061640.0,
+      "total_mv": 3503061640.0,
+      "turnover_rate": 4.38,
+      "ladder": 1,
+      "first_seal": "09:37:04",
+      "last_seal": "09:37:28",
+      "seal_fund": 66454193,
+      "blast_count": 1,
+      "industry": "电网设备",
+      "zt_days": 1,
+      "zt_count": 1
+    },
+    {
+      "code": "603032",
+      "name": "德新科技",
+      "price": 20.42,
+      "change_pct": 10.02,
+      "amount": 653535808,
+      "float_mv": 4755442272.0,
+      "total_mv": 4758501188.0,
+      "turnover_rate": 13.93,
+      "ladder": 1,
+      "first_seal": "09:37:47",
+      "last_seal": "14:23:26",
+      "seal_fund": 6818625,
+      "blast_count": 4,
+      "industry": "电池",
+      "zt_days": 1,
+      "zt_count": 1
+    },
+    {
+      "code": "002441",
+      "name": "众业达",
+      "price": 9.21,
+      "change_pct": 10.04,
+      "amount": 254621752,
+      "float_mv": 3674461009.59,
+      "total_mv": 5015246703.360001,
+      "turnover_rate": 6.98,
+      "ladder": 1,
+      "first_seal": "09:37:48",
+      "last_seal": "11:05:00",
+      "seal_fund": 15190053,
+      "blast_count": 2,
+      "industry": "电网设备",
+      "zt_days": 1,
+      "zt_count": 1
+    },
+    {
+      "code": "002576",
+      "name": "通达动力",
+      "price": 16.07,
+      "change_pct": 9.99,
+      "amount": 141156693,
+      "float_mv": 2603783065.9700003,
+      "total_mv": 2653157000.0,
+      "turnover_rate": 5.48,
+      "ladder": 1,
+      "first_seal": "09:38:18",
+      "last_seal": "09:39:15",
+      "seal_fund": 30412475,
+      "blast_count": 1,
+      "industry": "电机Ⅱ",
+      "zt_days": 1,
+      "zt_count": 1
+    },
+    {
+      "code": "002531",
+      "name": "天顺风能",
+      "price": 8.27,
+      "change_pct": 9.97,
+      "amount": 839926256,
+      "float_mv": 14777403313.73,
+      "total_mv": 14860186485.119999,
+      "turnover_rate": 5.85,
+      "ladder": 1,
+      "first_seal": "09:38:45",
+      "last_seal": "09:38:45",
+      "seal_fund": 215145712,
+      "blast_count": 0,
+      "industry": "风电设备",
+      "zt_days": 1,
+      "zt_count": 1
+    },
+    {
+      "code": "002692",
+      "name": "远程股份",
+      "price": 5.24,
+      "change_pct": 10.08,
+      "amount": 266233014,
+      "float_mv": 3761595177.0,
+      "total_mv": 3763085040.0,
+      "turnover_rate": 7.42,
+      "ladder": 2,
+      "first_seal": "09:40:39",
+      "last_seal": "09:40:39",
+      "seal_fund": 76709408,
+      "blast_count": 0,
+      "industry": "电网设备",
+      "zt_days": 2,
+      "zt_count": 2
+    },
+    {
+      "code": "300829",
+      "name": "金丹科技",
+      "price": 28.02,
+      "change_pct": 20.0,
+      "amount": 613444352,
+      "float_mv": 4711053904.62,
+      "total_mv": 6368248498.14,
+      "turnover_rate": 14.13,
+      "ladder": 1,
+      "first_seal": "09:47:36",
+      "last_seal": "09:47:36",
+      "seal_fund": 130509594,
+      "blast_count": 0,
+      "industry": "化学制品",
+      "zt_days": 1,
+      "zt_count": 1
+    },
+    {
+      "code": "002990",
+      "name": "盛视科技",
+      "price": 55.95,
+      "change_pct": 10.01,
+      "amount": 681227392,
+      "float_mv": 7722138599.85,
+      "total_mv": 14647521896.1,
+      "turnover_rate": 9.03,
+      "ladder": 1,
+      "first_seal": "09:54:06",
+      "last_seal": "10:19:12",
+      "seal_fund": 103781655,
+      "blast_count": 1,
+      "industry": "计算机设",
+      "zt_days": 1,
+      "zt_count": 1
+    },
+    {
+      "code": "600560",
+      "name": "金自天正",
+      "price": 12.53,
+      "change_pct": 10.01,
+      "amount": 80256859,
+      "float_mv": 2802278115.0,
+      "total_mv": 2802278115.0,
+      "turnover_rate": 2.93,
+      "ladder": 1,
+      "first_seal": "09:54:36",
+      "last_seal": "09:54:36",
+      "seal_fund": 15535947,
+      "blast_count": 0,
+      "industry": "专用设备",
+      "zt_days": 1,
+      "zt_count": 1
+    },
+    {
+      "code": "601811",
+      "name": "新华文轩",
+      "price": 23.0,
+      "change_pct": 10.0,
+      "amount": 1264841568,
+      "float_mv": 18213789700.0,
+      "total_mv": 28378343184.0,
+      "turnover_rate": 7.27,
+      "ladder": 2,
+      "first_seal": "09:54:53",
+      "last_seal": "10:28:02",
+      "seal_fund": 46726823,
+      "blast_count": 3,
+      "industry": "出版",
+      "zt_days": 11,
+      "zt_count": 8
+    },
+    {
+      "code": "301419",
+      "name": "阿莱德",
+      "price": 47.7,
+      "change_pct": 20.0,
+      "amount": 422151504,
+      "float_mv": 5347325025.0,
+      "total_mv": 7155000000.0,
+      "turnover_rate": 8.28,
+      "ladder": 1,
+      "first_seal": "09:55:45",
+      "last_seal": "09:59:12",
+      "seal_fund": 35691095,
+      "blast_count": 1,
+      "industry": "通信设备",
+      "zt_days": 1,
+      "zt_count": 1
+    },
+    {
+      "code": "301052",
+      "name": "果麦文化",
+      "price": 30.47,
+      "change_pct": 20.01,
+      "amount": 583938704,
+      "float_mv": 2444906523.18,
+      "total_mv": 3015291059.33,
+      "turnover_rate": 25.41,
+      "ladder": 1,
+      "first_seal": "10:07:06",
+      "last_seal": "10:08:12",
+      "seal_fund": 52502857,
+      "blast_count": 1,
+      "industry": "出版",
+      "zt_days": 1,
+      "zt_count": 1
+    },
+    {
+      "code": "603500",
+      "name": "祥和实业",
+      "price": 11.04,
+      "change_pct": 9.96,
+      "amount": 468892736,
+      "float_mv": 3673965775.2,
+      "total_mv": 3673965742.08,
+      "turnover_rate": 12.98,
+      "ladder": 1,
+      "first_seal": "10:07:27",
+      "last_seal": "13:50:57",
+      "seal_fund": 17260554,
+      "blast_count": 3,
+      "industry": "轨交设备",
+      "zt_days": 1,
+      "zt_count": 1
+    },
+    {
+      "code": "603533",
+      "name": "掌阅科技",
+      "price": 27.98,
+      "change_pct": 9.98,
+      "amount": 2096530448,
+      "float_mv": 12280333443.3,
+      "total_mv": 12280333359.36,
+      "turnover_rate": 17.84,
+      "ladder": 2,
+      "first_seal": "10:10:58",
+      "last_seal": "10:55:13",
+      "seal_fund": 88316072,
+      "blast_count": 1,
+      "industry": "数字媒体",
+      "zt_days": 5,
+      "zt_count": 3
+    },
+    {
+      "code": "002264",
+      "name": "新 华 都",
+      "price": 8.14,
+      "change_pct": 10.0,
+      "amount": 1122462176,
+      "float_mv": 5298390078.08,
+      "total_mv": 5859263949.440001,
+      "turnover_rate": 21.7,
+      "ladder": 1,
+      "first_seal": "10:12:12",
+      "last_seal": "14:23:39",
+      "seal_fund": 25297085,
+      "blast_count": 7,
+      "industry": "广告营销",
+      "zt_days": 1,
+      "zt_count": 1
+    },
+    {
+      "code": "601595",
+      "name": "上海电影",
+      "price": 27.21,
+      "change_pct": 9.98,
+      "amount": 753730736,
+      "float_mv": 12195522000.0,
+      "total_mv": 12195522000.0,
+      "turnover_rate": 6.35,
+      "ladder": 2,
+      "first_seal": "10:21:54",
+      "last_seal": "10:21:54",
+      "seal_fund": 30581319,
+      "blast_count": 0,
+      "industry": "影视院线",
+      "zt_days": 2,
+      "zt_count": 2
+    },
+    {
+      "code": "603992",
+      "name": "松霖科技",
+      "price": 20.94,
+      "change_pct": 9.98,
+      "amount": 157046556,
+      "float_mv": 9277295710.800001,
+      "total_mv": 9277295794.560001,
+      "turnover_rate": 1.73,
+      "ladder": 1,
+      "first_seal": "10:22:40",
+      "last_seal": "10:34:25",
+      "seal_fund": 33747992,
+      "blast_count": 2,
+      "industry": "家居用品",
+      "zt_days": 1,
+      "zt_count": 1
+    },
+    {
+      "code": "688004",
+      "name": "博汇科技",
+      "price": 37.25,
+      "change_pct": 20.01,
+      "amount": 410465088,
+      "float_mv": 2983278000.0,
+      "total_mv": 2983278000.0,
+      "turnover_rate": 14.94,
+      "ladder": 1,
+      "first_seal": "10:31:53",
+      "last_seal": "10:31:53",
+      "seal_fund": 27648812,
+      "blast_count": 0,
+      "industry": "IT服务Ⅱ",
+      "zt_days": 1,
+      "zt_count": 1
+    },
+    {
+      "code": "603232",
+      "name": "格尔软件",
+      "price": 18.68,
+      "change_pct": 10.01,
+      "amount": 744347904,
+      "float_mv": 4320683906.6,
+      "total_mv": 4343951714.6,
+      "turnover_rate": 18.07,
+      "ladder": 2,
+      "first_seal": "11:10:27",
+      "last_seal": "13:41:00",
+      "seal_fund": 57931163,
+      "blast_count": 1,
+      "industry": "软件开发",
+      "zt_days": 2,
+      "zt_count": 2
+    },
+    {
+      "code": "002908",
+      "name": "德生科技",
+      "price": 8.02,
+      "change_pct": 10.01,
+      "amount": 232753947,
+      "float_mv": 2608489890.3199997,
+      "total_mv": 3460085409.9199996,
+      "turnover_rate": 9.2,
+      "ladder": 1,
+      "first_seal": "13:08:30",
+      "last_seal": "13:08:30",
+      "seal_fund": 21862279,
+      "blast_count": 0,
+      "industry": "IT服务Ⅱ",
+      "zt_days": 1,
+      "zt_count": 1
+    },
+    {
+      "code": "301658",
+      "name": "首航新能",
+      "price": 27.12,
+      "change_pct": 20.0,
+      "amount": 512184288,
+      "float_mv": 2641940388.7200003,
+      "total_mv": 11183505208.32,
+      "turnover_rate": 21.17,
+      "ladder": 1,
+      "first_seal": "13:15:09",
+      "last_seal": "13:15:09",
+      "seal_fund": 14498352,
+      "blast_count": 0,
+      "industry": "光伏设备",
+      "zt_days": 1,
+      "zt_count": 1
+    },
+    {
+      "code": "001231",
+      "name": "农心科技",
+      "price": 25.61,
+      "change_pct": 10.01,
+      "amount": 192490606,
+      "float_mv": 1305160765.35,
+      "total_mv": 2552795452.35,
+      "turnover_rate": 15.53,
+      "ladder": 1,
+      "first_seal": "13:23:33",
+      "last_seal": "13:34:54",
+      "seal_fund": 202406074,
+      "blast_count": 1,
+      "industry": "农化制品",
+      "zt_days": 1,
+      "zt_count": 1
+    },
+    {
+      "code": "603336",
+      "name": "宏辉果蔬",
+      "price": 10.45,
+      "change_pct": 10.0,
+      "amount": 326095520,
+      "float_mv": 6361112975.25,
+      "total_mv": 6361112964.799999,
+      "turnover_rate": 5.35,
+      "ladder": 1,
+      "first_seal": "13:39:30",
+      "last_seal": "13:39:30",
+      "seal_fund": 27538487,
+      "blast_count": 0,
+      "industry": "种植业",
+      "zt_days": 1,
+      "zt_count": 1
+    },
+    {
+      "code": "603230",
+      "name": "内蒙新华",
+      "price": 14.63,
+      "change_pct": 10.0,
+      "amount": 825104576,
+      "float_mv": 5172041490.0,
+      "total_mv": 5172041607.04,
+      "turnover_rate": 16.92,
+      "ladder": 1,
+      "first_seal": "13:55:20",
+      "last_seal": "13:55:20",
+      "seal_fund": 75604899,
+      "blast_count": 0,
+      "industry": "出版",
+      "zt_days": 13,
+      "zt_count": 7
+    },
+    {
+      "code": "603968",
+      "name": "醋化股份",
+      "price": 13.05,
+      "change_pct": 10.03,
+      "amount": 321073552,
+      "float_mv": 2668464000.0,
+      "total_mv": 2668464000.0,
+      "turnover_rate": 12.85,
+      "ladder": 1,
+      "first_seal": "14:03:28",
+      "last_seal": "14:07:07",
+      "seal_fund": 18147330,
+      "blast_count": 1,
+      "industry": "化学制品",
+      "zt_days": 1,
+      "zt_count": 1
+    },
+    {
+      "code": "002591",
+      "name": "恒大高新",
+      "price": 7.16,
+      "change_pct": 9.98,
+      "amount": 259630736,
+      "float_mv": 1600349227.92,
+      "total_mv": 2149428334.08,
+      "turnover_rate": 17.0,
+      "ladder": 1,
+      "first_seal": "14:25:24",
+      "last_seal": "14:26:42",
+      "seal_fund": 32438380,
+      "blast_count": 1,
+      "industry": "化学制品",
+      "zt_days": 1,
+      "zt_count": 1
+    },
+    {
+      "code": "601127",
+      "name": "赛力斯",
+      "price": 51.24,
+      "change_pct": 10.0,
+      "amount": 2642317664,
+      "float_mv": 79791101806.08,
+      "total_mv": 89259315909.12001,
+      "turnover_rate": 3.52,
+      "ladder": 1,
+      "first_seal": "14:31:29",
+      "last_seal": "14:31:29",
+      "seal_fund": 309832498,
+      "blast_count": 0,
+      "industry": "乘用车",
+      "zt_days": 1,
+      "zt_count": 1
+    }
+  ],
+  "northbound_top10": {
+    "date": "2026-10-13",
+    "sh": [
+      {
+        "code": "603986",
+        "name": "兆易创新",
+        "rank": 1,
+        "close_pct": -1.49,
+        "deal_amt_yi": 16.8,
+        "mutual_ratio": 17.89
+      },
+      {
+        "code": "688008",
+        "name": "澜起科技",
+        "rank": 2,
+        "close_pct": -3.67,
+        "deal_amt_yi": 15.68,
+        "mutual_ratio": 24.4
+      },
+      {
+        "code": "600183",
+        "name": "生益科技",
+        "rank": 3,
+        "close_pct": 2.12,
+        "deal_amt_yi": 15.2,
+        "mutual_ratio": 21.99
+      },
+      {
+        "code": "603259",
+        "name": "药明康德",
+        "rank": 4,
+        "close_pct": -0.32,
+        "deal_amt_yi": 15.13,
+        "mutual_ratio": 30.24
+      },
+      {
+        "code": "688498",
+        "name": "源杰科技",
+        "rank": 5,
+        "close_pct": 3.64,
+        "deal_amt_yi": 14.68,
+        "mutual_ratio": 19.7
+      },
+      {
+        "code": "688256",
+        "name": "寒武纪",
+        "rank": 6,
+        "close_pct": 0.47,
+        "deal_amt_yi": 14.49,
+        "mutual_ratio": 17.4
+      },
+      {
+        "code": "600176",
+        "name": "中国巨石",
+        "rank": 7,
+        "close_pct": 0.42,
+        "deal_amt_yi": 12.68,
+        "mutual_ratio": 20.31
+      },
+      {
+        "code": "600519",
+        "name": "贵州茅台",
+        "rank": 8,
+        "close_pct": -1.02,
+        "deal_amt_yi": 10.64,
+        "mutual_ratio": 31.35
+      },
+      {
+        "code": "600036",
+        "name": "招商银行",
+        "rank": 9,
+        "close_pct": 0.09,
+        "deal_amt_yi": 10.59,
+        "mutual_ratio": 31.21
+      },
+      {
+        "code": "688041",
+        "name": "海光信息",
+        "rank": 10,
+        "close_pct": -1.76,
+        "deal_amt_yi": 10.46,
+        "mutual_ratio": 25.88
+      }
+    ],
+    "sz": [
+      {
+        "code": "300308",
+        "name": "中际旭创",
+        "rank": 1,
+        "close_pct": 1.45,
+        "deal_amt_yi": 48.76,
+        "mutual_ratio": 22.05
+      },
+      {
+        "code": "300750",
+        "name": "宁德时代",
+        "rank": 2,
+        "close_pct": -3.11,
+        "deal_amt_yi": 48.15,
+        "mutual_ratio": 40.44
+      },
+      {
+        "code": "300502",
+        "name": "新易盛",
+        "rank": 3,
+        "close_pct": 1.06,
+        "deal_amt_yi": 35.21,
+        "mutual_ratio": 24.1
+      },
+      {
+        "code": "002384",
+        "name": "东山精密",
+        "rank": 4,
+        "close_pct": 2.83,
+        "deal_amt_yi": 22.63,
+        "mutual_ratio": 22.74
+      },
+      {
+        "code": "300394",
+        "name": "天孚通信",
+        "rank": 5,
+        "close_pct": 7.48,
+        "deal_amt_yi": 14.52,
+        "mutual_ratio": 14.61
+      },
+      {
+        "code": "002463",
+        "name": "沪电股份",
+        "rank": 6,
+        "close_pct": 5.73,
+        "deal_amt_yi": 12.4,
+        "mutual_ratio": 18.53
+      },
+      {
+        "code": "300408",
+        "name": "三环集团",
+        "rank": 7,
+        "close_pct": -0.77,
+        "deal_amt_yi": 9.96,
+        "mutual_ratio": 21.34
+      },
+      {
+        "code": "002371",
+        "name": "北方华创",
+        "rank": 8,
+        "close_pct": 0.51,
+        "deal_amt_yi": 9.84,
+        "mutual_ratio": 27.06
+      },
+      {
+        "code": "300489",
+        "name": "光智科技",
+        "rank": 9,
+        "close_pct": 14.07,
+        "deal_amt_yi": 9.66,
+        "mutual_ratio": 18.25
+      },
+      {
+        "code": "002281",
+        "name": "光迅科技",
+        "rank": 10,
+        "close_pct": 4.06,
+        "deal_amt_yi": 8.27,
+        "mutual_ratio": 16.81
+      }
+    ],
+    "note": "沪深股通前十大成交活跃股（成交额口径，交易所披露）；净买入额自 2024-08-19 起不再披露，故无买卖方向，禁止据此推断净流入/加仓"
+  },
+  "dragon_seats": {
+    "date": "2026-10-13",
+    "total_boarded": 62,
+    "sample_top": 12,
+    "note": "龙虎榜买卖前五席位（东财 RPT_BILLBOARD_DAILYDETAILSBUY/SELL）。席位性质：机构专用=org；深股通/沪股通专用=north（北向通道）；其余营业部=dealer。席位明细只覆盖买卖前五，非全量成交；机构净买>0 通常意味趋势延续性更强，纯 dealer（无机构无北向）偏短线博弈——最终定性由 LLM 基于本结构给出。",
+    "stocks": [
+      {
+        "code": "301660",
+        "name": "粤芯半导体",
+        "reason": "无价格涨跌幅限制的证券",
+        "net_buy_yi": 3.82,
+        "org_buy_yi": 0.0,
+        "org_sell_yi": 0.0,
+        "org_net_yi": 0,
+        "north_buy_yi": 0.0,
+        "north_sell_yi": 0.0,
+        "north_net_yi": 0,
+        "dealer_net_yi": 6.2,
+        "total_buy_yi": 4.7,
+        "total_sell_yi": 1.56,
+        "top_buyer": {
+          "name": "国金证券股份有限公司成都双楠路证券营业部",
+          "net_yi": 1.05,
+          "kind": "dealer"
+        },
+        "top_seller": {
+          "name": "东方财富证券股份有限公司拉萨金融城南环路证券营业部",
+          "net_yi": 0.73,
+          "kind": "dealer"
+        },
+        "buy_seats": [
+          {
+            "name": "国金证券股份有限公司成都双楠路证券营业部",
+            "buy_yi": 1.08,
+            "sell_yi": 0.03,
+            "net_yi": 1.05,
+            "kind": "dealer",
+            "side": "buy"
+          },
+          {
+            "name": "东方财富证券股份有限公司拉萨东环路第一证券营业部",
+            "buy_yi": 0.78,
+            "sell_yi": 0.28,
+            "net_yi": 0.5,
+            "kind": "dealer",
+            "side": "buy"
+          },
+          {
+            "name": "东方财富证券股份有限公司拉萨金融城南环路证券营业部",
+            "buy_yi": 1.02,
+            "sell_yi": 0.29,
+            "net_yi": 0.73,
+            "kind": "dealer",
+            "side": "buy"
+          },
+          {
+            "name": "东方财富证券股份有限公司拉萨东环路第二证券营业部",
+            "buy_yi": 0.97,
+            "sell_yi": 0.37,
+            "net_yi": 0.6,
+            "kind": "dealer",
+            "side": "buy"
+          },
+          {
+            "name": "东方财富证券股份有限公司拉萨团结路第一证券营业部",
+            "buy_yi": 0.85,
+            "sell_yi": 0.3,
+            "net_yi": 0.55,
+            "kind": "dealer",
+            "side": "buy"
+          }
+        ],
+        "sell_seats": [
+          {
+            "name": "东方财富证券股份有限公司拉萨东环路第一证券营业部",
+            "buy_yi": 0.78,
+            "sell_yi": 0.28,
+            "net_yi": 0.5,
+            "kind": "dealer",
+            "side": "sell"
+          },
+          {
+            "name": "东方财富证券股份有限公司拉萨团结路第一证券营业部",
+            "buy_yi": 0.85,
+            "sell_yi": 0.3,
+            "net_yi": 0.55,
+            "kind": "dealer",
+            "side": "sell"
+          },
+          {
+            "name": "东方财富证券股份有限公司拉萨东环路第二证券营业部",
+            "buy_yi": 0.97,
+            "sell_yi": 0.37,
+            "net_yi": 0.6,
+            "kind": "dealer",
+            "side": "sell"
+          },
+          {
+            "name": "东方财富证券股份有限公司拉萨团结路第二证券营业部",
+            "buy_yi": 0.71,
+            "sell_yi": 0.32,
+            "net_yi": 0.39,
+            "kind": "dealer",
+            "side": "sell"
+          },
+          {
+            "name": "东方财富证券股份有限公司拉萨金融城南环路证券营业部",
+            "buy_yi": 1.02,
+            "sell_yi": 0.29,
+            "net_yi": 0.73,
+            "kind": "dealer",
+            "side": "sell"
+          }
+        ]
+      },
+      {
+        "code": "002242",
+        "name": "九阳股份",
+        "reason": "日振幅值达到15%的前5只证券",
+        "net_buy_yi": 1.5,
+        "org_buy_yi": 0.34,
+        "org_sell_yi": 0.0,
+        "org_net_yi": 0.29,
+        "north_buy_yi": 0.57,
+        "north_sell_yi": 0.21,
+        "north_net_yi": 0.72,
+        "dealer_net_yi": 0.86,
+        "total_buy_yi": 2.69,
+        "total_sell_yi": 1.23,
+        "top_buyer": {
+          "name": "东莞证券股份有限公司南京分公司",
+          "net_yi": 1.01,
+          "kind": "dealer"
+        },
+        "top_seller": {
+          "name": "深股通专用",
+          "net_yi": 0.36,
+          "kind": "north"
+        },
+        "buy_seats": [
+          {
+            "name": "机构专用",
+            "buy_yi": 0.34,
+            "sell_yi": 0.06,
+            "net_yi": 0.29,
+            "kind": "org",
+            "side": "buy"
+          },
+          {
+            "name": "东莞证券股份有限公司南京分公司",
+            "buy_yi": 1.05,
+            "sell_yi": 0.04,
+            "net_yi": 1.01,
+            "kind": "dealer",
+            "side": "buy"
+          },
+          {
+            "name": "中信建投证券股份有限公司福州东街证券营业部",
+            "buy_yi": 0.44,
+            "sell_yi": 0.04,
+            "net_yi": 0.4,
+            "kind": "dealer",
+            "side": "buy"
+          },
+          {
+            "name": "中信建投证券股份有限公司福清福和路证券营业部",
+            "buy_yi": 0.29,
+            "sell_yi": 0.01,
+            "net_yi": 0.28,
+            "kind": "dealer",
+            "side": "buy"
+          },
+          {
+            "name": "深股通专用",
+            "buy_yi": 0.57,
+            "sell_yi": 0.21,
+            "net_yi": 0.36,
+            "kind": "north",
+            "side": "buy"
+          }
+        ],
+        "sell_seats": [
+          {
+            "name": "国元证券股份有限公司南京建邺路证券营业部",
+            "buy_yi": 0.01,
+            "sell_yi": 0.31,
+            "net_yi": -0.3,
+            "kind": "dealer",
+            "side": "sell"
+          },
+          {
+            "name": "东方财富证券股份有限公司拉萨金融城南环路证券营业部",
+            "buy_yi": 0.16,
+            "sell_yi": 0.24,
+            "net_yi": -0.08,
+            "kind": "dealer",
+            "side": "sell"
+          },
+          {
+            "name": "中国银河证券股份有限公司桂林中山中路证券营业部",
+            "buy_yi": 0.01,
+            "sell_yi": 0.25,
+            "net_yi": -0.25,
+            "kind": "dealer",
+            "side": "sell"
+          },
+          {
+            "name": "深股通专用",
+            "buy_yi": 0.57,
+            "sell_yi": 0.21,
+            "net_yi": 0.36,
+            "kind": "north",
+            "side": "sell"
+          },
+          {
+            "name": "长江证券股份有限公司江阴虹桥南路证券营业部",
+            "buy_yi": 0.02,
+            "sell_yi": 0.22,
+            "net_yi": -0.2,
+            "kind": "dealer",
+            "side": "sell"
+          }
+        ]
+      },
+      {
+        "code": "002639",
+        "name": "雪人集团",
+        "reason": "日涨幅偏离值达到7%的前5只证券",
+        "net_buy_yi": 1.33,
+        "org_buy_yi": 1.06,
+        "org_sell_yi": 0.69,
+        "org_net_yi": 0.79,
+        "north_buy_yi": 0.72,
+        "north_sell_yi": 0.39,
+        "north_net_yi": 0.66,
+        "dealer_net_yi": 0.5,
+        "total_buy_yi": 2.32,
+        "total_sell_yi": 1.2,
+        "top_buyer": {
+          "name": "国泰海通证券股份有限公司上海长宁区江苏路证券营业部",
+          "net_yi": 0.53,
+          "kind": "dealer"
+        },
+        "top_seller": {
+          "name": "深股通专用",
+          "net_yi": 0.33,
+          "kind": "north"
+        },
+        "buy_seats": [
+          {
+            "name": "深股通专用",
+            "buy_yi": 0.72,
+            "sell_yi": 0.39,
+            "net_yi": 0.33,
+            "kind": "north",
+            "side": "buy"
+          },
+          {
+            "name": "国泰海通证券股份有限公司上海长宁区江苏路证券营业部",
+            "buy_yi": 0.54,
+            "sell_yi": 0.01,
+            "net_yi": 0.53,
+            "kind": "dealer",
+            "side": "buy"
+          },
+          {
+            "name": "机构专用",
+            "buy_yi": 0.26,
+            "sell_yi": 0.14,
+            "net_yi": 0.11,
+            "kind": "org",
+            "side": "buy"
+          },
+          {
+            "name": "机构专用",
+            "buy_yi": 0.4,
+            "sell_yi": 0.06,
+            "net_yi": 0.35,
+            "kind": "org",
+            "side": "buy"
+          },
+          {
+            "name": "机构专用",
+            "buy_yi": 0.4,
+            "sell_yi": 0.22,
+            "net_yi": 0.18,
+            "kind": "org",
+            "side": "buy"
+          }
+        ],
+        "sell_seats": [
+          {
+            "name": "机构专用",
+            "buy_yi": 0.4,
+            "sell_yi": 0.22,
+            "net_yi": 0.18,
+            "kind": "org",
+            "side": "sell"
+          },
+          {
+            "name": "机构专用",
+            "buy_yi": 0.19,
+            "sell_yi": 0.33,
+            "net_yi": -0.14,
+            "kind": "org",
+            "side": "sell"
+          },
+          {
+            "name": "机构专用",
+            "buy_yi": 0.26,
+            "sell_yi": 0.14,
+            "net_yi": 0.11,
+            "kind": "org",
+            "side": "sell"
+          },
+          {
+            "name": "国信证券股份有限公司浙江互联网分公司",
+            "buy_yi": 0.09,
+            "sell_yi": 0.12,
+            "net_yi": -0.03,
+            "kind": "dealer",
+            "side": "sell"
+          },
+          {
+            "name": "深股通专用",
+            "buy_yi": 0.72,
+            "sell_yi": 0.39,
+            "net_yi": 0.33,
+            "kind": "north",
+            "side": "sell"
+          }
+        ]
+      },
+      {
+        "code": "002640",
+        "name": "跨境通",
+        "reason": "日涨幅偏离值达到7%的前5只证券",
+        "net_buy_yi": 1.23,
+        "org_buy_yi": 0.32,
+        "org_sell_yi": 0.47,
+        "org_net_yi": 0.11,
+        "north_buy_yi": 0.47,
+        "north_sell_yi": 0.34,
+        "north_net_yi": 0.26,
+        "dealer_net_yi": 1.12,
+        "total_buy_yi": 2.01,
+        "total_sell_yi": 0.91,
+        "top_buyer": {
+          "name": "开源证券股份有限公司西安西大街证券营业部",
+          "net_yi": 0.53,
+          "kind": "dealer"
+        },
+        "top_seller": {
+          "name": "机构专用",
+          "net_yi": 0.14,
+          "kind": "org"
+        },
+        "buy_seats": [
+          {
+            "name": "机构专用",
+            "buy_yi": 0.32,
+            "sell_yi": 0.18,
+            "net_yi": 0.14,
+            "kind": "org",
+            "side": "buy"
+          },
+          {
+            "name": "国泰海通证券股份有限公司上海长宁区江苏路证券营业部",
+            "buy_yi": 0.37,
+            "sell_yi": 0.01,
+            "net_yi": 0.35,
+            "kind": "dealer",
+            "side": "buy"
+          },
+          {
+            "name": "深股通专用",
+            "buy_yi": 0.47,
+            "sell_yi": 0.34,
+            "net_yi": 0.13,
+            "kind": "north",
+            "side": "buy"
+          },
+          {
+            "name": "开源证券股份有限公司西安西大街证券营业部",
+            "buy_yi": 0.53,
+            "sell_yi": 0.0,
+            "net_yi": 0.53,
+            "kind": "dealer",
+            "side": "buy"
+          },
+          {
+            "name": "国泰海通证券股份有限公司上海自贸试验区第二分公司",
+            "buy_yi": 0.32,
+            "sell_yi": 0.0,
+            "net_yi": 0.32,
+            "kind": "dealer",
+            "side": "buy"
+          }
+        ],
+        "sell_seats": [
+          {
+            "name": "招商证券股份有限公司深圳益田路免税商务大厦证券营业部",
+            "buy_yi": 0.02,
+            "sell_yi": 0.1,
+            "net_yi": -0.08,
+            "kind": "dealer",
+            "side": "sell"
+          },
+          {
+            "name": "深股通专用",
+            "buy_yi": 0.47,
+            "sell_yi": 0.34,
+            "net_yi": 0.13,
+            "kind": "north",
+            "side": "sell"
+          },
+          {
+            "name": "机构专用",
+            "buy_yi": 0.32,
+            "sell_yi": 0.18,
+            "net_yi": 0.14,
+            "kind": "org",
+            "side": "sell"
+          },
+          {
+            "name": "机构专用",
+            "buy_yi": 0.09,
+            "sell_yi": 0.17,
+            "net_yi": -0.08,
+            "kind": "org",
+            "side": "sell"
+          },
+          {
+            "name": "机构专用",
+            "buy_yi": 0.03,
+            "sell_yi": 0.12,
+            "net_yi": -0.09,
+            "kind": "org",
+            "side": "sell"
+          }
+        ]
+      },
+      {
+        "code": "600354",
+        "name": "敦煌种业",
+        "reason": "有价格涨跌幅限制的日换手率达到20%的前五只证券",
+        "net_buy_yi": 1.03,
+        "org_buy_yi": 0.0,
+        "org_sell_yi": 0.0,
+        "org_net_yi": 0,
+        "north_buy_yi": 0.0,
+        "north_sell_yi": 0.0,
+        "north_net_yi": 0,
+        "dealer_net_yi": 1.02,
+        "total_buy_yi": 1.9,
+        "total_sell_yi": 0.88,
+        "top_buyer": {
+          "name": "国泰海通证券股份有限公司总部",
+          "net_yi": 0.59,
+          "kind": "dealer"
+        },
+        "top_seller": {
+          "name": "国泰海通证券股份有限公司总部",
+          "net_yi": -0.26,
+          "kind": "dealer"
+        },
+        "buy_seats": [
+          {
+            "name": "摩根大通证券(中国)有限公司上海银城中路证券营业部",
+            "buy_yi": 0.34,
+            "sell_yi": 0.0,
+            "net_yi": 0.34,
+            "kind": "dealer",
+            "side": "buy"
+          },
+          {
+            "name": "瑞银证券有限责任公司上海花园石桥路证券营业部",
+            "buy_yi": 0.24,
+            "sell_yi": 0.0,
+            "net_yi": 0.24,
+            "kind": "dealer",
+            "side": "buy"
+          },
+          {
+            "name": "国泰海通证券股份有限公司总部",
+            "buy_yi": 0.59,
+            "sell_yi": 0.0,
+            "net_yi": 0.59,
+            "kind": "dealer",
+            "side": "buy"
+          },
+          {
+            "name": "中国国际金融股份有限公司上海分公司",
+            "buy_yi": 0.34,
+            "sell_yi": 0.0,
+            "net_yi": 0.34,
+            "kind": "dealer",
+            "side": "buy"
+          },
+          {
+            "name": "中信证券股份有限公司上海分公司",
+            "buy_yi": 0.39,
+            "sell_yi": 0.0,
+            "net_yi": 0.39,
+            "kind": "dealer",
+            "side": "buy"
+          }
+        ],
+        "sell_seats": [
+          {
+            "name": "中国中金财富证券有限公司深圳中金大厦证券营业部",
+            "buy_yi": 0.0,
+            "sell_yi": 0.12,
+            "net_yi": -0.12,
+            "kind": "dealer",
+            "side": "sell"
+          },
+          {
+            "name": "华泰证券股份有限公司总部",
+            "buy_yi": 0.0,
+            "sell_yi": 0.12,
+            "net_yi": -0.12,
+            "kind": "dealer",
+            "side": "sell"
+          },
+          {
+            "name": "国泰海通证券股份有限公司总部",
+            "buy_yi": 0.0,
+            "sell_yi": 0.26,
+            "net_yi": -0.26,
+            "kind": "dealer",
+            "side": "sell"
+          },
+          {
+            "name": "中信证券股份有限公司深圳深南中路中信大厦证券营业部",
+            "buy_yi": 0.0,
+            "sell_yi": 0.12,
+            "net_yi": -0.12,
+            "kind": "dealer",
+            "side": "sell"
+          },
+          {
+            "name": "中信证券股份有限公司上海分公司",
+            "buy_yi": 0.0,
+            "sell_yi": 0.26,
+            "net_yi": -0.26,
+            "kind": "dealer",
+            "side": "sell"
+          }
+        ]
+      },
+      {
+        "code": "600408",
+        "name": "安泰集团",
+        "reason": "有价格涨跌幅限制的日换手率达到20%的前五只证券",
+        "net_buy_yi": 0.94,
+        "org_buy_yi": 0.0,
+        "org_sell_yi": 0.0,
+        "org_net_yi": 0,
+        "north_buy_yi": 0.0,
+        "north_sell_yi": 0.0,
+        "north_net_yi": 0,
+        "dealer_net_yi": 0.94,
+        "total_buy_yi": 2.12,
+        "total_sell_yi": 1.18,
+        "top_buyer": {
+          "name": "开源证券股份有限公司西安西大街证券营业部",
+          "net_yi": 0.61,
+          "kind": "dealer"
+        },
+        "top_seller": {
+          "name": "国泰海通证券股份有限公司总部",
+          "net_yi": -0.28,
+          "kind": "dealer"
+        },
+        "buy_seats": [
+          {
+            "name": "东亚前海证券有限责任公司上海分公司",
+            "buy_yi": 0.42,
+            "sell_yi": 0.0,
+            "net_yi": 0.42,
+            "kind": "dealer",
+            "side": "buy"
+          },
+          {
+            "name": "国泰海通证券股份有限公司总部",
+            "buy_yi": 0.28,
+            "sell_yi": 0.0,
+            "net_yi": 0.28,
+            "kind": "dealer",
+            "side": "buy"
+          },
+          {
+            "name": "国新证券股份有限公司北京分公司",
+            "buy_yi": 0.48,
+            "sell_yi": 0.0,
+            "net_yi": 0.48,
+            "kind": "dealer",
+            "side": "buy"
+          },
+          {
+            "name": "国泰海通证券股份有限公司南京太平南路证券营业部",
+            "buy_yi": 0.33,
+            "sell_yi": 0.0,
+            "net_yi": 0.33,
+            "kind": "dealer",
+            "side": "buy"
+          },
+          {
+            "name": "开源证券股份有限公司西安西大街证券营业部",
+            "buy_yi": 0.61,
+            "sell_yi": 0.0,
+            "net_yi": 0.61,
+            "kind": "dealer",
+            "side": "buy"
+          }
+        ],
+        "sell_seats": [
+          {
+            "name": "瑞银证券有限责任公司上海花园石桥路证券营业部",
+            "buy_yi": 0.0,
+            "sell_yi": 0.13,
+            "net_yi": -0.13,
+            "kind": "dealer",
+            "side": "sell"
+          },
+          {
+            "name": "高盛(中国)证券有限责任公司上海浦东新区世纪大道证券营业部",
+            "buy_yi": 0.0,
+            "sell_yi": 0.27,
+            "net_yi": -0.27,
+            "kind": "dealer",
+            "side": "sell"
+          },
+          {
+            "name": "摩根大通证券(中国)有限公司上海银城中路证券营业部",
+            "buy_yi": 0.0,
+            "sell_yi": 0.27,
+            "net_yi": -0.27,
+            "kind": "dealer",
+            "side": "sell"
+          },
+          {
+            "name": "中信证券股份有限公司上海分公司",
+            "buy_yi": 0.0,
+            "sell_yi": 0.23,
+            "net_yi": -0.23,
+            "kind": "dealer",
+            "side": "sell"
+          },
+          {
+            "name": "国泰海通证券股份有限公司总部",
+            "buy_yi": 0.0,
+            "sell_yi": 0.28,
+            "net_yi": -0.28,
+            "kind": "dealer",
+            "side": "sell"
+          }
+        ]
+      },
+      {
+        "code": "002636",
+        "name": "金安国纪",
+        "reason": "日振幅值达到15%的前5只证券",
+        "net_buy_yi": 0.93,
+        "org_buy_yi": 1.1,
+        "org_sell_yi": 0.37,
+        "org_net_yi": 0.27,
+        "north_buy_yi": 1.5,
+        "north_sell_yi": 0.79,
+        "north_net_yi": 1.42,
+        "dealer_net_yi": -0.11,
+        "total_buy_yi": 2.93,
+        "total_sell_yi": 2.0,
+        "top_buyer": {
+          "name": "深股通专用",
+          "net_yi": 0.71,
+          "kind": "north"
+        },
+        "top_seller": {
+          "name": "深股通专用",
+          "net_yi": 0.71,
+          "kind": "north"
+        },
+        "buy_seats": [
+          {
+            "name": "机构专用",
+            "buy_yi": 0.4,
+            "sell_yi": 0.18,
+            "net_yi": 0.22,
+            "kind": "org",
+            "side": "buy"
+          },
+          {
+            "name": "深股通专用",
+            "buy_yi": 1.5,
+            "sell_yi": 0.79,
+            "net_yi": 0.71,
+            "kind": "north",
+            "side": "buy"
+          },
+          {
+            "name": "机构专用",
+            "buy_yi": 0.32,
+            "sell_yi": 0.37,
+            "net_yi": -0.05,
+            "kind": "org",
+            "side": "buy"
+          },
+          {
+            "name": "机构专用",
+            "buy_yi": 0.38,
+            "sell_yi": 0.23,
+            "net_yi": 0.15,
+            "kind": "org",
+            "side": "buy"
+          },
+          {
+            "name": "华泰证券股份有限公司上海黄浦区黄陂南路证券营业部",
+            "buy_yi": 0.33,
+            "sell_yi": 0.03,
+            "net_yi": 0.3,
+            "kind": "dealer",
+            "side": "buy"
+          }
+        ],
+        "sell_seats": [
+          {
+            "name": "机构专用",
+            "buy_yi": 0.32,
+            "sell_yi": 0.37,
+            "net_yi": -0.05,
+            "kind": "org",
+            "side": "sell"
+          },
+          {
+            "name": "国信证券股份有限公司浙江互联网分公司",
+            "buy_yi": 0.25,
+            "sell_yi": 0.28,
+            "net_yi": -0.03,
+            "kind": "dealer",
+            "side": "sell"
+          },
+          {
+            "name": "东方财富证券股份有限公司长春人民大街证券营业部",
+            "buy_yi": 0.0,
+            "sell_yi": 0.29,
+            "net_yi": -0.29,
+            "kind": "dealer",
+            "side": "sell"
+          },
+          {
+            "name": "东方财富证券股份有限公司山南香曲东路证券营业部",
+            "buy_yi": 0.18,
+            "sell_yi": 0.27,
+            "net_yi": -0.09,
+            "kind": "dealer",
+            "side": "sell"
+          },
+          {
+            "name": "深股通专用",
+            "buy_yi": 1.5,
+            "sell_yi": 0.79,
+            "net_yi": 0.71,
+            "kind": "north",
+            "side": "sell"
+          }
+        ]
+      },
+      {
+        "code": "002430",
+        "name": "杭氧股份",
+        "reason": "日涨幅偏离值达到7%的前5只证券",
+        "net_buy_yi": 0.83,
+        "org_buy_yi": 0.0,
+        "org_sell_yi": 0.69,
+        "org_net_yi": 0.02,
+        "north_buy_yi": 0.87,
+        "north_sell_yi": 1.42,
+        "north_net_yi": -1.12,
+        "dealer_net_yi": 1.37,
+        "total_buy_yi": 2.65,
+        "total_sell_yi": 2.41,
+        "top_buyer": {
+          "name": "深股通专用",
+          "net_yi": -0.56,
+          "kind": "north"
+        },
+        "top_seller": {
+          "name": "深股通专用",
+          "net_yi": -0.56,
+          "kind": "north"
+        },
+        "buy_seats": [
+          {
+            "name": "深股通专用",
+            "buy_yi": 0.87,
+            "sell_yi": 1.42,
+            "net_yi": -0.56,
+            "kind": "north",
+            "side": "buy"
+          },
+          {
+            "name": "开源证券股份有限公司西安西大街证券营业部",
+            "buy_yi": 0.38,
+            "sell_yi": 0.0,
+            "net_yi": 0.38,
+            "kind": "dealer",
+            "side": "buy"
+          },
+          {
+            "name": "国泰海通证券股份有限公司常州健身路证券营业部",
+            "buy_yi": 0.43,
+            "sell_yi": 0.0,
+            "net_yi": 0.43,
+            "kind": "dealer",
+            "side": "buy"
+          },
+          {
+            "name": "国泰海通证券股份有限公司上海长宁区江苏路证券营业部",
+            "buy_yi": 0.59,
+            "sell_yi": 0.04,
+            "net_yi": 0.54,
+            "kind": "dealer",
+            "side": "buy"
+          },
+          {
+            "name": "平安证券股份有限公司浙江分公司",
+            "buy_yi": 0.38,
+            "sell_yi": 0.06,
+            "net_yi": 0.32,
+            "kind": "dealer",
+            "side": "buy"
+          }
+        ],
+        "sell_seats": [
+          {
+            "name": "光大证券股份有限公司绍兴胜利东路证券营业部",
+            "buy_yi": 0.0,
+            "sell_yi": 0.3,
+            "net_yi": -0.3,
+            "kind": "dealer",
+            "side": "sell"
+          },
+          {
+            "name": "深股通专用",
+            "buy_yi": 0.87,
+            "sell_yi": 1.42,
+            "net_yi": -0.56,
+            "kind": "north",
+            "side": "sell"
+          },
+          {
+            "name": "机构专用",
+            "buy_yi": 0.25,
+            "sell_yi": 0.22,
+            "net_yi": 0.03,
+            "kind": "org",
+            "side": "sell"
+          },
+          {
+            "name": "机构专用",
+            "buy_yi": 0.11,
+            "sell_yi": 0.23,
+            "net_yi": -0.12,
+            "kind": "org",
+            "side": "sell"
+          },
+          {
+            "name": "机构专用",
+            "buy_yi": 0.35,
+            "sell_yi": 0.24,
+            "net_yi": 0.11,
+            "kind": "org",
+            "side": "sell"
+          }
+        ]
+      },
+      {
+        "code": "000759",
+        "name": "中百集团",
+        "reason": "日换手率达到20%的前5只证券",
+        "net_buy_yi": 0.69,
+        "org_buy_yi": 0.99,
+        "org_sell_yi": 0.14,
+        "org_net_yi": 0.68,
+        "north_buy_yi": 0.82,
+        "north_sell_yi": 0.56,
+        "north_net_yi": 0.52,
+        "dealer_net_yi": -0.18,
+        "total_buy_yi": 1.81,
+        "total_sell_yi": 1.16,
+        "top_buyer": {
+          "name": "机构专用",
+          "net_yi": 0.27,
+          "kind": "org"
+        },
+        "top_seller": {
+          "name": "深股通专用",
+          "net_yi": 0.26,
+          "kind": "north"
+        },
+        "buy_seats": [
+          {
+            "name": "机构专用",
+            "buy_yi": 0.22,
+            "sell_yi": 0.06,
+            "net_yi": 0.16,
+            "kind": "org",
+            "side": "buy"
+          },
+          {
+            "name": "深股通专用",
+            "buy_yi": 0.82,
+            "sell_yi": 0.56,
+            "net_yi": 0.26,
+            "kind": "north",
+            "side": "buy"
+          },
+          {
+            "name": "机构专用",
+            "buy_yi": 0.37,
+            "sell_yi": 0.09,
+            "net_yi": 0.27,
+            "kind": "org",
+            "side": "buy"
+          },
+          {
+            "name": "机构专用",
+            "buy_yi": 0.18,
+            "sell_yi": 0.09,
+            "net_yi": 0.09,
+            "kind": "org",
+            "side": "buy"
+          },
+          {
+            "name": "机构专用",
+            "buy_yi": 0.22,
+            "sell_yi": 0.14,
+            "net_yi": 0.08,
+            "kind": "org",
+            "side": "buy"
+          }
+        ],
+        "sell_seats": [
+          {
+            "name": "深股通专用",
+            "buy_yi": 0.82,
+            "sell_yi": 0.56,
+            "net_yi": 0.26,
+            "kind": "north",
+            "side": "sell"
+          },
+          {
+            "name": "中信证券股份有限公司浙江分公司",
+            "buy_yi": 0.08,
+            "sell_yi": 0.23,
+            "net_yi": -0.15,
+            "kind": "dealer",
+            "side": "sell"
+          },
+          {
+            "name": "东方财富证券股份有限公司拉萨金融城南环路证券营业部",
+            "buy_yi": 0.07,
+            "sell_yi": 0.1,
+            "net_yi": -0.03,
+            "kind": "dealer",
+            "side": "sell"
+          },
+          {
+            "name": "机构专用",
+            "buy_yi": 0.22,
+            "sell_yi": 0.14,
+            "net_yi": 0.08,
+            "kind": "org",
+            "side": "sell"
+          },
+          {
+            "name": "国信证券股份有限公司浙江互联网分公司",
+            "buy_yi": 0.13,
+            "sell_yi": 0.13,
+            "net_yi": 0.0,
+            "kind": "dealer",
+            "side": "sell"
+          }
+        ]
+      },
+      {
+        "code": "601091",
+        "name": "沈鼓集团",
+        "reason": "有价格涨跌幅限制的日换手率达到20%的前五只证券",
+        "net_buy_yi": 0.66,
+        "org_buy_yi": 0.0,
+        "org_sell_yi": 0.0,
+        "org_net_yi": 0,
+        "north_buy_yi": 0.0,
+        "north_sell_yi": 0.0,
+        "north_net_yi": 0,
+        "dealer_net_yi": 0.67,
+        "total_buy_yi": 1.39,
+        "total_sell_yi": 0.72,
+        "top_buyer": {
+          "name": "东亚前海证券有限责任公司苏州分公司",
+          "net_yi": 0.41,
+          "kind": "dealer"
+        },
+        "top_seller": {
+          "name": "国泰海通证券股份有限公司长沙五一大道第二证券营业部",
+          "net_yi": -0.16,
+          "kind": "dealer"
+        },
+        "buy_seats": [
+          {
+            "name": "中原证券股份有限公司湖南分公司",
+            "buy_yi": 0.16,
+            "sell_yi": 0.0,
+            "net_yi": 0.16,
+            "kind": "dealer",
+            "side": "buy"
+          },
+          {
+            "name": "东方财富证券股份有限公司昌都两江大道证券营业部",
+            "buy_yi": 0.14,
+            "sell_yi": 0.0,
+            "net_yi": 0.14,
+            "kind": "dealer",
+            "side": "buy"
+          },
+          {
+            "name": "华泰证券股份有限公司总部",
+            "buy_yi": 0.27,
+            "sell_yi": 0.0,
+            "net_yi": 0.27,
+            "kind": "dealer",
+            "side": "buy"
+          },
+          {
+            "name": "东亚前海证券有限责任公司苏州分公司",
+            "buy_yi": 0.41,
+            "sell_yi": 0.0,
+            "net_yi": 0.41,
+            "kind": "dealer",
+            "side": "buy"
+          },
+          {
+            "name": "国泰海通证券股份有限公司广州琶洲证券营业部",
+            "buy_yi": 0.41,
+            "sell_yi": 0.0,
+            "net_yi": 0.41,
+            "kind": "dealer",
+            "side": "buy"
+          }
+        ],
+        "sell_seats": [
+          {
+            "name": "国泰海通证券股份有限公司长沙五一大道第二证券营业部",
+            "buy_yi": 0.0,
+            "sell_yi": 0.16,
+            "net_yi": -0.16,
+            "kind": "dealer",
+            "side": "sell"
+          },
+          {
+            "name": "摩根大通证券(中国)有限公司上海银城中路证券营业部",
+            "buy_yi": 0.0,
+            "sell_yi": 0.13,
+            "net_yi": -0.13,
+            "kind": "dealer",
+            "side": "sell"
+          },
+          {
+            "name": "国信证券股份有限公司浙江互联网分公司",
+            "buy_yi": 0.0,
+            "sell_yi": 0.14,
+            "net_yi": -0.14,
+            "kind": "dealer",
+            "side": "sell"
+          },
+          {
+            "name": "东方财富证券股份有限公司山南香曲东路证券营业部",
+            "buy_yi": 0.0,
+            "sell_yi": 0.13,
+            "net_yi": -0.13,
+            "kind": "dealer",
+            "side": "sell"
+          },
+          {
+            "name": "申万宏源证券有限公司上海闵行区莘松路证券营业部",
+            "buy_yi": 0.0,
+            "sell_yi": 0.16,
+            "net_yi": -0.16,
+            "kind": "dealer",
+            "side": "sell"
+          }
+        ]
+      },
+      {
+        "code": "002300",
+        "name": "太阳电缆",
+        "reason": "日振幅值达到15%的前5只证券",
+        "net_buy_yi": 0.6,
+        "org_buy_yi": 0.29,
+        "org_sell_yi": 0.0,
+        "org_net_yi": 0.28,
+        "north_buy_yi": 0.29,
+        "north_sell_yi": 0.12,
+        "north_net_yi": 0.34,
+        "dealer_net_yi": 0.16,
+        "total_buy_yi": 0.81,
+        "total_sell_yi": 0.31,
+        "top_buyer": {
+          "name": "机构专用",
+          "net_yi": 0.2,
+          "kind": "org"
+        },
+        "top_seller": {
+          "name": "深股通专用",
+          "net_yi": 0.17,
+          "kind": "north"
+        },
+        "buy_seats": [
+          {
+            "name": "机构专用",
+            "buy_yi": 0.09,
+            "sell_yi": 0.02,
+            "net_yi": 0.08,
+            "kind": "org",
+            "side": "buy"
+          },
+          {
+            "name": "中泰证券股份有限公司杭州滨和路证券营业部",
+            "buy_yi": 0.11,
+            "sell_yi": 0.0,
+            "net_yi": 0.11,
+            "kind": "dealer",
+            "side": "buy"
+          },
+          {
+            "name": "平安证券股份有限公司兰州分公司",
+            "buy_yi": 0.12,
+            "sell_yi": 0.01,
+            "net_yi": 0.12,
+            "kind": "dealer",
+            "side": "buy"
+          },
+          {
+            "name": "机构专用",
+            "buy_yi": 0.2,
+            "sell_yi": 0.0,
+            "net_yi": 0.2,
+            "kind": "org",
+            "side": "buy"
+          },
+          {
+            "name": "深股通专用",
+            "buy_yi": 0.29,
+            "sell_yi": 0.12,
+            "net_yi": 0.17,
+            "kind": "north",
+            "side": "buy"
+          }
+        ],
+        "sell_seats": [
+          {
+            "name": "深股通专用",
+            "buy_yi": 0.29,
+            "sell_yi": 0.12,
+            "net_yi": 0.17,
+            "kind": "north",
+            "side": "sell"
+          },
+          {
+            "name": "东方财富证券股份有限公司拉萨东环路第二证券营业部",
+            "buy_yi": 0.02,
+            "sell_yi": 0.05,
+            "net_yi": -0.02,
+            "kind": "dealer",
+            "side": "sell"
+          },
+          {
+            "name": "东方财富证券股份有限公司拉萨团结路第一证券营业部",
+            "buy_yi": 0.03,
+            "sell_yi": 0.04,
+            "net_yi": -0.01,
+            "kind": "dealer",
+            "side": "sell"
+          },
+          {
+            "name": "东方财富证券股份有限公司拉萨东环路第一证券营业部",
+            "buy_yi": 0.02,
+            "sell_yi": 0.05,
+            "net_yi": -0.02,
+            "kind": "dealer",
+            "side": "sell"
+          },
+          {
+            "name": "东方财富证券股份有限公司拉萨金融城南环路证券营业部",
+            "buy_yi": 0.04,
+            "sell_yi": 0.05,
+            "net_yi": -0.02,
+            "kind": "dealer",
+            "side": "sell"
+          }
+        ]
+      },
+      {
+        "code": "605366",
+        "name": "宏柏新材",
+        "reason": "有价格涨跌幅限制的日价格振幅达到15%的前五只证券",
+        "net_buy_yi": 0.53,
+        "org_buy_yi": 0.0,
+        "org_sell_yi": 0.0,
+        "org_net_yi": 0,
+        "north_buy_yi": 0.47,
+        "north_sell_yi": 0.27,
+        "north_net_yi": 0.2,
+        "dealer_net_yi": 0.33,
+        "total_buy_yi": 1.46,
+        "total_sell_yi": 0.93,
+        "top_buyer": {
+          "name": "沪股通专用",
+          "net_yi": 0.47,
+          "kind": "north"
+        },
+        "top_seller": {
+          "name": "沪股通专用",
+          "net_yi": -0.27,
+          "kind": "north"
+        },
+        "buy_seats": [
+          {
+            "name": "国新证券股份有限公司厦门民族路证券营业部",
+            "buy_yi": 0.15,
+            "sell_yi": 0.0,
+            "net_yi": 0.15,
+            "kind": "dealer",
+            "side": "buy"
+          },
+          {
+            "name": "沪股通专用",
+            "buy_yi": 0.47,
+            "sell_yi": 0.0,
+            "net_yi": 0.47,
+            "kind": "north",
+            "side": "buy"
+          },
+          {
+            "name": "国泰海通证券股份有限公司总部",
+            "buy_yi": 0.41,
+            "sell_yi": 0.0,
+            "net_yi": 0.41,
+            "kind": "dealer",
+            "side": "buy"
+          },
+          {
+            "name": "中信证券股份有限公司上海分公司",
+            "buy_yi": 0.16,
+            "sell_yi": 0.0,
+            "net_yi": 0.16,
+            "kind": "dealer",
+            "side": "buy"
+          },
+          {
+            "name": "高盛(中国)证券有限责任公司上海浦东新区世纪大道证券营业部",
+            "buy_yi": 0.27,
+            "sell_yi": 0.0,
+            "net_yi": 0.27,
+            "kind": "dealer",
+            "side": "buy"
+          }
+        ],
+        "sell_seats": [
+          {
+            "name": "沪股通专用",
+            "buy_yi": 0.0,
+            "sell_yi": 0.27,
+            "net_yi": -0.27,
+            "kind": "north",
+            "side": "sell"
+          },
+          {
+            "name": "摩根大通证券(中国)有限公司上海银城中路证券营业部",
+            "buy_yi": 0.0,
+            "sell_yi": 0.12,
+            "net_yi": -0.12,
+            "kind": "dealer",
+            "side": "sell"
+          },
+          {
+            "name": "国信证券股份有限公司浙江互联网分公司",
+            "buy_yi": 0.0,
+            "sell_yi": 0.1,
+            "net_yi": -0.1,
+            "kind": "dealer",
+            "side": "sell"
+          },
+          {
+            "name": "国盛证券股份有限公司南昌金融大街证券营业部",
+            "buy_yi": 0.0,
+            "sell_yi": 0.27,
+            "net_yi": -0.27,
+            "kind": "dealer",
+            "side": "sell"
+          },
+          {
+            "name": "中泰证券股份有限公司北京中关村大街证券营业部",
+            "buy_yi": 0.0,
+            "sell_yi": 0.17,
+            "net_yi": -0.17,
+            "kind": "dealer",
+            "side": "sell"
+          }
+        ]
+      }
+    ]
+  },
+  "macro": {
+    "date": "2026-10-13",
+    "asof": "2026-10-13T19:38:50+08:00",
+    "source": "新浪期货日K（主力连续，InnerFuturesNewService）",
+    "note": "口径：交易日 T 的日K = T 当日日盘 + T-1 夜盘（A股盘中全程可感，视为当日催化）；chg_pct = T 日收盘/前一交易日收盘-1（前一交易日自动跳过休市）；target 日无行时回退最近交易日并在 trade_date 标注。本快照仅含国内商品期货主连——美元指数、离岸人民币与外盘商品（COMEX/CBOT 等）无稳定历史公开源（东财 push2his 有 IP 级风控、新浪相关接口已下线），未纳入，报告引用本数据时禁止编造美元/外盘数值。",
+    "items": [
+      {
+        "name": "玉米主连",
+        "code": "C0",
+        "group": "农产品链",
+        "trade_date": "2026-10-13",
+        "close": 2195.0,
+        "prev_close": 2176.0,
+        "chg_pct": 0.87
+      },
+      {
+        "name": "生猪主连",
+        "code": "LH0",
+        "group": "农产品链",
+        "trade_date": "2026-10-13",
+        "close": 10605.0,
+        "prev_close": 10885.0,
+        "chg_pct": -2.57
+      },
+      {
+        "name": "豆粕主连",
+        "code": "M0",
+        "group": "农产品链",
+        "trade_date": "2026-10-13",
+        "close": 3361.0,
+        "prev_close": 3383.0,
+        "chg_pct": -0.65
+      },
+      {
+        "name": "尿素主连",
+        "code": "UR0",
+        "group": "农化/化肥",
+        "trade_date": "2026-10-13",
+        "close": 1698.0,
+        "prev_close": 1713.0,
+        "chg_pct": -0.88
+      },
+      {
+        "name": "沪铜主连",
+        "code": "CU0",
+        "group": "工业金属",
+        "trade_date": "2026-10-13",
+        "close": 110990.0,
+        "prev_close": 110630.0,
+        "chg_pct": 0.33
+      },
+      {
+        "name": "沪铝主连",
+        "code": "AL0",
+        "group": "工业金属",
+        "trade_date": "2026-10-13",
+        "close": 23320.0,
+        "prev_close": 23465.0,
+        "chg_pct": -0.62
+      },
+      {
+        "name": "沪锌主连",
+        "code": "ZN0",
+        "group": "工业金属",
+        "trade_date": "2026-10-13",
+        "close": 25730.0,
+        "prev_close": 26115.0,
+        "chg_pct": -1.47
+      },
+      {
+        "name": "沪金主连",
+        "code": "AU0",
+        "group": "贵金属",
+        "trade_date": "2026-10-13",
+        "close": 907.02,
+        "prev_close": 905.52,
+        "chg_pct": 0.17
+      }
+    ]
+  },
+  "industry_intel": {
+    "date": "2026-10-13",
+    "source": "events/2026-10-13.jsonl（P1 事件流：词典预筛 + 二次确认）",
+    "note": "产业事件聚合（现象层，不含判断）。node_signals.score=Σ(类型权重×置信度折扣，high=1.0/mid=0.7/low=0.0)仅用于排序；chain_level 为链级事件（node=unknown，政策等作用于整条链，不作单环节归因）；stock_watchlist 为个股观察池（按 code 去重）；industry_counts 为未归链行业计数（仅作报告『宏观催化』方向解释）；海外宏观/地缘已在预筛剔除，不会出现在事件流。",
+    "summary": {
+      "total": 5,
+      "by_granularity": {
+        "node": 2,
+        "stock": 1,
+        "industry": 2
+      },
+      "by_type": {
+        "policy": 3,
+        "rumor": 1,
+        "order_win": 1
+      },
+      "by_confirmer": {
+        "llm": 5
+      },
+      "confirmer_note": "by_confirmer=确认归属计数（human/rule/llm/unmarked）。确认归属=写报告的 LLM 时该键为 llm；报告 1.1 引用事件时应据此说明来源等级，unmarked 只出现在 v0.3 之前落盘的历史事件流里。"
+    },
+    "node_signals": [
+      {
+        "chain_id": "ai_compute",
+        "node": "storage",
+        "event_count": 1,
+        "score": 0.7,
+        "events": [
+          {
+            "event_id": "E-20261013-0005",
+            "type": "rumor",
+            "granularity": "node",
+            "confidence": "mid",
+            "text": "高盛：高带宽闪存有望破解AI“内存墙” 潜在市场规模最高1500亿美元",
+            "score": 0.7
+          }
+        ]
+      }
+    ],
+    "chain_level": [
+      {
+        "event_id": "E-20261013-0002",
+        "type": "policy",
+        "granularity": "node",
+        "confidence": "mid",
+        "text": "上海：提升数据中心项目能效准入门槛 新建算力设施能源利用效率不超过1.2",
+        "chain_id": "ai_compute",
+        "score": 1.4
+      }
+    ],
+    "stock_watchlist": [
+      {
+        "code": "300657",
+        "name": "弘信电子",
+        "chain_id": "ai_compute",
+        "node": "gpu_chip",
+        "types": [
+          "order_win"
+        ],
+        "max_confidence": "mid",
+        "event_ids": [
+          "E-20261013-0011"
+        ]
+      }
+    ],
+    "industry_counts": [
+      {
+        "industry": "电力设备",
+        "count": 1
+      },
+      {
+        "industry": "其他",
+        "count": 1
+      }
+    ],
+    "confirmation": {
+      "decided_by": "llm",
+      "packet": {
+        "candidates": 27,
+        "tbd": 27,
+        "vetoed": 0,
+        "ineligible": 0,
+        "tbd_chain_bound": 7,
+        "already_confirmed": 0
+      },
+      "decisions": {
+        "decisions": 27,
+        "confirm": 5,
+        "reject": 22,
+        "override": 0,
+        "confirm_chain_bound": 3,
+        "tbd": 27,
+        "unmentioned": 0
+      },
+      "audit": {
+        "confirm": 5,
+        "reject": 22,
+        "override": 0,
+        "untouched": 0
+      },
+      "note": "④.55 事件二次确认的漏斗计数（来源 outputs/<date>/confirm_result.json）。**audit 是最终生效口径**（`confirm`/`reject`/`override`/`untouched`），packet 是候选池分档、decisions 是裁定书逐条计数——三者**口径不同、不可相加**。报告 1.1 可用它说明收口情况，但不得由条数推断事件的重要性或真伪。"
+    }
+  },
+  "event_verification": {
+    "date": "2026-10-13",
+    "sources": {
+      "price": "新浪期货主连日K（data/futures.py）",
+      "order": "巨潮资讯公告全文检索（data/cninfo.py）"
+    },
+    "note": "验证器只做确定性比对，不含买卖判断。verdict 四态：confirmed=证据同步；not_confirmed=该路证据未跟上（**不等于事件为假**：未达披露标准的订单不公告、很多商品无期货）；ambiguous=涨跌与位置指向不一致（须照抄数字）；no_data=无验证源或未取到（**不得写成未获证实**）。strength=direct 表示事件说的就是这个商品；upstream/weak 只是该环节上游原料，仅印证成本端，禁止据此断言该环节产品涨价。",
+    "counts": {
+      "confirmed": 0,
+      "not_confirmed": 1,
+      "ambiguous": 0,
+      "no_data": 0
+    },
+    "price_checks": [],
+    "order_checks": [
+      {
+        "event_id": "E-20261013-0011",
+        "type": "order_win",
+        "granularity": "stock",
+        "text": "弘信电子: 弘信电子:关于全资子公司签署算力芯片采购合同的公告",
+        "code": "300657",
+        "name": "弘信电子",
+        "hits": [],
+        "verdict": "not_confirmed",
+        "matched_by": "code",
+        "basis": "公告账本可用但该股无订单类公告——**不等于事件为假**（未达披露标准的订单不公告）"
+      }
+    ],
+    "no_commodity_events": [],
+    "no_source_nodes": [
+      {
+        "chain_id": "ai_compute",
+        "node": "storage",
+        "reason": "DRAM/NAND 为寡头协议定价，无对应国内商品期货 → 存储涨价事件**无价格侧验证源**，必须如实标注『无数据』，禁止用铜/硅代偿。"
+      },
+      {
+        "chain_id": "ai_compute",
+        "node": "optical",
+        "reason": "光模块/光芯片为定制工业品，无商品期货 → 同标注『无数据』。"
+      }
+    ],
+    "order_window_days": 1,
+    "lookback": 20
+  },
+  "notes": [
+    "数据源：同花顺日线（指数/板块成交额）+ 东方财富涨停/跌停池 + 腾讯个股K线 + 新浪个股资金流；板块主力净流入：东财行业板块主力净流入命中 66/70 个板块；中军尾盘行为取自东财分钟线（近 3 个交易日内可得）；⚠️ 板块集合不完整/口径不一致：70 个板块成交合计 12776.5 亿 ÷ 两市成交 16759.1 亿 = 76.2%（可比较区间 [85%, 115%]）——不接受跨层级板块集合替换，本日板块成交占比与行业集中度标为不可用，禁止引用任何板块占比数字或跨日比较板块占比",
+    "北向资金日频净买入未披露（2024-08-19 起），仅披露成交总额与沪深股通前十大成交活跃股（成交额口径：沪股通 10 / 深股通 10 条）；涨停池口径为东财（67 家），跌停 8 家",
+    "昨日涨停溢价源=fuyao（up_prev+prices_historical 日K，47 只；原东财 zt_prev+腾讯日K 已降级为回退）",
+    "宏观快照源=新浪期货日K主力连续（8 品种，含前夜盘口径；美元/离岸/外盘未纳入）",
+    "产业事件流源=events/2026-10-13.jsonl（词典预筛+二次确认，5 条；确认归属 {'llm': 5}）"
+  ]
+}
